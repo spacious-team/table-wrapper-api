@@ -7,6 +7,7 @@
     <groupId>org.spacious-team</groupId>
     <artifactId>table-wrapper-api</artifactId>
     <version>2020.11</version>
+    <packaging>jar</packaging>
 
     <name>Table Wrapper API</name>
     <description>
@@ -21,5 +22,28 @@
             <url>https://www.gnu.org/licenses/agpl-3.0.html</url>
         </license>
     </licenses>
+
+    <properties>
+        <maven.compiler.target>15</maven.compiler.target>
+        <maven.compiler.source>15</maven.compiler.source>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>
