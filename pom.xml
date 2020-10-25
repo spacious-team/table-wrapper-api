@@ -23,6 +23,10 @@
         </license>
     </licenses>
 
+    <scm>
+        <url>https://github.com/spacious-team/table-wrapper-api</url>
+    </scm>
+
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
