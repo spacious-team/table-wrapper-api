@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.spacious-team</groupId>
+    <artifactId>table-wrapper-api</artifactId>
+    <version>2020.11</version>
+
+    <name>Table Wrapper API</name>
+    <description>
+        Helps to declare tables from various file formats and provides unified API
+        for search and access to rows, columns, and cell values.
+    </description>
+    <url>https://github.com/spacious-team/table-wrapper-api</url>
+
+    <licenses>
+        <license>
+            <name>GNU Affero GPLv3</name>
+            <url>https://www.gnu.org/licenses/agpl-3.0.html</url>
+        </license>
+    </licenses>
+
+</project>
