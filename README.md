@@ -7,10 +7,10 @@
 - [Зависимости](#зависимости)
 
 ### Назначение
-Предоставит удобный API для доступа к табличным данным из файлов в форматах excel, xml и др.
-Представим, что на листе excel имеется несколько таблиц.
+Предоставляет удобный API для доступа к табличным данным из файлов в форматах excel, xml и др.
+Пусть на листе excel имеется несколько таблиц.
 
-- Простая таблица с ценой товаров:
+- Таблица с ценой товаров:
 
 *Таблица товаров*
 
@@ -19,7 +19,7 @@
 Яблоко| 50                 | 90.5
 Груша | 120                | 180.0
 
-- Таблица с мультистрочным заголовком:
+- Таблица с заголовком из 2-х строк:
 
 *Таблица продаж*
 
@@ -41,7 +41,7 @@
 Для представленного выше примера объявляются описания столбцов:
 ```java
 enum ProductTableHeader implements TableColumnDescription {
-    PRODUCT(1),
+    PRODUCT(0),
     PRICE_TRADE("цена", "опт"),
     PRICE("цена", "розничная");
 
@@ -79,11 +79,11 @@ enum CellTableHeader implements TableColumnDescription {
     }  
 }
 ```
-Подготавливаем объекты, зависящие от формата файла. Например для excel файла
+В зависимости от формата исходных данных подготавливаются объекты. Например для excel файла потребуются
 ```java
 // table wrapper excel impl dependency required 
-Workbook book = new XSSFWorkbook(xlsFileinputStream);          // opening excel file
-ReportPage reportPage = new ExcelSheet(book.getSheetAt(0));    // selecting excel sheet
+Workbook book = new XSSFWorkbook(xlsFileinputStream);          // open excel file
+ReportPage reportPage = new ExcelSheet(book.getSheetAt(0));    // select first excel sheet
 TableFactory tableFactory = new ExcelTableFactory(reportPage);
 ```
 Используем API для доступа к данным таблиц
@@ -103,7 +103,7 @@ for (TableRow row : productTable) {
 API предоставляет и другие удобные интерфейсы для работы с таблицами.
 
 ### Зависимости
-Сначала необходимо подключить репозиторий библиотек [jitpack](https://jitpack.io/#spacious-team/table-wrapper-api),
+Необходимо подключить репозиторий open source библиотек github [jitpack](https://jitpack.io/#spacious-team/table-wrapper-api),
 например для Apache Maven проекта
 ```xml
 <repositories>
@@ -113,7 +113,7 @@ API предоставляет и другие удобные интерфейс
     </repository>
 </repositories>
 ```
-и подключить зависимость `table-wrapper-api`
+и добавить зависимость `table-wrapper-api`
 ```xml
 <dependency>
     <groupId>com.github.spacious-team</groupId>
@@ -126,7 +126,7 @@ API предоставляет и другие удобные интерфейс
 - паттерн `<branch>-SNAPSHOT` для сборки зависимости с последнего коммита выбранной ветки;
 - короткий 10-ти значный номер коммита для сборки зависимости с указанного коммита.
  
-Вам также подтребуется подключить зависимой одной из реализаций парсера, например для работы с excel файлами подключите
+Вам также потребуется реализация парсера, например для работы с excel файлами
 ```xml
 <dependency>
     <groupId>com.github.spacious-team</groupId>
