@@ -24,7 +24,7 @@
 
     <groupId>org.spacious-team</groupId>
     <artifactId>table-wrapper-api</artifactId>
-    <version>2020.11</version>
+    <version>2020.12</version>
     <packaging>jar</packaging>
 
     <name>Table Wrapper API</name>
