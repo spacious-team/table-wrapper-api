@@ -25,11 +25,17 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-
-import static java.util.Collections.emptyList;
 
 @Slf4j
 @ToString(of = {"tableName"})
@@ -87,17 +93,24 @@ public abstract class AbstractTable implements Table {
      * Extracts exactly one object from excel row
      */
     public <T> List<T> getData(Path file, BiFunction<? super Table, TableRow, T> rowExtractor) {
-        return getDataCollection(file, (table, row) ->
-                Optional.ofNullable(rowExtractor.apply(table, row))
-                        .map(Collections::singletonList)
-                        .orElse(emptyList()));
+        return getDataCollection(file, (row, data) -> {
+            T result = rowExtractor.apply(this, row);
+            if (result != null) {
+                data.add(result);
+            }
+        });
     }
 
     /**
      * Extracts objects from excel table without duplicate objects handling (duplicated row are both will be returned)
      */
     public <T> List<T> getDataCollection(Path file, BiFunction<? super Table, TableRow, Collection<T>> rowExtractor) {
-        return getDataCollection(file, rowExtractor, Object::equals, Arrays::asList);
+        return getDataCollection(file, (row, data) -> {
+            Collection<T> result = rowExtractor.apply(this, row);
+            if (result != null) {
+                data.addAll(result);
+            }
+        });
     }
 
     /**
@@ -106,18 +119,25 @@ public abstract class AbstractTable implements Table {
     public <T> List<T> getDataCollection(Path file, BiFunction<? super Table, TableRow, Collection<T>> rowExtractor,
                                          BiPredicate<T, T> equalityChecker,
                                          BiFunction<T, T, Collection<T>> mergeDuplicates) {
+        return getDataCollection(file, (row, data) -> {
+            Collection<T> result = rowExtractor.apply(this, row);
+            if (result != null) {
+                for (T r : result) {
+                    addWithEqualityChecker(r, data, equalityChecker, mergeDuplicates);
+                }
+            }
+        });
+    }
+
+    private <T> List<T> getDataCollection(Path file, BiConsumer<TableRow, Collection<T>> rowHandler) {
         List<T> data = new ArrayList<>();
         for (TableRow row : this) {
             if (row != null) {
                 try {
-                    Collection<T> result = rowExtractor.apply(this, row);
-                    if (result != null) {
-                        for (T r : result) {
-                            addWithEqualityChecker(r, data, equalityChecker, mergeDuplicates);
-                        }
-                    }
+                    rowHandler.accept(row, data);
                 } catch (Exception e) {
-                    log.warn("Не могу распарсить таблицу '{}' в файле {}, строка {}", tableName, file.getFileName(), row.getRowNum() + 1, e);
+                    log.warn("Не могу распарсить таблицу '{}' в файле {}, строка {}",
+                            tableName, file.getFileName(), row.getRowNum() + 1, e);
                 }
             }
         }
@@ -127,7 +147,7 @@ public abstract class AbstractTable implements Table {
     public static <T> void addWithEqualityChecker(T element,
                                                   Collection<T> collection,
                                                   BiPredicate<T, T> equalityChecker,
-                                                  BiFunction<T, T, Collection<T>> mergeDuplicates) {
+                                                  BiFunction<T, T, Collection<T>> duplicatesMerger) {
         T equalsObject = null;
         for (T e : collection) {
             if (equalityChecker.test(e, element)) {
@@ -137,7 +157,7 @@ public abstract class AbstractTable implements Table {
         }
         if (equalsObject != null) {
             collection.remove(equalsObject);
-            collection.addAll(mergeDuplicates.apply(equalsObject, element));
+            collection.addAll(duplicatesMerger.apply(equalsObject, element));
         } else {
             collection.add(element);
         }
