@@ -36,7 +36,7 @@ public class AnyOfTableColumn implements TableColumn {
     }
 
     @Override
-    public int getColumnIndex(int firstColumnForSearch, TableRow... headerRows) {
+    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         for (TableColumn c : columns) {
             try {
                 return c.getColumnIndex(firstColumnForSearch, headerRows);

@@ -29,7 +29,7 @@ public class RelativePositionTableColumn implements TableColumn {
     private final int relatedOffset;
 
     @Override
-    public int getColumnIndex(int firstColumnForSearch, TableRow... headerRows) {
+    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         return relatedTableColumn.getColumnIndex(firstColumnForSearch, headerRows) + relatedOffset;
     }
 }

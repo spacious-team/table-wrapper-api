@@ -23,7 +23,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,16 +35,21 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @ToString(of = {"tableName"})
 public abstract class AbstractTable implements Table {
 
+    private static final Path unknown = Path.of("unknown");
     protected final ReportPage reportPage;
     protected final String tableName;
     @Getter
     protected final TableCellRange tableRange;
-    protected final Map<TableColumn, Integer> columnIndices;
+    @Getter
+    private final Map<TableColumn, Integer> headerDescription;
     @Getter
     protected final boolean empty;
     /**
@@ -67,16 +71,16 @@ public abstract class AbstractTable implements Table {
         this.dataRowOffset = 1 + headersRowCount; // table_name + headersRowCount
         this.empty = tableRange.equals(TableCellRange.EMPTY_RANGE) ||
                 ((tableRange.getLastRow() - tableRange.getFirstRow()) <= headersRowCount);
-        this.columnIndices = empty ?
+        this.headerDescription = empty ?
                 Collections.emptyMap() :
-                getColumnIndices(reportPage, tableRange, headerDescription, headersRowCount);
+                getHeaderDescription(reportPage, tableRange, headerDescription, headersRowCount);
     }
 
-    private Map<TableColumn, Integer> getColumnIndices(ReportPage reportPage, TableCellRange tableRange,
-                                                       Class<? extends TableColumnDescription> headerDescription,
-                                                       int headersRowCount) {
+    private Map<TableColumn, Integer> getHeaderDescription(ReportPage reportPage, TableCellRange tableRange,
+                                                           Class<? extends TableColumnDescription> headerDescription,
+                                                           int headersRowCount) {
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
-        TableRow[] headerRows = new TableRow[headersRowCount];
+        ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
         for (int i = 0; i < headersRowCount; i++) {
             headerRows[i] = reportPage.getRow(tableRange.getFirstRow() + 1 + i);
         }
@@ -86,15 +90,24 @@ public abstract class AbstractTable implements Table {
         for (TableColumn column : columns) {
             columnIndices.put(column, column.getColumnIndex(headerRows));
         }
-        return columnIndices;
+        return Collections.unmodifiableMap(columnIndices);
     }
 
     /**
      * Extracts exactly one object from excel row
      */
-    public <T> List<T> getData(Path file, BiFunction<? super Table, TableRow, T> rowExtractor) {
+    public <T> List<T> getData(Function<TableRow, T> rowExtractor) {
+        return getDataCollection(unknown, (row, data) -> {
+            T result = rowExtractor.apply(row);
+            if (result != null) {
+                data.add(result);
+            }
+        });
+    }
+
+    public <T> List<T> getData(Path file, Function<TableRow, T> rowExtractor) {
         return getDataCollection(file, (row, data) -> {
-            T result = rowExtractor.apply(this, row);
+            T result = rowExtractor.apply(row);
             if (result != null) {
                 data.add(result);
             }
@@ -104,9 +117,18 @@ public abstract class AbstractTable implements Table {
     /**
      * Extracts objects from excel table without duplicate objects handling (duplicated row are both will be returned)
      */
-    public <T> List<T> getDataCollection(Path file, BiFunction<? super Table, TableRow, Collection<T>> rowExtractor) {
+    public <T> List<T> getDataCollection(Function<TableRow, Collection<T>> rowExtractor) {
+        return getDataCollection(unknown, (row, data) -> {
+            Collection<T> result = rowExtractor.apply(row);
+            if (result != null) {
+                data.addAll(result);
+            }
+        });
+    }
+
+    public <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor) {
         return getDataCollection(file, (row, data) -> {
-            Collection<T> result = rowExtractor.apply(this, row);
+            Collection<T> result = rowExtractor.apply(row);
             if (result != null) {
                 data.addAll(result);
             }
@@ -116,11 +138,11 @@ public abstract class AbstractTable implements Table {
     /**
      * Extracts objects from excel table with duplicate objects handling logic
      */
-    public <T> List<T> getDataCollection(Path file, BiFunction<? super Table, TableRow, Collection<T>> rowExtractor,
+    public <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor,
                                          BiPredicate<T, T> equalityChecker,
                                          BiFunction<T, T, Collection<T>> mergeDuplicates) {
         return getDataCollection(file, (row, data) -> {
-            Collection<T> result = rowExtractor.apply(this, row);
+            Collection<T> result = rowExtractor.apply(row);
             if (result != null) {
                 for (T r : result) {
                     addWithEqualityChecker(r, data, equalityChecker, mergeDuplicates);
@@ -163,36 +185,9 @@ public abstract class AbstractTable implements Table {
         }
     }
 
-    public int getIntCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, int defaultValue) {
-        try {
-            return getIntCellValue(row, columnDescription);
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public long getLongCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, long defaultValue) {
-        try {
-            return getLongCellValue(row, columnDescription);
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public BigDecimal getCurrencyCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, BigDecimal defaultValue) {
-        try {
-            return getCurrencyCellValue(row, columnDescription);
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public String getStringCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, String defaultValue) {
-        try {
-            return getStringCellValue(row, columnDescription);
-        } catch (Exception e) {
-            return defaultValue;
-        }
+    @Override
+    public Stream<TableRow> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 
     @Override
@@ -213,11 +208,11 @@ public abstract class AbstractTable implements Table {
 
         @Override
         public TableRow next() {
-            TableRow row;
+            ReportPageRow row;
             do {
                 row = reportPage.getRow(tableRange.getFirstRow() + dataRowOffset + (cnt++));
             } while (row == null && hasNext());
-            return row;
+            return new TableRow(AbstractTable.this, row);
         }
     }
 
@@ -227,6 +222,6 @@ public abstract class AbstractTable implements Table {
         if (address.equals(TableCellAddress.NOT_FOUND)) {
             return null;
         }
-        return reportPage.getRow(address.getRow());
+        return new TableRow(this, reportPage.getRow(address.getRow()));
     }
 }

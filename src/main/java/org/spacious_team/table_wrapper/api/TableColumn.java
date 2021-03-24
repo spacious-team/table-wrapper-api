@@ -29,7 +29,7 @@ public interface TableColumn {
      * @param headerRows header rows
      * @return column index of table
      */
-    default int getColumnIndex(TableRow... headerRows) {
+    default int getColumnIndex(ReportPageRow... headerRows) {
         return getColumnIndex(0, headerRows);
     }
 
@@ -38,5 +38,5 @@ public interface TableColumn {
      * @param headerRows header rows
      * @return column index of table
      */
-    int getColumnIndex(int firstColumnForSearch, TableRow... headerRows);
+    int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows);
 }

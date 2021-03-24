@@ -22,25 +22,39 @@ public interface TableFactory {
 
     boolean canHandle(ReportPage reportPage);
 
-    default Table create(ReportPage reportPage, String tableName, String tableFooterString,
+    default Table create(ReportPage reportPage,
+                         String tableName,
+                         String tableFooterString,
                          Class<? extends TableColumnDescription> headerDescription) {
         return create(reportPage, tableName, tableFooterString, headerDescription, 1);
     }
 
-    default Table create(ReportPage reportPage, String tableName,
+    default Table create(ReportPage reportPage,
+                         String tableName,
                          Class<? extends TableColumnDescription> headerDescription) {
         return create(reportPage, tableName, headerDescription, 1);
     }
 
-    Table create(ReportPage reportPage, String tableName, String tableFooterString,
+    Table create(ReportPage reportPage,
+                 String tableName,
+                 String tableFooterString,
                  Class<? extends TableColumnDescription> headerDescription,
                  int headersRowCount);
 
-    Table create(ReportPage reportPage, String tableName,
+    Table create(ReportPage reportPage,
+                 String tableName,
                  Class<? extends TableColumnDescription> headerDescription,
                  int headersRowCount);
 
-    Table createOfNoName(ReportPage reportPage, String madeUpTableName, String firstLineText,
+    default Table createOfNoName(ReportPage reportPage,
+                                 String firstLineText,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return createOfNoName(reportPage, "undefined", firstLineText, headerDescription, 1);
+    }
+
+    Table createOfNoName(ReportPage reportPage,
+                         String providedTableName,
+                         String firstLineText,
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount);
 

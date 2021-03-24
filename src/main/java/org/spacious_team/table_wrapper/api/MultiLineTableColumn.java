@@ -54,14 +54,14 @@ public class MultiLineTableColumn implements TableColumn {
      * @param headerRows header rows count should be equal to count of row descriptors
      */
     @Override
-    public int getColumnIndex(int firstColumnForSearch, TableRow... headerRows) {
+    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         if (headerRows.length != rowDescriptors.length) {
             throw new RuntimeException("Внутренняя ошибка, в таблице ожидается " + rowDescriptors.length +
                     " строк в заголовке");
         }
         int columnIndex = firstColumnForSearch;
         int i = 0;
-        for (TableRow row : headerRows) {
+        for (ReportPageRow row : headerRows) {
             TableColumn rowDescriptor = rowDescriptors[i++];
             columnIndex = rowDescriptor.getColumnIndex(columnIndex, row);
         }

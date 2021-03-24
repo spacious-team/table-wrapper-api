@@ -90,14 +90,14 @@ TableFactory tableFactory = new ExcelTableFactory(reportPage);
 ```java
 // finding row with "таблица товаров" content, parsing next row as header and
 // counting next rows as table till empty line
-Table productTable = tableFactory.create(reportTable, "таблица товаров", null, ProductTableHeader.class);
+Table productTable = tableFactory.create(reportPage, "таблица товаров", null, ProductTableHeader.class);
 // finding row with "таблица продаж" content, parsing next 2 rows as header and
 // counting next rows as table till row containing "итого" in any cell
-Table cellTable = tableFactory.create(reportTable, "таблица продаж", "итого",  CellTableHeader.class, 2);
+Table cellTable = tableFactory.create(reportPage, "таблица продаж", "итого",  CellTableHeader.class, 2);
 
 for (TableRow row : productTable) {
-    String product = table.getStringCellValueOrDefault(row, PRICE_TRADE, "Неизвестный товар");
-    BigDecimal price = table.getCurrencyCellValue(row, PRICE_TRADE);
+    String product = row.getStringCellValueOrDefault(PRICE_TRADE, "Неизвестный товар");
+    BigDecimal price = row.getCurrencyCellValue(PRICE_TRADE);
 }
 ```
 API предоставляет и другие удобные интерфейсы для работы с таблицами.

@@ -18,42 +18,195 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Iterator;
-import java.util.function.Function;
 
 @RequiredArgsConstructor
-public abstract class TableRow implements Iterable<TableCell> {
+public class TableRow extends ReportPageRow {
+
+    @Getter
+    private final Table table;
+    private final ReportPageRow row;
+
+    public TableCell getCell(TableColumnDescription column) {
+        int i = table.getHeaderDescription()
+                .get(column.getColumn());
+        return getCell(i);
+    }
+
+    @Override
+    public TableCell getCell(int i) {
+        return row.getCell(i);
+    }
+
+    @Override
+    public int getRowNum() {
+        return row.getRowNum();
+    }
+
+    @Override
+    public int getFirstCellNum() {
+        return row.getFirstCellNum();
+    }
+
+    @Override
+    public int getLastCellNum() {
+        return row.getLastCellNum();
+    }
+
+    @Override
+    public boolean rowContains(Object value) {
+        return row.rowContains(value);
+    }
+
+    @Override
+    public Iterator<TableCell> iterator() {
+        return row.iterator();
+    }
+
+    public Object getCellValue(TableColumnDescription column) {
+        return getCell(column).getValue();
+    }
 
     /**
-     * @return cell ot null if cell does not exists
+     * @throws RuntimeException if can't extract int value
      */
-    public abstract TableCell getCell(int i);
+    public int getIntCellValue(TableColumnDescription column) {
+        return getCell(column).getIntValue();
+    }
 
-    public abstract int getRowNum();
+    /**
+     * @throws RuntimeException if can't extract long value
+     */
+    public long getLongCellValue(TableColumnDescription column) {
+        return getCell(column).getLongValue();
+    }
 
-    public abstract int getFirstCellNum();
+    /**
+     * @throws RuntimeException if can't extract Double value
+     */
+    public Double getDoubleCellValue(TableColumnDescription column) {
+        return getCell(column).getDoubleValue();
+    }
 
-    public abstract int getLastCellNum();
+    /**
+     * @throws RuntimeException if can't extract BigDecimal value
+     */
+    public BigDecimal getBigDecimalCellValue(TableColumnDescription column) {
+        return getCell(column).getBigDecimalValue();
+    }
 
-    public abstract boolean rowContains(Object value);
+    /**
+     * @throws RuntimeException if can't extract string value
+     */
+    public String getStringCellValue(TableColumnDescription column) {
+        return getCell(column).getStringValue();
+    }
 
-    @RequiredArgsConstructor
-    protected static class TableRowIterator<T> implements Iterator<TableCell> {
+    /**
+     * @throws RuntimeException if can't extract instant value
+     */
+    public Instant getInstantCellValue(TableColumnDescription column) {
+        return getCell(column).getInstantValue();
+    }
 
-        private final Iterator<T> innerIterator;
-        private final Function<T, TableCell> converter;
+    /**
+     * @throws RuntimeException if can't extract local date time value
+     */
+    public LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column) {
+        return getCell(column).getLocalDateTimeValue();
+    }
 
-
-        @Override
-        public boolean hasNext() {
-            return innerIterator.hasNext();
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    public Object getCellValueOrDefault(TableColumnDescription column, Object defaultValue) {
+        try {
+            return getCell(column).getValueOrDefault(defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
         }
+    }
 
-        @Override
-        public TableCell next() {
-            return converter.apply(innerIterator.next());
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    public int getIntCellValueOrDefault(TableColumnDescription column, int defaultValue) {
+        try {
+            return getCell(column).getIntValueOrDefault(defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    public long getLongCellValueOrDefault(TableColumnDescription column, long defaultValue) {
+        try {
+            return getCell(column).getLongValueOrDefault(defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    public double getDoubleCellValue(TableColumnDescription column, double defaultValue) {
+        try {
+            return getCell(column).getDoubleValue(defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    public BigDecimal getBigDecimalCellValueOrDefault(TableColumnDescription column, BigDecimal defaultValue) {
+        try {
+            return getCell(column).getBigDecimalValueOrDefault(defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    public String getStringCellValueOrDefault(TableColumnDescription column, String defaultValue) {
+        try {
+            return getCell(column).getStringValueOrDefault(defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    public Instant getInstantCellValueOrDefault(TableColumnDescription column, Instant defaultValue) {
+        try {
+            return getCell(column).getInstantValueOrDefault(defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    public LocalDateTime getLocalDateTimeCellValueOrDefault(TableColumnDescription column, LocalDateTime defaultValue) {
+        try {
+            return getCell(column).getLocalDateTimeValueOrDefault(defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
         }
     }
 }
