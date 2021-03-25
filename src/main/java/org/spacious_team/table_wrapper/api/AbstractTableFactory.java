@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <an-vitek@ya.ru>
+ * Copyright (C) 2021  Vitalii Ananev <an-vitek@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,26 +18,27 @@
 
 package org.spacious_team.table_wrapper.api;
 
-public interface TableColumn {
-    int NOCOLUMN_INDEX = -1;
-    TableColumn NOCOLUMN = (i, j) -> NOCOLUMN_INDEX;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-    default TableColumn ofOptional(TableColumn column) {
-        return AnyOfTableColumn.of(column, TableColumn.NOCOLUMN);
+/**
+ * {@link TableFactory} factory with specified {@link ReportPage}
+ */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class AbstractTableFactory<T extends ReportPage> implements TableFactory {
+
+    private final Class<T> reportPageType;
+
+    @Override
+    public boolean canHandle(ReportPage reportPage) {
+        return reportPageType.isAssignableFrom(reportPage.getClass());
     }
 
     /**
-     * @param headerRows header rows
-     * @return column index of table
+     * Safe cast operation if {@link #canHandle(ReportPage)} is true
      */
-    default int getColumnIndex(ReportPageRow... headerRows) {
-        return getColumnIndex(0, headerRows);
+    @SuppressWarnings("unchecked")
+    protected T cast(ReportPage reportPage) {
+        return (T) reportPage;
     }
-
-    /**
-     * @param firstColumnForSearch start result column search from this index
-     * @param headerRows header rows
-     * @return column index of table
-     */
-    int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows);
 }

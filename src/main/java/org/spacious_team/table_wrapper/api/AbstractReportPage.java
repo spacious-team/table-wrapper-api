@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <an-vitek@ya.ru>
+ * Copyright (C) 2021  Vitalii Ananev <an-vitek@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,26 +18,12 @@
 
 package org.spacious_team.table_wrapper.api;
 
-public interface TableColumn {
-    int NOCOLUMN_INDEX = -1;
-    TableColumn NOCOLUMN = (i, j) -> NOCOLUMN_INDEX;
+/**
+ * {@link ReportPage} with specified {@link ReportPageRow}
+ */
+public abstract class AbstractReportPage<T extends ReportPageRow> implements ReportPage {
 
-    default TableColumn ofOptional(TableColumn column) {
-        return AnyOfTableColumn.of(column, TableColumn.NOCOLUMN);
-    }
+    @Override
+    public abstract T getRow(int i);
 
-    /**
-     * @param headerRows header rows
-     * @return column index of table
-     */
-    default int getColumnIndex(ReportPageRow... headerRows) {
-        return getColumnIndex(0, headerRows);
-    }
-
-    /**
-     * @param firstColumnForSearch start result column search from this index
-     * @param headerRows header rows
-     * @return column index of table
-     */
-    int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows);
 }

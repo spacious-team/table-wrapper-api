@@ -84,21 +84,24 @@ enum CellTableHeader implements TableColumnDescription {
 // table wrapper excel impl dependency required 
 Workbook book = new XSSFWorkbook(xlsFileinputStream);          // open excel file
 ReportPage reportPage = new ExcelSheet(book.getSheetAt(0));    // select first excel sheet
-TableFactory tableFactory = new ExcelTableFactory(reportPage);
 ```
 Используем API для доступа к данным таблиц
 ```java
 // finding row with "таблица товаров" content, parsing next row as header and
 // counting next rows as table till empty line
-Table productTable = tableFactory.create(reportPage, "таблица товаров", null, ProductTableHeader.class);
+Table productTable = reportPage.create("таблица товаров", null, ProductTableHeader.class);
 // finding row with "таблица продаж" content, parsing next 2 rows as header and
 // counting next rows as table till row containing "итого" in any cell
-Table cellTable = tableFactory.create(reportPage, "таблица продаж", "итого",  CellTableHeader.class, 2);
+Table cellTable = reportPage.create("таблица продаж", "итого",  CellTableHeader.class, 2);
 
 for (TableRow row : productTable) {
     String product = row.getStringCellValueOrDefault(PRICE_TRADE, "Неизвестный товар");
-    BigDecimal price = row.getCurrencyCellValue(PRICE_TRADE);
+    BigDecimal price = row.getBigDecimalCellValue(PRICE_TRADE);
 }
+
+Set<String> countries = cellTable.stream()
+    .map(row -> row.getStringCelValueOrDefault(BUYER_COUNTRY, "unknown"))
+    .collect(toSet())
 ```
 API предоставляет и другие удобные интерфейсы для работы с таблицами.
 

@@ -41,10 +41,10 @@ import java.util.stream.StreamSupport;
 
 @Slf4j
 @ToString(of = {"tableName"})
-public abstract class AbstractTable implements Table {
+public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
     private static final Path unknown = Path.of("unknown");
-    protected final ReportPage reportPage;
+    protected final AbstractReportPage<R> reportPage;
     protected final String tableName;
     @Getter
     protected final TableCellRange tableRange;
@@ -63,7 +63,7 @@ public abstract class AbstractTable implements Table {
     private boolean isLastTableRowContainsTotalData = false;
 
 
-    protected AbstractTable(ReportPage reportPage, String tableName, TableCellRange tableRange,
+    protected AbstractTable(AbstractReportPage<R> reportPage, String tableName, TableCellRange tableRange,
                             Class<? extends TableColumnDescription> headerDescription, int headersRowCount) {
         this.reportPage = reportPage;
         this.tableName = tableName;
@@ -76,7 +76,7 @@ public abstract class AbstractTable implements Table {
                 getHeaderDescription(reportPage, tableRange, headerDescription, headersRowCount);
     }
 
-    private Map<TableColumn, Integer> getHeaderDescription(ReportPage reportPage, TableCellRange tableRange,
+    private Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<R> reportPage, TableCellRange tableRange,
                                                            Class<? extends TableColumnDescription> headerDescription,
                                                            int headersRowCount) {
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
@@ -185,17 +185,29 @@ public abstract class AbstractTable implements Table {
         }
     }
 
+    /**
+     * {@link TableRow} impl is mutable.
+     * For performance issue same object with changed state is provided in each loop cycle.
+     * Call {@link TableRow#clone()} if you want use row object outside stream() block.
+     */
     @Override
     public Stream<TableRow> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
 
+    /**
+     * {@link TableRow} impl is mutable.
+     * For performance issue same object with changed state is provided in each loop cycle.
+     * Call {@link TableRow#clone()} if you want use row object outside iterator() block.
+     */
     @Override
     public Iterator<TableRow> iterator() {
         return new TableIterator();
     }
 
     protected class TableIterator implements Iterator<TableRow> {
+        private final MutableTableRow<R> tableRow =
+                new MutableTableRow<>(AbstractTable.this, getCellDataAccessObject());
         private final int dataRowsCount = tableRange.getLastRow() - tableRange.getFirstRow()
                 - dataRowOffset
                 + (isLastTableRowContainsTotalData ? 0 : 1);
@@ -208,11 +220,12 @@ public abstract class AbstractTable implements Table {
 
         @Override
         public TableRow next() {
-            ReportPageRow row;
+            R row;
             do {
                 row = reportPage.getRow(tableRange.getFirstRow() + dataRowOffset + (cnt++));
             } while (row == null && hasNext());
-            return new TableRow(AbstractTable.this, row);
+            tableRow.setRow(row);
+            return tableRow;
         }
     }
 
@@ -222,6 +235,10 @@ public abstract class AbstractTable implements Table {
         if (address.equals(TableCellAddress.NOT_FOUND)) {
             return null;
         }
-        return new TableRow(this, reportPage.getRow(address.getRow()));
+        MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
+        tableRow.setRow(reportPage.getRow(address.getRow()));
+        return tableRow;
     }
+
+    protected abstract CellDataAccessObject<?, R> getCellDataAccessObject();
 }

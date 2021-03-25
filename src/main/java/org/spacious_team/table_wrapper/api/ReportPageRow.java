@@ -23,37 +23,18 @@ import lombok.RequiredArgsConstructor;
 import java.util.Iterator;
 import java.util.function.Function;
 
-@RequiredArgsConstructor
-public abstract class ReportPageRow implements Iterable<TableCell> {
+public interface ReportPageRow extends Iterable<TableCell> {
 
     /**
      * @return cell ot null if cell does not exists
      */
-    public abstract TableCell getCell(int i);
+    TableCell getCell(int i);
 
-    public abstract int getRowNum();
+    int getRowNum();
 
-    public abstract int getFirstCellNum();
+    int getFirstCellNum();
 
-    public abstract int getLastCellNum();
+    int getLastCellNum();
 
-    public abstract boolean rowContains(Object value);
-
-    @RequiredArgsConstructor
-    protected static class ReportPageRowIterator<T> implements java.util.Iterator<TableCell> {
-
-        private final java.util.Iterator<T> innerIterator;
-        private final Function<T, TableCell> converter;
-
-
-        @Override
-        public boolean hasNext() {
-            return innerIterator.hasNext();
-        }
-
-        @Override
-        public TableCell next() {
-            return converter.apply(innerIterator.next());
-        }
-    }
+    boolean rowContains(Object value);
 }

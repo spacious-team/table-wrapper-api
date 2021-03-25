@@ -18,26 +18,28 @@
 
 package org.spacious_team.table_wrapper.api;
 
-public interface TableColumn {
-    int NOCOLUMN_INDEX = -1;
-    TableColumn NOCOLUMN = (i, j) -> NOCOLUMN_INDEX;
+import lombok.RequiredArgsConstructor;
 
-    default TableColumn ofOptional(TableColumn column) {
-        return AnyOfTableColumn.of(column, TableColumn.NOCOLUMN);
+import java.util.Iterator;
+import java.util.function.Function;
+
+public abstract class AbstractReportPageRow implements ReportPageRow {
+
+    @RequiredArgsConstructor
+    protected static class ReportPageRowIterator<T> implements Iterator<TableCell> {
+
+        private final Iterator<T> innerIterator;
+        private final Function<T, TableCell> converter;
+
+
+        @Override
+        public boolean hasNext() {
+            return innerIterator.hasNext();
+        }
+
+        @Override
+        public TableCell next() {
+            return converter.apply(innerIterator.next());
+        }
     }
-
-    /**
-     * @param headerRows header rows
-     * @return column index of table
-     */
-    default int getColumnIndex(ReportPageRow... headerRows) {
-        return getColumnIndex(0, headerRows);
-    }
-
-    /**
-     * @param firstColumnForSearch start result column search from this index
-     * @param headerRows header rows
-     * @return column index of table
-     */
-    int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows);
 }
