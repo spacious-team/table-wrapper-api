@@ -57,7 +57,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
      */
     private final int dataRowOffset;
     /**
-     * Set to true if last table row contains total information. Default is false.
+     * Set to true if last table row contains total information. So this row don't returned by iterator. Default is false.
      */
     @Setter
     private boolean isLastTableRowContainsTotalData = false;

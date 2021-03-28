@@ -119,7 +119,8 @@ public interface ReportPage {
     }
 
     /**
-     * Get table range, table ends with empty line
+     * Get table range, table ends with empty line.
+     * This implementation generates a huge amount of garbage. May be override for improve performance.
      */
     default TableCellRange getTableCellRange(String tableName, int headersRowCount) {
         TableCellAddress startAddress = find(tableName);
@@ -144,7 +145,9 @@ public interface ReportPage {
             }
             break; // all row cells blank
         }
-        lastRowNum--; // exclude last row from table
+        if (lastRowNum < getLastRowNum()) {
+            lastRowNum--; // exclude last row from table
+        }
         if (lastRowNum < startAddress.getRow()) lastRowNum = startAddress.getRow();
         return new TableCellRange(
                 startAddress.getRow(),
