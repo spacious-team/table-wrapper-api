@@ -54,4 +54,22 @@ public interface Table extends Iterable<TableRow> {
     TableRow findRow(Object value);
 
     Map<TableColumn, Integer> getHeaderDescription();
+
+    /**
+     * By default table iterates throw all rows, call method if last row is "total" row and it should be excluded
+     */
+    default Table excludeTotalRow() {
+        return subTable(0, -1);
+    }
+
+    /**
+     * Returns table with same columns but without some top and bottom data rows. For example use
+     * <pre>
+     *     subTable(0, -1)
+     * </pre>
+     * for exclude last "Total" row from iterator or stream.
+     * @param topRows positive value for inclusion, negative for exclusion
+     * @param bottomRows positive value for inclusion, negative for exclusion
+     */
+    Table subTable(int topRows, int bottomRows);
 }

@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * {@link TableFactory} factory with specified {@link ReportPage}
+ * @param <T> the factory supported {@link ReportPage} type and subtypes
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractTableFactory<T extends ReportPage> implements TableFactory {

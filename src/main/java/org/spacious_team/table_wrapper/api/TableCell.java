@@ -24,6 +24,9 @@ import java.time.LocalDateTime;
 
 public interface TableCell {
 
+    /**
+     * Zero-based column index
+     */
     int getColumnIndex();
 
     Object getValue();

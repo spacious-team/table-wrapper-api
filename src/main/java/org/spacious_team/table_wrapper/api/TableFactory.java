@@ -22,48 +22,95 @@ public interface TableFactory {
 
     boolean canHandle(ReportPage reportPage);
 
+    /**
+     * Creates table which starts with name followed by header and ends with row containing cell with text starting with
+     * given string.
+     * @param tableName table name's row contains cell which starts with given text
+     * @param lastRowString table last row contains cell which starts with given text
+     */
     default Table create(ReportPage reportPage,
                          String tableName,
-                         String tableFooterString,
+                         String lastRowString,
                          Class<? extends TableColumnDescription> headerDescription) {
-        return create(reportPage, tableName, tableFooterString, headerDescription, 1);
+        return create(reportPage, tableName, lastRowString, headerDescription, 1);
     }
 
+    /**
+     * Creates table which starts with name followed by header and ends with empty row or last row of report page.
+     * @param tableName table name's row contains cell which starts with given text
+     */
     default Table create(ReportPage reportPage,
                          String tableName,
                          Class<? extends TableColumnDescription> headerDescription) {
         return create(reportPage, tableName, headerDescription, 1);
     }
 
+    /**
+     * Creates table which starts with name followed by header and ends with row containing cell with text starting with
+     * given string.
+     * @param tableName table name's row contains cell which starts with given text
+     * @param lastRowString table last row contains cell which starts with given text
+     */
     Table create(ReportPage reportPage,
                  String tableName,
-                 String tableFooterString,
+                 String lastRowString,
                  Class<? extends TableColumnDescription> headerDescription,
                  int headersRowCount);
 
+    /**
+     * Creates table which starts with name followed by header and ends with empty row or last row of report page.
+     * @param tableName table name's row contains cell which starts with given text
+     */
     Table create(ReportPage reportPage,
                  String tableName,
                  Class<? extends TableColumnDescription> headerDescription,
                  int headersRowCount);
 
-    default Table createOfNoName(ReportPage reportPage,
-                                 String firstLineText,
+    /**
+     * Creates table without name which starts with header and ends with row containing cell with text starting with
+     * given string.
+     * @param firstRowString table first row contains cell which starts with given text
+     * @param lastRowString table last row contains cell which starts with given text
+     */
+    default Table createNameless(ReportPage reportPage,
+                                 String firstRowString,
+                                 String lastRowString,
                                  Class<? extends TableColumnDescription> headerDescription) {
-        return createOfNoName(reportPage, "undefined", firstLineText, headerDescription, 1);
+        return createNameless(reportPage, "undefined", firstRowString, lastRowString, headerDescription, 1);
     }
 
-    Table createOfNoName(ReportPage reportPage,
+    /**
+     * Creates table without name which starts with header and ends with row containing cell with text starting with
+     * given string.
+     * @param providedTableName predefined (not existing in reportPage) table name
+     * @param firstRowString table first row contains cell which starts with given text
+     * @param lastRowString table last row contains cell which starts with given text
+     */
+    Table createNameless(ReportPage reportPage,
                          String providedTableName,
-                         String firstLineText,
+                         String firstRowString,
+                         String lastRowString,
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount);
 
-    default TableCellRange getNoNameTableRange(ReportPage reportPage, String firstLineText, int headersRowCount) {
-        TableCellRange range = reportPage.getTableCellRange(firstLineText, headersRowCount);
-        if (!range.equals(TableCellRange.EMPTY_RANGE)) {
-            range = new TableCellRange(range.getFirstRow() - 1, range.getLastRow(),
-                    range.getFirstColumn(), range.getLastColumn());
-        }
-        return range;
+    /**
+     * Creates table without name which starts with header and ends with empty row or last row of report page.
+     * @param firstRowString table first row contains cell which starts with given text
+     */
+    default Table createNameless(ReportPage reportPage,
+                                 String firstRowString,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return createNameless(reportPage, "undefined", firstRowString, headerDescription, 1);
     }
+
+    /**
+     * Creates table without name which starts with header and ends with empty row or last row of report page.
+     * @param providedTableName predefined (not existing in reportPage) table name
+     * @param firstRowString table first row contains cell which starts with given text
+     */
+    Table createNameless(ReportPage reportPage,
+                         String providedTableName,
+                         String firstRowString,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount);
 }

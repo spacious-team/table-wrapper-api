@@ -26,14 +26,24 @@ import java.util.function.Function;
 public interface ReportPageRow extends Iterable<TableCell> {
 
     /**
+     * @param i zero-based cell number
      * @return cell ot null if cell does not exists
      */
     TableCell getCell(int i);
 
+    /**
+     * Zero-based row number
+     */
     int getRowNum();
 
+    /**
+     * Zero-based cell number
+     */
     int getFirstCellNum();
 
+    /**
+     * @return Zero-based cell number or -1 if row doesn't contain cells
+     */
     int getLastCellNum();
 
     boolean rowContains(Object value);

@@ -19,7 +19,6 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,33 +46,47 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     protected final AbstractReportPage<R> reportPage;
     protected final String tableName;
     @Getter
-    protected final TableCellRange tableRange;
+    private final TableCellRange tableRange;
     @Getter
     private final Map<TableColumn, Integer> headerDescription;
     @Getter
-    protected final boolean empty;
+    private final boolean empty;
     /**
      * Offset of first data row. First table row is a header.
      */
     private final int dataRowOffset;
-    /**
-     * Set to true if last table row contains total information. So this row don't returned by iterator. Default is false.
-     */
-    @Setter
-    private boolean isLastTableRowContainsTotalData = false;
 
-
-    protected AbstractTable(AbstractReportPage<R> reportPage, String tableName, TableCellRange tableRange,
-                            Class<? extends TableColumnDescription> headerDescription, int headersRowCount) {
+    protected AbstractTable(AbstractReportPage<R> reportPage,
+                            String tableName,
+                            TableCellRange tableRange,
+                            Class<? extends TableColumnDescription> headerDescription,
+                            int headersRowCount) {
         this.reportPage = reportPage;
         this.tableName = tableName;
         this.tableRange = tableRange;
         this.dataRowOffset = 1 + headersRowCount; // table_name + headersRowCount
-        this.empty = tableRange.equals(TableCellRange.EMPTY_RANGE) ||
-                ((tableRange.getLastRow() - tableRange.getFirstRow()) <= headersRowCount);
-        this.headerDescription = empty ?
+        this.empty = isEmpty(tableRange, dataRowOffset);
+        this.headerDescription = this.empty ?
                 Collections.emptyMap() :
                 getHeaderDescription(reportPage, tableRange, headerDescription, headersRowCount);
+    }
+
+    protected AbstractTable(AbstractTable<R> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
+        this.reportPage = table.reportPage;
+        this.tableName = table.tableName;
+        this.tableRange = table.tableRange.addRowsToTop(appendDataRowsToTop).addRowsToBottom(appendDataRowsToBottom);
+        this.dataRowOffset = table.dataRowOffset;
+        this.empty = isEmpty(tableRange, dataRowOffset);
+        this.headerDescription = table.headerDescription;
+    }
+
+    private static boolean isEmpty(TableCellRange tableRange, int dataRowOffset) {
+        return tableRange.equals(TableCellRange.EMPTY_RANGE) ||
+                (getNumberOfTableRows(tableRange) - dataRowOffset) <= 0;
+    }
+
+    private static int getNumberOfTableRows(TableCellRange tableRange) {
+        return tableRange.getLastRow() - tableRange.getFirstRow() + 1;
     }
 
     private Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<R> reportPage, TableCellRange tableRange,
@@ -208,21 +221,19 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     protected class TableIterator implements Iterator<TableRow> {
         private final MutableTableRow<R> tableRow =
                 new MutableTableRow<>(AbstractTable.this, getCellDataAccessObject());
-        private final int dataRowsCount = tableRange.getLastRow() - tableRange.getFirstRow()
-                - dataRowOffset
-                + (isLastTableRowContainsTotalData ? 0 : 1);
-        private int cnt = 0;
+        private final int numberOfRows = getNumberOfTableRows(tableRange);
+        private int i = dataRowOffset;
 
         @Override
         public boolean hasNext() {
-            return cnt < dataRowsCount;
+            return i < numberOfRows;
         }
 
         @Override
         public TableRow next() {
             R row;
             do {
-                row = reportPage.getRow(tableRange.getFirstRow() + dataRowOffset + (cnt++));
+                row = reportPage.getRow(tableRange.getFirstRow() + (i++));
             } while (row == null && hasNext());
             tableRow.setRow(row);
             return tableRow;

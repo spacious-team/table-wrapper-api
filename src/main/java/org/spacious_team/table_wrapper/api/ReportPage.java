@@ -88,12 +88,13 @@ public interface ReportPage {
     }
 
     /**
+     * @param i zero-based index
      * @return row object or null is row does not exist
      */
     ReportPageRow getRow(int i);
 
     /**
-     * Zero-based row number
+     * @return last row contained on this page (zero-based) or -1 if no row exists
      */
     int getLastRowNum();
 
@@ -123,7 +124,6 @@ public interface ReportPage {
 
     /**
      * Returns table range, table ends with empty row or last row of report page.
-     * This implementation generates a huge amount of garbage. May be override for improve performance.
      */
     default TableCellRange getTableCellRange(String tableName, int headersRowCount) {
         TableCellAddress startAddress = find(tableName);
@@ -147,6 +147,9 @@ public interface ReportPage {
     }
 
     /**
+     * Returns zero-based index of empty row.
+     * This implementation generates a huge amount of garbage. May be override for improve performance.
+     *
      * @param startRow first row for check
      * @return index of first empty row or -1 if not found
      */
@@ -155,7 +158,7 @@ public interface ReportPage {
         LAST_ROW:
         for (int n = getLastRowNum(); lastRowNum <= n; lastRowNum++) {
             ReportPageRow row = getRow(lastRowNum);
-            if (row == null || row.getLastCellNum() == 0) {
+            if (row == null || row.getLastCellNum() == -1) {
                 return lastRowNum; // all row cells blank
             }
             for (TableCell cell : row) {
@@ -200,17 +203,33 @@ public interface ReportPage {
                 .create(this, tableName, headerDescription, headersRowCount);
     }
 
-    default Table createOfNoName(String firstLineText,
+    default Table createNameless(String firstLineText,
+                                 String lastRowString,
                                  Class<? extends TableColumnDescription> headerDescription) {
         return TableFactoryRegistry.get(this)
-                .createOfNoName(this, firstLineText, headerDescription);
+                .createNameless(this, firstLineText, lastRowString, headerDescription);
     }
 
-    default Table createOfNoName(String providedTableName,
+    default Table createNameless(String providedTableName,
+                                 String firstLineText,
+                                 String lastRowString,
+                                 Class<? extends TableColumnDescription> headerDescription,
+                                 int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstLineText, lastRowString, headerDescription, headersRowCount);
+    }
+
+    default Table createNameless(String firstLineText,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineText, headerDescription);
+    }
+
+    default Table createNameless(String providedTableName,
                                  String firstLineText,
                                  Class<? extends TableColumnDescription> headerDescription,
                                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
-                .createOfNoName(this, providedTableName, firstLineText, headerDescription, headersRowCount);
+                .createNameless(this, providedTableName, firstLineText, headerDescription, headersRowCount);
     }
 }
