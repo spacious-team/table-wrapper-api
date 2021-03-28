@@ -22,10 +22,6 @@ public interface TableColumn {
     int NOCOLUMN_INDEX = -1;
     TableColumn NOCOLUMN = (i, j) -> NOCOLUMN_INDEX;
 
-    default TableColumn ofOptional(TableColumn column) {
-        return AnyOfTableColumn.of(column, TableColumn.NOCOLUMN);
-    }
-
     /**
      * @param headerRows header rows
      * @return column index of table

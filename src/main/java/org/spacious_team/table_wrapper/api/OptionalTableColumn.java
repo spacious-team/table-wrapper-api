@@ -27,6 +27,9 @@ public class OptionalTableColumn implements TableColumn {
     private OptionalTableColumn() {
     }
 
+    /**
+     * Should never be called
+     */
     @Override
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         return TableColumn.NOCOLUMN_INDEX;

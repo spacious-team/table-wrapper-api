@@ -35,6 +35,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -56,6 +57,9 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
      */
     private final int dataRowOffset;
 
+    /**
+     * @param tableRange only first and last row numbers matters
+     */
     protected AbstractTable(AbstractReportPage<R> reportPage,
                             String tableName,
                             TableCellRange tableRange,
@@ -63,12 +67,18 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                             int headersRowCount) {
         this.reportPage = reportPage;
         this.tableName = tableName;
-        this.tableRange = tableRange;
         this.dataRowOffset = 1 + headersRowCount; // table_name + headersRowCount
         this.empty = isEmpty(tableRange, dataRowOffset);
         this.headerDescription = this.empty ?
                 Collections.emptyMap() :
                 getHeaderDescription(reportPage, tableRange, headerDescription, headersRowCount);
+        this.tableRange = empty ?
+                tableRange :
+                new TableCellRange(
+                        tableRange.getFirstRow(),
+                        tableRange.getLastRow(),
+                        getColumnIndices(this.headerDescription).min().orElse(tableRange.getFirstColumn()),
+                        getColumnIndices(this.headerDescription).max().orElse(tableRange.getLastColumn()));
     }
 
     protected AbstractTable(AbstractTable<R> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
@@ -89,9 +99,9 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         return tableRange.getLastRow() - tableRange.getFirstRow() + 1;
     }
 
-    private Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<R> reportPage, TableCellRange tableRange,
-                                                           Class<? extends TableColumnDescription> headerDescription,
-                                                           int headersRowCount) {
+    private static Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<?> reportPage, TableCellRange tableRange,
+                                                                  Class<? extends TableColumnDescription> headerDescription,
+                                                                  int headersRowCount) {
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
         ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
         for (int i = 0; i < headersRowCount; i++) {
@@ -104,6 +114,13 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
             columnIndices.put(column, column.getColumnIndex(headerRows));
         }
         return Collections.unmodifiableMap(columnIndices);
+    }
+
+    private static IntStream getColumnIndices(Map<TableColumn, Integer> headerDescription) {
+        return headerDescription.values()
+                .stream()
+                .mapToInt(i -> i)
+                .filter(i -> i != TableColumn.NOCOLUMN_INDEX);
     }
 
     /**
@@ -243,12 +260,12 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     @Override
     public TableRow findRow(Object value) {
         TableCellAddress address = reportPage.find(value);
-        if (address.equals(TableCellAddress.NOT_FOUND)) {
-            return null;
+        if (tableRange.contains(address)) {
+            MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
+            tableRow.setRow(reportPage.getRow(address.getRow()));
+            return tableRow;
         }
-        MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
-        tableRow.setRow(reportPage.getRow(address.getRow()));
-        return tableRow;
+        return null;
     }
 
     protected abstract CellDataAccessObject<?, R> getCellDataAccessObject();

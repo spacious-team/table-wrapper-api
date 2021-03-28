@@ -18,11 +18,6 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.RequiredArgsConstructor;
-
-import java.util.Iterator;
-import java.util.function.Function;
-
 public interface ReportPageRow extends Iterable<TableCell> {
 
     /**

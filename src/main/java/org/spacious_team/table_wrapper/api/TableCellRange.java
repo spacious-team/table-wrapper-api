@@ -38,6 +38,18 @@ public class TableCellRange {
     private final int firstColumn;
     private final int lastColumn;
 
+    public boolean contains(TableCellAddress address) {
+        return containsRow(address.getRow()) && containsColumn(address.getColumn());
+    }
+
+    public boolean containsRow(int row) {
+        return firstColumn <= row && row <= lastRow;
+    }
+
+    public boolean containsColumn(int column) {
+        return firstColumn <= column && column <= lastColumn;
+    }
+
     /**
      * Adds rows without range check. First rows index of range may become negative.
      * @param number positive or negative values
@@ -72,6 +84,21 @@ public class TableCellRange {
 
         private EmptyTableCellRange() {
             super(0, 0, 0, 0);
+        }
+
+        @Override
+        public boolean contains(TableCellAddress address) {
+            return false;
+        }
+
+        @Override
+        public boolean containsRow(int row) {
+            return false;
+        }
+
+        @Override
+        public boolean containsColumn(int column) {
+            return false;
         }
 
         @Override
