@@ -92,6 +92,9 @@ public interface ReportPage {
      */
     ReportPageRow getRow(int i);
 
+    /**
+     * Zero-based row number
+     */
     int getLastRowNum();
 
     default TableCell getCell(TableCellAddress address) {
@@ -99,7 +102,7 @@ public interface ReportPage {
     }
 
     /**
-     * Get table range, table ends with predefined string in one of the row cells
+     * Returns table range, table ends with predefined string in one of the row cells.
      */
     default TableCellRange getTableCellRange(String tableName, int headersRowCount, String tableFooterString) {
         TableCellAddress startAddress = find(tableName);
@@ -119,7 +122,7 @@ public interface ReportPage {
     }
 
     /**
-     * Get table range, table ends with empty line.
+     * Returns table range, table ends with empty row or last row of report page.
      * This implementation generates a huge amount of garbage. May be override for improve performance.
      */
     default TableCellRange getTableCellRange(String tableName, int headersRowCount) {
@@ -127,12 +130,33 @@ public interface ReportPage {
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
-        int lastRowNum = startAddress.getRow() + headersRowCount + 1;
+        int lastRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
+        if (lastRowNum == -1) {
+            lastRowNum = getLastRowNum(); // empty row not found
+        } else if (lastRowNum <= getLastRowNum()) {
+            lastRowNum--; // exclude last row from table
+        }
+        if (lastRowNum < startAddress.getRow()) {
+            lastRowNum = startAddress.getRow();
+        }
+        return new TableCellRange(
+                startAddress.getRow(),
+                lastRowNum,
+                getRow(startAddress.getRow()).getFirstCellNum(),
+                getRow(lastRowNum).getLastCellNum());
+    }
+
+    /**
+     * @param startRow first row for check
+     * @return index of first empty row or -1 if not found
+     */
+    default int findEmptyRow(int startRow) {
+        int lastRowNum = startRow;
         LAST_ROW:
-        for (int n = getLastRowNum(); lastRowNum < n; lastRowNum++) {
+        for (int n = getLastRowNum(); lastRowNum <= n; lastRowNum++) {
             ReportPageRow row = getRow(lastRowNum);
             if (row == null || row.getLastCellNum() == 0) {
-                break; // all row cells blank
+                return lastRowNum; // all row cells blank
             }
             for (TableCell cell : row) {
                 Object value;
@@ -143,17 +167,9 @@ public interface ReportPage {
                     continue LAST_ROW;
                 }
             }
-            break; // all row cells blank
+            return lastRowNum; // all row cells blank
         }
-        if (lastRowNum < getLastRowNum()) {
-            lastRowNum--; // exclude last row from table
-        }
-        if (lastRowNum < startAddress.getRow()) lastRowNum = startAddress.getRow();
-        return new TableCellRange(
-                startAddress.getRow(),
-                lastRowNum,
-                getRow(startAddress.getRow()).getFirstCellNum(),
-                getRow(lastRowNum).getLastCellNum());
+        return -1;
     }
 
     default Table create(String tableName,
