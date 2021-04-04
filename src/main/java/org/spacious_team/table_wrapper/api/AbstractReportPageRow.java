@@ -19,15 +19,27 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
-@ToString
-@RequiredArgsConstructor(staticName = "of")
-public class ConstantPositionTableColumn implements TableColumn {
-    private final int columnIndex;
+import java.util.Iterator;
+import java.util.function.Function;
 
-    @Override
-    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
-        return columnIndex;
+public abstract class AbstractReportPageRow implements ReportPageRow {
+
+    @RequiredArgsConstructor
+    protected static class ReportPageRowIterator<T> implements Iterator<TableCell> {
+
+        private final Iterator<T> innerIterator;
+        private final Function<T, TableCell> converter;
+
+
+        @Override
+        public boolean hasNext() {
+            return innerIterator.hasNext();
+        }
+
+        @Override
+        public TableCell next() {
+            return converter.apply(innerIterator.next());
+        }
     }
 }

@@ -18,16 +18,28 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+public interface ReportPageRow extends Iterable<TableCell> {
 
-@ToString
-@RequiredArgsConstructor(staticName = "of")
-public class ConstantPositionTableColumn implements TableColumn {
-    private final int columnIndex;
+    /**
+     * @param i zero-based cell number
+     * @return cell ot null if cell does not exists
+     */
+    TableCell getCell(int i);
 
-    @Override
-    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
-        return columnIndex;
-    }
+    /**
+     * Zero-based row number
+     */
+    int getRowNum();
+
+    /**
+     * Zero-based cell number
+     */
+    int getFirstCellNum();
+
+    /**
+     * @return Zero-based cell number or -1 if row doesn't contain cells
+     */
+    int getLastCellNum();
+
+    boolean rowContains(Object value);
 }

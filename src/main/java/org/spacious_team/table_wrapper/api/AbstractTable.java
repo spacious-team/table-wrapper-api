@@ -19,11 +19,9 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,47 +34,76 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @ToString(of = {"tableName"})
-public abstract class AbstractTable implements Table {
+public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
-    protected final ReportPage reportPage;
+    private static final Path unknown = Path.of("unknown");
+    protected final AbstractReportPage<R> reportPage;
     protected final String tableName;
     @Getter
-    protected final TableCellRange tableRange;
-    protected final Map<TableColumn, Integer> columnIndices;
+    private final TableCellRange tableRange;
     @Getter
-    protected final boolean empty;
+    private final Map<TableColumn, Integer> headerDescription;
+    @Getter
+    private final boolean empty;
     /**
      * Offset of first data row. First table row is a header.
      */
     private final int dataRowOffset;
+
     /**
-     * Set to true if last table row contains total information. Default is false.
+     * @param tableRange only first and last row numbers matters
      */
-    @Setter
-    private boolean isLastTableRowContainsTotalData = false;
-
-
-    protected AbstractTable(ReportPage reportPage, String tableName, TableCellRange tableRange,
-                            Class<? extends TableColumnDescription> headerDescription, int headersRowCount) {
+    protected AbstractTable(AbstractReportPage<R> reportPage,
+                            String tableName,
+                            TableCellRange tableRange,
+                            Class<? extends TableColumnDescription> headerDescription,
+                            int headersRowCount) {
         this.reportPage = reportPage;
         this.tableName = tableName;
-        this.tableRange = tableRange;
         this.dataRowOffset = 1 + headersRowCount; // table_name + headersRowCount
-        this.empty = tableRange.equals(TableCellRange.EMPTY_RANGE) ||
-                ((tableRange.getLastRow() - tableRange.getFirstRow()) <= headersRowCount);
-        this.columnIndices = empty ?
+        this.empty = isEmpty(tableRange, dataRowOffset);
+        this.headerDescription = this.empty ?
                 Collections.emptyMap() :
-                getColumnIndices(reportPage, tableRange, headerDescription, headersRowCount);
+                getHeaderDescription(reportPage, tableRange, headerDescription, headersRowCount);
+        this.tableRange = empty ?
+                tableRange :
+                new TableCellRange(
+                        tableRange.getFirstRow(),
+                        tableRange.getLastRow(),
+                        getColumnIndices(this.headerDescription).min().orElse(tableRange.getFirstColumn()),
+                        getColumnIndices(this.headerDescription).max().orElse(tableRange.getLastColumn()));
     }
 
-    private Map<TableColumn, Integer> getColumnIndices(ReportPage reportPage, TableCellRange tableRange,
-                                                       Class<? extends TableColumnDescription> headerDescription,
-                                                       int headersRowCount) {
+    protected AbstractTable(AbstractTable<R> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
+        this.reportPage = table.reportPage;
+        this.tableName = table.tableName;
+        this.tableRange = table.tableRange.addRowsToTop(appendDataRowsToTop).addRowsToBottom(appendDataRowsToBottom);
+        this.dataRowOffset = table.dataRowOffset;
+        this.empty = isEmpty(tableRange, dataRowOffset);
+        this.headerDescription = table.headerDescription;
+    }
+
+    private static boolean isEmpty(TableCellRange tableRange, int dataRowOffset) {
+        return tableRange.equals(TableCellRange.EMPTY_RANGE) ||
+                (getNumberOfTableRows(tableRange) - dataRowOffset) <= 0;
+    }
+
+    private static int getNumberOfTableRows(TableCellRange tableRange) {
+        return tableRange.getLastRow() - tableRange.getFirstRow() + 1;
+    }
+
+    private static Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<?> reportPage, TableCellRange tableRange,
+                                                                  Class<? extends TableColumnDescription> headerDescription,
+                                                                  int headersRowCount) {
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
-        TableRow[] headerRows = new TableRow[headersRowCount];
+        ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
         for (int i = 0; i < headersRowCount; i++) {
             headerRows[i] = reportPage.getRow(tableRange.getFirstRow() + 1 + i);
         }
@@ -86,15 +113,31 @@ public abstract class AbstractTable implements Table {
         for (TableColumn column : columns) {
             columnIndices.put(column, column.getColumnIndex(headerRows));
         }
-        return columnIndices;
+        return Collections.unmodifiableMap(columnIndices);
+    }
+
+    private static IntStream getColumnIndices(Map<TableColumn, Integer> headerDescription) {
+        return headerDescription.values()
+                .stream()
+                .mapToInt(i -> i)
+                .filter(i -> i != TableColumn.NOCOLUMN_INDEX);
     }
 
     /**
      * Extracts exactly one object from excel row
      */
-    public <T> List<T> getData(Path file, BiFunction<? super Table, TableRow, T> rowExtractor) {
+    public <T> List<T> getData(Function<TableRow, T> rowExtractor) {
+        return getDataCollection(unknown, (row, data) -> {
+            T result = rowExtractor.apply(row);
+            if (result != null) {
+                data.add(result);
+            }
+        });
+    }
+
+    public <T> List<T> getData(Path file, Function<TableRow, T> rowExtractor) {
         return getDataCollection(file, (row, data) -> {
-            T result = rowExtractor.apply(this, row);
+            T result = rowExtractor.apply(row);
             if (result != null) {
                 data.add(result);
             }
@@ -104,9 +147,18 @@ public abstract class AbstractTable implements Table {
     /**
      * Extracts objects from excel table without duplicate objects handling (duplicated row are both will be returned)
      */
-    public <T> List<T> getDataCollection(Path file, BiFunction<? super Table, TableRow, Collection<T>> rowExtractor) {
+    public <T> List<T> getDataCollection(Function<TableRow, Collection<T>> rowExtractor) {
+        return getDataCollection(unknown, (row, data) -> {
+            Collection<T> result = rowExtractor.apply(row);
+            if (result != null) {
+                data.addAll(result);
+            }
+        });
+    }
+
+    public <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor) {
         return getDataCollection(file, (row, data) -> {
-            Collection<T> result = rowExtractor.apply(this, row);
+            Collection<T> result = rowExtractor.apply(row);
             if (result != null) {
                 data.addAll(result);
             }
@@ -116,11 +168,11 @@ public abstract class AbstractTable implements Table {
     /**
      * Extracts objects from excel table with duplicate objects handling logic
      */
-    public <T> List<T> getDataCollection(Path file, BiFunction<? super Table, TableRow, Collection<T>> rowExtractor,
+    public <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor,
                                          BiPredicate<T, T> equalityChecker,
                                          BiFunction<T, T, Collection<T>> mergeDuplicates) {
         return getDataCollection(file, (row, data) -> {
-            Collection<T> result = rowExtractor.apply(this, row);
+            Collection<T> result = rowExtractor.apply(row);
             if (result != null) {
                 for (T r : result) {
                     addWithEqualityChecker(r, data, equalityChecker, mergeDuplicates);
@@ -163,70 +215,58 @@ public abstract class AbstractTable implements Table {
         }
     }
 
-    public int getIntCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, int defaultValue) {
-        try {
-            return getIntCellValue(row, columnDescription);
-        } catch (Exception e) {
-            return defaultValue;
-        }
+    /**
+     * {@link TableRow} impl is mutable.
+     * For performance issue same object with changed state is provided in each loop cycle.
+     * Call {@link TableRow#clone()} if you want use row object outside stream() block.
+     */
+    @Override
+    public Stream<TableRow> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 
-    public long getLongCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, long defaultValue) {
-        try {
-            return getLongCellValue(row, columnDescription);
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public BigDecimal getCurrencyCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, BigDecimal defaultValue) {
-        try {
-            return getCurrencyCellValue(row, columnDescription);
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public String getStringCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, String defaultValue) {
-        try {
-            return getStringCellValue(row, columnDescription);
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
+    /**
+     * {@link TableRow} impl is mutable.
+     * For performance issue same object with changed state is provided in each loop cycle.
+     * Call {@link TableRow#clone()} if you want use row object outside iterator() block.
+     */
     @Override
     public Iterator<TableRow> iterator() {
         return new TableIterator();
     }
 
     protected class TableIterator implements Iterator<TableRow> {
-        private final int dataRowsCount = tableRange.getLastRow() - tableRange.getFirstRow()
-                - dataRowOffset
-                + (isLastTableRowContainsTotalData ? 0 : 1);
-        private int cnt = 0;
+        private final MutableTableRow<R> tableRow =
+                new MutableTableRow<>(AbstractTable.this, getCellDataAccessObject());
+        private final int numberOfRows = getNumberOfTableRows(tableRange);
+        private int i = dataRowOffset;
 
         @Override
         public boolean hasNext() {
-            return cnt < dataRowsCount;
+            return i < numberOfRows;
         }
 
         @Override
         public TableRow next() {
-            TableRow row;
+            R row;
             do {
-                row = reportPage.getRow(tableRange.getFirstRow() + dataRowOffset + (cnt++));
+                row = reportPage.getRow(tableRange.getFirstRow() + (i++));
             } while (row == null && hasNext());
-            return row;
+            tableRow.setRow(row);
+            return tableRow;
         }
     }
 
     @Override
     public TableRow findRow(Object value) {
         TableCellAddress address = reportPage.find(value);
-        if (address.equals(TableCellAddress.NOT_FOUND)) {
-            return null;
+        if (tableRange.contains(address)) {
+            MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
+            tableRow.setRow(reportPage.getRow(address.getRow()));
+            return tableRow;
         }
-        return reportPage.getRow(address.getRow());
+        return null;
     }
+
+    protected abstract CellDataAccessObject<?, R> getCellDataAccessObject();
 }

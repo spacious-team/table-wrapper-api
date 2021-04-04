@@ -18,42 +18,142 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.RequiredArgsConstructor;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
 
-import java.util.Iterator;
-import java.util.function.Function;
+/**
+ * {@link TableRow} subclass can be mutable. Use {@link #clone()} to make copy.
+ */
+public interface TableRow extends ReportPageRow, Cloneable {
 
-@RequiredArgsConstructor
-public abstract class TableRow implements Iterable<TableCell> {
+    Table getTable();
+
+    TableCell getCell(TableColumnDescription column);
+
+    Object getCellValue(TableColumnDescription column);
 
     /**
-     * @return cell ot null if cell does not exists
+     * @throws RuntimeException if can't extract int value
      */
-    public abstract TableCell getCell(int i);
+    int getIntCellValue(TableColumnDescription column);
 
-    public abstract int getRowNum();
+    /**
+     * @throws RuntimeException if can't extract long value
+     */
+    long getLongCellValue(TableColumnDescription column);
 
-    public abstract int getFirstCellNum();
+    /**
+     * @throws RuntimeException if can't extract Double value
+     */
+    double getDoubleCellValue(TableColumnDescription column);
+    /**
+     * @throws RuntimeException if can't extract BigDecimal value
+     */
+    BigDecimal getBigDecimalCellValue(TableColumnDescription column);
 
-    public abstract int getLastCellNum();
+    /**
+     * @throws RuntimeException if can't extract string value
+     */
+    String getStringCellValue(TableColumnDescription column);
 
-    public abstract boolean rowContains(Object value);
+    /**
+     * @throws RuntimeException if can't extract instant value
+     */
+    Instant getInstantCellValue(TableColumnDescription column);
 
-    @RequiredArgsConstructor
-    protected static class TableRowIterator<T> implements Iterator<TableCell> {
+    /**
+     * @throws RuntimeException if can't extract local date time value
+     */
+    LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column);
 
-        private final Iterator<T> innerIterator;
-        private final Function<T, TableCell> converter;
-
-
-        @Override
-        public boolean hasNext() {
-            return innerIterator.hasNext();
-        }
-
-        @Override
-        public TableCell next() {
-            return converter.apply(innerIterator.next());
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default Object getCellValueOrDefault(TableColumnDescription column, Object defaultValue) {
+        try {
+            return getCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
         }
     }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default int getIntCellValueOrDefault(TableColumnDescription column, int defaultValue) {
+        try {
+            return getIntCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default long getLongCellValueOrDefault(TableColumnDescription column, long defaultValue) {
+        try {
+            return getLongCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default double getDoubleCellValue(TableColumnDescription column, double defaultValue) {
+        try {
+            return getDoubleCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default BigDecimal getBigDecimalCellValueOrDefault(TableColumnDescription column, BigDecimal defaultValue) {
+        try {
+            return getBigDecimalCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default String getStringCellValueOrDefault(TableColumnDescription column, String defaultValue) {
+        try {
+            return getStringCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default Instant getInstantCellValueOrDefault(TableColumnDescription column, Instant defaultValue) {
+        try {
+            return getInstantCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default LocalDateTime getLocalDateTimeCellValueOrDefault(TableColumnDescription column, LocalDateTime defaultValue) {
+        try {
+            return getLocalDateTimeCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    TableRow clone() throws CloneNotSupportedException;
 }

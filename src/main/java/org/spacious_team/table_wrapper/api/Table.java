@@ -18,69 +18,55 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public interface Table extends Iterable<TableRow> {
 
-    <T> List<T> getData(Path file, BiFunction<? super Table, TableRow, T> rowExtractor);
+    <T> List<T> getData(Function<TableRow, T> rowExtractor);
 
-    <T> List<T> getDataCollection(Path file, BiFunction<? super Table, TableRow, Collection<T>> rowExtractor);
+    <T> List<T> getData(Path file, Function<TableRow, T> rowExtractor);
 
-    <T> List<T> getDataCollection(Path file, BiFunction<? super Table, TableRow, Collection<T>> rowExtractor,
+    <T> List<T> getDataCollection(Function<TableRow, Collection<T>> rowExtractor);
+
+    <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor);
+
+    <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor,
                                   BiPredicate<T, T> equalityChecker,
                                   BiFunction<T, T, Collection<T>> mergeDuplicates);
 
     boolean isEmpty();
+
+    Stream<TableRow> stream();
 
     /**
      * @return row containing given value or null if not found
      */
     TableRow findRow(Object value);
 
-    Object getCellValue(TableRow row, TableColumnDescription columnDescription);
+    Map<TableColumn, Integer> getHeaderDescription();
 
     /**
-     * @throws RuntimeException if can't extract int value
+     * By default table iterates throw all rows, call method if last row is "total" row and it should be excluded
      */
-    int getIntCellValue(TableRow row, TableColumnDescription columnDescription);
+    default Table excludeTotalRow() {
+        return subTable(0, -1);
+    }
 
     /**
-     * @throws RuntimeException if can't extract long value
+     * Returns table with same columns but without some top and bottom data rows. For example use
+     * <pre>
+     *     subTable(0, -1)
+     * </pre>
+     * for exclude last "Total" row from iterator or stream.
+     * @param topRows positive value for inclusion, negative for exclusion
+     * @param bottomRows positive value for inclusion, negative for exclusion
      */
-    long getLongCellValue(TableRow row, TableColumnDescription columnDescription);
-
-    /**
-     * @throws RuntimeException if can't extract BigDecimal value
-     */
-    BigDecimal getCurrencyCellValue(TableRow row, TableColumnDescription columnDescription);
-
-    /**
-     * @throws RuntimeException if can't extract string value
-     */
-    String getStringCellValue(TableRow row, TableColumnDescription columnDescription);
-
-    /**
-     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
-     */
-    int getIntCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, int defaultValue);
-
-    /**
-     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
-     */
-    long getLongCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, long defaultValue);
-
-    /**
-     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
-     */
-    BigDecimal getCurrencyCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, BigDecimal defaultValue);
-
-    /**
-     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
-     */
-    String getStringCellValueOrDefault(TableRow row, TableColumnDescription columnDescription, String defaultValue);
+    Table subTable(int topRows, int bottomRows);
 }

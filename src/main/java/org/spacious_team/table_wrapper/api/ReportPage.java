@@ -41,7 +41,7 @@ public interface ReportPage {
 
     /**
      * @param startRow search rows start from this
-     * @param endRow search rows excluding this, can handle values greater than real rows count
+     * @param endRow   search rows excluding this, can handle values greater than real rows count
      * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress find(Object value, int startRow, int endRow) {
@@ -49,8 +49,8 @@ public interface ReportPage {
     }
 
     /**
-     * @param startRow search rows start from this
-     * @param endRow search rows excluding this, can handle values greater than real rows count
+     * @param startRow        search rows start from this
+     * @param endRow          search rows excluding this, can handle values greater than real rows count
      * @param stringPredicate cell and value comparing bi-predicate if cell value type is string
      * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
      */
@@ -59,16 +59,16 @@ public interface ReportPage {
     }
 
     /**
-     * @param value searching value
-     * @param startRow search rows start from this
-     * @param endRow search rows excluding this, can handle values greater than real rows count
+     * @param value       searching value
+     * @param startRow    search rows start from this
+     * @param endRow      search rows excluding this, can handle values greater than real rows count
      * @param startColumn search columns start from this
-     * @param endColumn search columns excluding this, can handle values greater than real columns count
+     * @param endColumn   search columns excluding this, can handle values greater than real columns count
      * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
      */
     TableCellAddress find(Object value, int startRow, int endRow,
-                                         int startColumn, int endColumn,
-                                         BiPredicate<String, Object> stringPredicate);
+                          int startColumn, int endColumn,
+                          BiPredicate<String, Object> stringPredicate);
 
 
     /**
@@ -88,10 +88,14 @@ public interface ReportPage {
     }
 
     /**
+     * @param i zero-based index
      * @return row object or null is row does not exist
      */
-    TableRow getRow(int i);
+    ReportPageRow getRow(int i);
 
+    /**
+     * @return last row contained on this page (zero-based) or -1 if no row exists
+     */
     int getLastRowNum();
 
     default TableCell getCell(TableCellAddress address) {
@@ -99,7 +103,7 @@ public interface ReportPage {
     }
 
     /**
-     * Get table range, table ends with predefined string in one of the row cells
+     * Returns table range, table ends with predefined string in one of the row cells.
      */
     default TableCellRange getTableCellRange(String tableName, int headersRowCount, String tableFooterString) {
         TableCellAddress startAddress = find(tableName);
@@ -119,19 +123,43 @@ public interface ReportPage {
     }
 
     /**
-     * Get table range, table ends with empty line
+     * Returns table range, table ends with empty row or last row of report page.
      */
     default TableCellRange getTableCellRange(String tableName, int headersRowCount) {
         TableCellAddress startAddress = find(tableName);
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
-        int lastRowNum = startAddress.getRow() + headersRowCount + 1;
+        int lastRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
+        if (lastRowNum == -1) {
+            lastRowNum = getLastRowNum(); // empty row not found
+        } else if (lastRowNum <= getLastRowNum()) {
+            lastRowNum--; // exclude last row from table
+        }
+        if (lastRowNum < startAddress.getRow()) {
+            lastRowNum = startAddress.getRow();
+        }
+        return new TableCellRange(
+                startAddress.getRow(),
+                lastRowNum,
+                getRow(startAddress.getRow()).getFirstCellNum(),
+                getRow(lastRowNum).getLastCellNum());
+    }
+
+    /**
+     * Returns zero-based index of empty row.
+     * This implementation generates a huge amount of garbage. May be override for improve performance.
+     *
+     * @param startRow first row for check
+     * @return index of first empty row or -1 if not found
+     */
+    default int findEmptyRow(int startRow) {
+        int lastRowNum = startRow;
         LAST_ROW:
-        for(int n = getLastRowNum(); lastRowNum < n; lastRowNum++) {
-            TableRow row = getRow(lastRowNum);
-            if (row == null || row.getLastCellNum() == 0) {
-                break; // all row cells blank
+        for (int n = getLastRowNum(); lastRowNum <= n; lastRowNum++) {
+            ReportPageRow row = getRow(lastRowNum);
+            if (row == null || row.getLastCellNum() == -1) {
+                return lastRowNum; // all row cells blank
             }
             for (TableCell cell : row) {
                 Object value;
@@ -142,14 +170,66 @@ public interface ReportPage {
                     continue LAST_ROW;
                 }
             }
-            break; // all row cells blank
+            return lastRowNum; // all row cells blank
         }
-        lastRowNum--; // exclude last row from table
-        if (lastRowNum < startAddress.getRow()) lastRowNum = startAddress.getRow();
-        return new TableCellRange(
-                startAddress.getRow(),
-                lastRowNum,
-                getRow(startAddress.getRow()).getFirstCellNum(),
-                getRow(lastRowNum).getLastCellNum());
+        return -1;
+    }
+
+    default Table create(String tableName,
+                         String tableFooterString,
+                         Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableName, tableFooterString, headerDescription);
+    }
+
+    default Table create(String tableName,
+                         Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableName, headerDescription);
+    }
+
+    default Table create(String tableName,
+                         String tableFooterString,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableName, tableFooterString, headerDescription, headersRowCount);
+    }
+
+    default Table create(String tableName,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableName, headerDescription, headersRowCount);
+    }
+
+    default Table createNameless(String firstLineText,
+                                 String lastRowString,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineText, lastRowString, headerDescription);
+    }
+
+    default Table createNameless(String providedTableName,
+                                 String firstLineText,
+                                 String lastRowString,
+                                 Class<? extends TableColumnDescription> headerDescription,
+                                 int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstLineText, lastRowString, headerDescription, headersRowCount);
+    }
+
+    default Table createNameless(String firstLineText,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineText, headerDescription);
+    }
+
+    default Table createNameless(String providedTableName,
+                                 String firstLineText,
+                                 Class<? extends TableColumnDescription> headerDescription,
+                                 int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstLineText, headerDescription, headersRowCount);
     }
 }

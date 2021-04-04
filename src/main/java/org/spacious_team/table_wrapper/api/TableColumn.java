@@ -19,17 +19,14 @@
 package org.spacious_team.table_wrapper.api;
 
 public interface TableColumn {
-    TableColumn NOCOLUMN = (i, j) -> -1;
-
-    default TableColumn ofOptional(TableColumn column) {
-        return AnyOfTableColumn.of(column, TableColumn.NOCOLUMN);
-    }
+    int NOCOLUMN_INDEX = -1;
+    TableColumn NOCOLUMN = (i, j) -> NOCOLUMN_INDEX;
 
     /**
      * @param headerRows header rows
      * @return column index of table
      */
-    default int getColumnIndex(TableRow... headerRows) {
+    default int getColumnIndex(ReportPageRow... headerRows) {
         return getColumnIndex(0, headerRows);
     }
 
@@ -38,5 +35,5 @@ public interface TableColumn {
      * @param headerRows header rows
      * @return column index of table
      */
-    int getColumnIndex(int firstColumnForSearch, TableRow... headerRows);
+    int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows);
 }

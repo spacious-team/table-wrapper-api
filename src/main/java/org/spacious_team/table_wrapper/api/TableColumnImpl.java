@@ -38,8 +38,8 @@ public class TableColumnImpl implements TableColumn {
                 .toArray(String[]::new);
     }
 
-    public int getColumnIndex(int firstColumnForSearch, TableRow... headerRows) {
-        for (TableRow header : headerRows) {
+    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
+        for (ReportPageRow header : headerRows) {
             next_cell:
             for (TableCell cell : header) {
                 Object value;

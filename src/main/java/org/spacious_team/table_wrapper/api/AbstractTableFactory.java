@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <an-vitek@ya.ru>
+ * Copyright (C) 2021  Vitalii Ananev <an-vitek@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,16 +18,28 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
-@ToString
-@RequiredArgsConstructor(staticName = "of")
-public class ConstantPositionTableColumn implements TableColumn {
-    private final int columnIndex;
+/**
+ * {@link TableFactory} factory with specified {@link ReportPage}
+ * @param <T> the factory supported {@link ReportPage} type and subtypes
+ */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class AbstractTableFactory<T extends ReportPage> implements TableFactory {
+
+    private final Class<T> reportPageType;
 
     @Override
-    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
-        return columnIndex;
+    public boolean canHandle(ReportPage reportPage) {
+        return reportPageType.isAssignableFrom(reportPage.getClass());
+    }
+
+    /**
+     * Safe cast operation if {@link #canHandle(ReportPage)} is true
+     */
+    @SuppressWarnings("unchecked")
+    protected T cast(ReportPage reportPage) {
+        return (T) reportPage;
     }
 }

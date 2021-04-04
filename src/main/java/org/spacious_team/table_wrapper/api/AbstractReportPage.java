@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <an-vitek@ya.ru>
+ * Copyright (C) 2021  Vitalii Ananev <an-vitek@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,16 +18,12 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-
-@ToString
-@RequiredArgsConstructor(staticName = "of")
-public class ConstantPositionTableColumn implements TableColumn {
-    private final int columnIndex;
+/**
+ * {@link ReportPage} with specified {@link ReportPageRow}
+ */
+public abstract class AbstractReportPage<T extends ReportPageRow> implements ReportPage {
 
     @Override
-    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
-        return columnIndex;
-    }
+    public abstract T getRow(int i);
+
 }
