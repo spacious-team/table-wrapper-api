@@ -18,7 +18,6 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,15 +28,28 @@ import java.util.stream.Stream;
 
 public interface Table extends Iterable<TableRow> {
 
-    <T> List<T> getData(Function<TableRow, T> rowExtractor);
+    /**
+     * Extracts exactly one object from excel row
+     */
+    default <T> List<T> getData(Function<TableRow, T> rowExtractor) {
+        return getData("unknown", rowExtractor);
+    }
 
-    <T> List<T> getData(Path file, Function<TableRow, T> rowExtractor);
+    <T> List<T> getData(Object report, Function<TableRow, T> rowExtractor);
 
-    <T> List<T> getDataCollection(Function<TableRow, Collection<T>> rowExtractor);
+    /**
+     * Extracts objects from table without duplicate objects handling (duplicated row are both will be returned)
+     */
+    default <T> List<T> getDataCollection(Function<TableRow, Collection<T>> rowExtractor) {
+        return getDataCollection("unknown", rowExtractor);
+    }
 
-    <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor);
+    <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor);
 
-    <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor,
+    /**
+     * Extracts objects from table with duplicate objects handling logic
+     */
+    <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor,
                                   BiPredicate<T, T> equalityChecker,
                                   BiFunction<T, T, Collection<T>> mergeDuplicates);
 

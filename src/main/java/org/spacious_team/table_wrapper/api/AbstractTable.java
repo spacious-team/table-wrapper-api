@@ -22,7 +22,6 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +42,6 @@ import java.util.stream.StreamSupport;
 @ToString(of = {"tableName"})
 public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
-    private static final Path unknown = Path.of("unknown");
     protected final AbstractReportPage<R> reportPage;
     protected final String tableName;
     @Getter
@@ -123,11 +121,8 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                 .filter(i -> i != TableColumn.NOCOLUMN_INDEX);
     }
 
-    /**
-     * Extracts exactly one object from excel row
-     */
-    public <T> List<T> getData(Function<TableRow, T> rowExtractor) {
-        return getDataCollection(unknown, (row, data) -> {
+    public <T> List<T> getData(Object report, Function<TableRow, T> rowExtractor) {
+        return getDataCollection(report, (row, data) -> {
             T result = rowExtractor.apply(row);
             if (result != null) {
                 data.add(result);
@@ -135,20 +130,8 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         });
     }
 
-    public <T> List<T> getData(Path file, Function<TableRow, T> rowExtractor) {
-        return getDataCollection(file, (row, data) -> {
-            T result = rowExtractor.apply(row);
-            if (result != null) {
-                data.add(result);
-            }
-        });
-    }
-
-    /**
-     * Extracts objects from excel table without duplicate objects handling (duplicated row are both will be returned)
-     */
-    public <T> List<T> getDataCollection(Function<TableRow, Collection<T>> rowExtractor) {
-        return getDataCollection(unknown, (row, data) -> {
+    public <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor) {
+        return getDataCollection(report, (row, data) -> {
             Collection<T> result = rowExtractor.apply(row);
             if (result != null) {
                 data.addAll(result);
@@ -156,22 +139,10 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         });
     }
 
-    public <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor) {
-        return getDataCollection(file, (row, data) -> {
-            Collection<T> result = rowExtractor.apply(row);
-            if (result != null) {
-                data.addAll(result);
-            }
-        });
-    }
-
-    /**
-     * Extracts objects from excel table with duplicate objects handling logic
-     */
-    public <T> List<T> getDataCollection(Path file, Function<TableRow, Collection<T>> rowExtractor,
+    public <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor,
                                          BiPredicate<T, T> equalityChecker,
                                          BiFunction<T, T, Collection<T>> mergeDuplicates) {
-        return getDataCollection(file, (row, data) -> {
+        return getDataCollection(report, (row, data) -> {
             Collection<T> result = rowExtractor.apply(row);
             if (result != null) {
                 for (T r : result) {
@@ -181,15 +152,15 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         });
     }
 
-    private <T> List<T> getDataCollection(Path file, BiConsumer<TableRow, Collection<T>> rowHandler) {
+    private <T> List<T> getDataCollection(Object report, BiConsumer<TableRow, Collection<T>> rowHandler) {
         List<T> data = new ArrayList<>();
         for (TableRow row : this) {
             if (row != null) {
                 try {
                     rowHandler.accept(row, data);
                 } catch (Exception e) {
-                    log.warn("Не могу распарсить таблицу '{}' в файле {}, строка {}",
-                            tableName, file.getFileName(), row.getRowNum() + 1, e);
+                    log.warn("Не могу распарсить таблицу '{}' в {}, строка {}",
+                            tableName, report, row.getRowNum() + 1, e);
                 }
             }
         }
