@@ -29,6 +29,9 @@ public class TableColumnImpl implements TableColumn {
     private final String[] words;
 
     public static TableColumn of(String... words) {
+        if (words.length == 0 || (words.length == 1 && (words[0] == null || words[0].isEmpty()))) {
+            return LEFTMOST_COLUMN;
+        }
         return new TableColumnImpl(words);
     }
 
