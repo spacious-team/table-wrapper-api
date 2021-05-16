@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <an-vitek@ya.ru>
+ * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -29,6 +29,9 @@ public class TableColumnImpl implements TableColumn {
     private final String[] words;
 
     public static TableColumn of(String... words) {
+        if (words.length == 0 || (words.length == 1 && (words[0] == null || words[0].isEmpty()))) {
+            return LEFTMOST_COLUMN;
+        }
         return new TableColumnImpl(words);
     }
 

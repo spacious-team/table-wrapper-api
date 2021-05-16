@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <an-vitek@ya.ru>
+ * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -21,6 +21,7 @@ package org.spacious_team.table_wrapper.api;
 public interface TableColumn {
     int NOCOLUMN_INDEX = -1;
     TableColumn NOCOLUMN = (i, j) -> NOCOLUMN_INDEX;
+    TableColumn LEFTMOST_COLUMN = (firstColumnForSearch, $) -> firstColumnForSearch;
 
     /**
      * @param headerRows header rows
