@@ -31,7 +31,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
 
     ZoneId defaultZoneId = ZoneId.systemDefault();
     Pattern spacePattern = Pattern.compile("\\s");
-    NullPointerException npe = new NullPointerException("Cell doesn't contains value");
+    String NO_CELL_VALUE_EXCEPTION_MESSAGE = "Cell doesn't contains value";
 
     C getCell(R row, Integer cellIndex);
 
@@ -54,7 +54,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
         } else if (value != null) {
             return Long.parseLong(spacePattern.matcher((CharSequence) value).replaceAll(""));
         } else {
-            throw npe;
+            throw new NullPointerException(NO_CELL_VALUE_EXCEPTION_MESSAGE);
         }
     }
 
@@ -68,7 +68,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
         } else if (value != null) {
             return Double.parseDouble(spacePattern.matcher((CharSequence) value).replaceAll(""));
         } else {
-            throw npe;
+            throw new NullPointerException(NO_CELL_VALUE_EXCEPTION_MESSAGE);
         }
     }
     /**
