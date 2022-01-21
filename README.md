@@ -89,7 +89,7 @@ ReportPage reportPage = new ExcelSheet(book.getSheetAt(0));    // select first e
 ```java
 // finding row with "таблица товаров" content, parsing next row as header and
 // counting next rows as table till empty line
-Table productTable = reportPage.create("таблица товаров", null, ProductTableHeader.class);
+Table productTable = reportPage.create("таблица товаров", ProductTableHeader.class);
 // finding row with "таблица продаж" content, parsing next 2 rows as header and
 // counting next rows as table till row containing "итого" in any cell
 Table cellTable = reportPage.create("таблица продаж", "итого",  CellTableHeader.class, 2);
@@ -100,7 +100,7 @@ for (TableRow row : productTable) {
 }
 
 Set<String> countries = cellTable.stream()
-    .map(row -> row.getStringCelValueOrDefault(BUYER_COUNTRY, "unknown"))
+    .map(row -> row.getStringCellValueOrDefault(BUYER_COUNTRY, "unknown"))
     .collect(toSet())
 ```
 API предоставляет и другие удобные интерфейсы для работы с таблицами.
