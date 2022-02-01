@@ -66,7 +66,17 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
         } else if (value != null) {
-            return Double.parseDouble(spacePattern.matcher((CharSequence) value).replaceAll(""));
+            String str = spacePattern.matcher((CharSequence) value).replaceAll("");
+            try {
+                return Double.parseDouble(str);
+            } catch (NumberFormatException e) {
+                if (str.indexOf(',') != -1) {
+                    return Double.parseDouble(str.replace(',', '.'));
+                } else if (str.indexOf('.') != -1) {
+                    return Double.parseDouble(str.replace('.', ','));
+                }
+                throw e;
+            }
         } else {
             throw new NullPointerException(NO_CELL_VALUE_EXCEPTION_MESSAGE);
         }
