@@ -18,64 +18,118 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import java.util.Objects;
 import java.util.function.BiPredicate;
 
 public interface ReportPage {
 
-    BiPredicate<String, Object> CELL_STRING_STARTS_WITH = (cell, searchingValue) ->
-            searchingValue != null && cell.trim().toLowerCase().startsWith(searchingValue.toString().trim().toLowerCase());
-
     /**
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * Finds cell address containing exact value.
+     *
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress find(Object value) {
         return find(value, 0);
     }
 
     /**
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * Finds cell address containing exact value.
+     *
+     * @param startRow search rows start from this
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress find(Object value, int startRow) {
         return find(value, startRow, Integer.MAX_VALUE);
     }
 
     /**
+     * Finds cell address containing exact value.
+     *
      * @param startRow search rows start from this
      * @param endRow   search rows excluding this, can handle values greater than real rows count
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress find(Object value, int startRow, int endRow) {
-        return find(value, startRow, endRow, ReportPage.CELL_STRING_STARTS_WITH);
+        return find(value, startRow, endRow, (cell, _value) ->
+                cell == _value || (_value != null && Objects.equals(cell, _value.toString())));
     }
 
     /**
-     * @param startRow        search rows start from this
-     * @param endRow          search rows excluding this, can handle values greater than real rows count
-     * @param stringPredicate cell and value comparing bi-predicate if cell value type is string
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * @param startRow            search rows start from this
+     * @param endRow              search rows excluding this, can handle values greater than real rows count
+     * @param stringCellPredicate predicate for testing string containing cell with 'value' arg
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
-    default TableCellAddress find(Object value, int startRow, int endRow, BiPredicate<String, Object> stringPredicate) {
-        return find(value, startRow, endRow, 0, Integer.MAX_VALUE, stringPredicate);
+    default TableCellAddress find(Object value, int startRow, int endRow, BiPredicate<String, Object> stringCellPredicate) {
+        return find(value, startRow, endRow, 0, Integer.MAX_VALUE, stringCellPredicate);
     }
 
     /**
-     * @param value       searching value
+     * @param value               searching value
+     * @param startRow            search rows start from this
+     * @param endRow              search rows excluding this, can handle values greater than real rows count
+     * @param startColumn         search columns start from this
+     * @param endColumn           search columns excluding this, can handle values greater than real columns count
+     * @param stringCellPredicate predicate for testing string containing cell with 'value' arg
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    TableCellAddress find(Object value, int startRow, int endRow,
+                          int startColumn, int endColumn,
+                          BiPredicate<String, Object> stringCellPredicate);
+
+    /**
+     * Finds cell address staring with value (ignore case, trims leading spaces).
+     *
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress findByPrefix(String prefix) {
+        return findByPrefix(prefix, 0);
+    }
+
+    /**
+     * Finds cell address staring with value (ignore case, trims leading spaces).
+     *
+     * @param startRow search rows start from this
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress findByPrefix(String prefix, int startRow) {
+        return findByPrefix(prefix, startRow, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Finds cell address staring with value (ignore case, trims leading spaces).
+     *
+     * @param startRow search rows start from this
+     * @param endRow   search rows excluding this, can handle values greater than real rows count
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress findByPrefix(String prefix, int startRow, int endRow) {
+        return findByPrefix(prefix, startRow, endRow, 0, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Finds cell address staring with value (ignore case, trims leading spaces).
+     *
      * @param startRow    search rows start from this
      * @param endRow      search rows excluding this, can handle values greater than real rows count
      * @param startColumn search columns start from this
      * @param endColumn   search columns excluding this, can handle values greater than real columns count
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
-    TableCellAddress find(Object value, int startRow, int endRow,
-                          int startColumn, int endColumn,
-                          BiPredicate<String, Object> stringPredicate);
-
+    default TableCellAddress findByPrefix(String prefix, int startRow, int endRow, int startColumn, int endColumn) {
+        if (prefix != null) {
+            return find(prefix.trim().toLowerCase(),
+                    startRow, endRow, startColumn, endColumn,
+                    ReportPageHelper.CELL_STARTS_WITH_IGNORE_CASE);
+        }
+        return TableCellAddress.NOT_FOUND;
+    }
 
     /**
      * For vertical table of key-value records (table with two columns), search and return value for requested key.
      */
-    default Object getNextColumnValue(String firstColumnValue) {
-        TableCellAddress address = find(firstColumnValue);
+    default Object getNextColumnValue(String firstColumnValuePrefix) {
+        TableCellAddress address = findByPrefix(firstColumnValuePrefix);
         for (TableCell cell : getRow(address.getRow())) {
             if (cell != null && cell.getColumnIndex() > address.getColumn()) {
                 Object value = cell.getValue();
@@ -106,12 +160,17 @@ public interface ReportPage {
      * Returns table range, table ends with predefined string in one of the row cells.
      */
     default TableCellRange getTableCellRange(String tableName, int headersRowCount, String tableFooterString) {
-        TableCellAddress startAddress = find(tableName);
+        if (tableFooterString == null) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        TableCellAddress startAddress = findByPrefix(tableName);
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
-        TableCellAddress endAddress = find(tableFooterString, startAddress.getRow() + headersRowCount + 1,
-                getLastRowNum(), ReportPage.CELL_STRING_STARTS_WITH);
+        TableCellAddress endAddress = findByPrefix(
+                tableFooterString,
+                startAddress.getRow() + headersRowCount + 1,
+                getLastRowNum());
         if (endAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
@@ -126,7 +185,7 @@ public interface ReportPage {
      * Returns table range, table ends with empty row or last row of report page.
      */
     default TableCellRange getTableCellRange(String tableName, int headersRowCount) {
-        TableCellAddress startAddress = find(tableName);
+        TableCellAddress startAddress = findByPrefix(tableName);
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
