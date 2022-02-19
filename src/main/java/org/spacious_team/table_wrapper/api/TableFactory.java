@@ -80,6 +80,16 @@ public interface TableFactory {
     }
 
     /**
+     * Creates table without name which starts with header and ends with empty row or last row of report page.
+     * @param firstRowString table first row contains cell which starts with given text
+     */
+    default Table createNameless(ReportPage reportPage,
+                                 String firstRowString,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return createNameless(reportPage, "undefined", firstRowString, headerDescription, 1);
+    }
+
+    /**
      * Creates table without name which starts with header and ends with row containing cell with text starting with
      * given string.
      * @param providedTableName predefined (not existing in reportPage) table name
@@ -92,16 +102,6 @@ public interface TableFactory {
                          String lastRowString,
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount);
-
-    /**
-     * Creates table without name which starts with header and ends with empty row or last row of report page.
-     * @param firstRowString table first row contains cell which starts with given text
-     */
-    default Table createNameless(ReportPage reportPage,
-                                 String firstRowString,
-                                 Class<? extends TableColumnDescription> headerDescription) {
-        return createNameless(reportPage, "undefined", firstRowString, headerDescription, 1);
-    }
 
     /**
      * Creates table without name which starts with header and ends with empty row or last row of report page.

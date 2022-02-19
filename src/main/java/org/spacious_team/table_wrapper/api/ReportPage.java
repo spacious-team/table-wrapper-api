@@ -304,6 +304,12 @@ public interface ReportPage {
                 .createNameless(this, firstLineText, lastRowString, headerDescription);
     }
 
+    default Table createNameless(String firstLineText,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineText, headerDescription);
+    }
+
     default Table createNameless(String providedTableName,
                                  String firstLineText,
                                  String lastRowString,
@@ -311,12 +317,6 @@ public interface ReportPage {
                                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, providedTableName, firstLineText, lastRowString, headerDescription, headersRowCount);
-    }
-
-    default Table createNameless(String firstLineText,
-                                 Class<? extends TableColumnDescription> headerDescription) {
-        return TableFactoryRegistry.get(this)
-                .createNameless(this, firstLineText, headerDescription);
     }
 
     default Table createNameless(String providedTableName,
