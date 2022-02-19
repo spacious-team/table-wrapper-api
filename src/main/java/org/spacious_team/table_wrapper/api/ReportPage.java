@@ -53,6 +53,8 @@ public interface ReportPage {
     }
 
     /**
+     * Finds cell address containing exact value.
+     *
      * @param value       searching value
      * @param startRow    search rows start from this
      * @param endRow      search rows excluding this, can handle values greater than real rows count
@@ -63,6 +65,39 @@ public interface ReportPage {
     TableCellAddress find(Object value, int startRow, int endRow, int startColumn, int endColumn);
 
     /**
+     * Finds cell by predicate.
+     *
+     * @param cellValuePredicate predicate for testing cell value
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress find(Predicate<Object> cellValuePredicate) {
+        return find(0, cellValuePredicate);
+    }
+
+    /**
+     * Finds cell by predicate.
+     *
+     * @param startRow search rows start from this
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress find(int startRow, Predicate<Object> cellValuePredicate) {
+        return find(startRow, Integer.MAX_VALUE, cellValuePredicate);
+    }
+
+    /**
+     * Finds cell by predicate.
+     *
+     * @param startRow search rows start from this
+     * @param endRow   search rows excluding this, can handle values greater than real rows count
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress find(int startRow, int endRow, Predicate<Object> cellValuePredicate) {
+        return find(startRow, endRow, 0, Integer.MAX_VALUE, cellValuePredicate);
+    }
+
+    /**
+     * Finds cell by predicate.
+     *
      * @param startRow           search rows start from this
      * @param endRow             search rows excluding this, can handle values greater than real rows count
      * @param startColumn        search columns start from this
@@ -117,7 +152,7 @@ public interface ReportPage {
         if (prefix != null) {
             String lowercasePrefix = prefix.trim().toLowerCase();
             Predicate<Object> cellPredicate = (cell) -> (cell instanceof String) &&
-                            ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
+                    ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
             return find(startRow, endRow, startColumn, endColumn, cellPredicate);
         }
         return TableCellAddress.NOT_FOUND;
