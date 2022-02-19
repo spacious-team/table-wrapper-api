@@ -18,6 +18,8 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import java.util.function.Predicate;
+
 public interface TableFactory {
 
     boolean canHandle(ReportPage reportPage);
@@ -25,8 +27,9 @@ public interface TableFactory {
     /**
      * Creates table which starts with name followed by header and ends with row containing cell with text starting with
      * given string.
-     * @param tableName table name's row contains cell which starts with given text
-     * @param lastRowString table last row contains cell which starts with given text
+     *
+     * @param tableName     table name's row should contain cell which starts with given text
+     * @param lastRowString table's last row should contain cell which starts with given text
      */
     default Table create(ReportPage reportPage,
                          String tableName,
@@ -37,7 +40,8 @@ public interface TableFactory {
 
     /**
      * Creates table which starts with name followed by header and ends with empty row or last row of report page.
-     * @param tableName table name's row contains cell which starts with given text
+     *
+     * @param tableName table name's row should contain cell which starts with given text
      */
     default Table create(ReportPage reportPage,
                          String tableName,
@@ -48,8 +52,9 @@ public interface TableFactory {
     /**
      * Creates table which starts with name followed by header and ends with row containing cell with text starting with
      * given string.
-     * @param tableName table name's row contains cell which starts with given text
-     * @param lastRowString table last row contains cell which starts with given text
+     *
+     * @param tableName     table name's row should contain cell which starts with given text
+     * @param lastRowString table's last row should contain cell which starts with given text
      */
     Table create(ReportPage reportPage,
                  String tableName,
@@ -59,7 +64,8 @@ public interface TableFactory {
 
     /**
      * Creates table which starts with name followed by header and ends with empty row or last row of report page.
-     * @param tableName table name's row contains cell which starts with given text
+     *
+     * @param tableName table name's row should contain cell which starts with given text
      */
     Table create(ReportPage reportPage,
                  String tableName,
@@ -67,10 +73,59 @@ public interface TableFactory {
                  int headersRowCount);
 
     /**
+     * Creates table. Table name containing row and last row will be found by predicate.
+     *
+     * @param tableNameFinder table name containing row should contain cell satisfying predicate
+     * @param lastRowFinder   table's last row should contain cell satisfying predicate
+     */
+    default Table create(ReportPage reportPage,
+                         Predicate<Object> tableNameFinder,
+                         Predicate<Object> lastRowFinder,
+                         Class<? extends TableColumnDescription> headerDescription) {
+        return create(reportPage, tableNameFinder, lastRowFinder, headerDescription, 1);
+    }
+
+    /**
+     * Creates table. Table name containing row will be found by predicate, table ends by empty row
+     * or last row of report page.
+     *
+     * @param tableNameFinder table name containing row should contain cell satisfying predicate
+     */
+    default Table create(ReportPage reportPage,
+                         Predicate<Object> tableNameFinder,
+                         Class<? extends TableColumnDescription> headerDescription) {
+        return create(reportPage, tableNameFinder, headerDescription, 1);
+    }
+
+    /**
+     * Creates table. Table name containing row and last row will be found by predicate.
+     *
+     * @param tableNameFinder table name containing row should contain cell satisfying predicate
+     * @param lastRowFinder   table's last row should contain cell satisfying predicate
+     */
+    Table create(ReportPage reportPage,
+                 Predicate<Object> tableNameFinder,
+                 Predicate<Object> lastRowFinder,
+                 Class<? extends TableColumnDescription> headerDescription,
+                 int headersRowCount);
+
+    /**
+     * Creates table. Table name containing row will be found by predicate, table ends by empty row
+     * or last row of report page.
+     *
+     * @param tableNameFinder table name containing row should contain cell satisfying predicate
+     */
+    Table create(ReportPage reportPage,
+                 Predicate<Object> tableNameFinder,
+                 Class<? extends TableColumnDescription> headerDescription,
+                 int headersRowCount);
+
+    /**
      * Creates table without name which starts with header and ends with row containing cell with text starting with
      * given string.
-     * @param firstRowString table first row contains cell which starts with given text
-     * @param lastRowString table last row contains cell which starts with given text
+     *
+     * @param firstRowString table first row should contain cell which starts with given text
+     * @param lastRowString  table's last row should contain cell which starts with given text
      */
     default Table createNameless(ReportPage reportPage,
                                  String firstRowString,
@@ -81,7 +136,8 @@ public interface TableFactory {
 
     /**
      * Creates table without name which starts with header and ends with empty row or last row of report page.
-     * @param firstRowString table first row contains cell which starts with given text
+     *
+     * @param firstRowString table first row should contain cell which starts with given text
      */
     default Table createNameless(ReportPage reportPage,
                                  String firstRowString,
@@ -90,11 +146,12 @@ public interface TableFactory {
     }
 
     /**
-     * Creates table without name which starts with header and ends with row containing cell with text starting with
-     * given string.
+     * Creates table with predefined name which starts with header and ends with row containing cell with text starting
+     * with given string.
+     *
      * @param providedTableName predefined (not existing in reportPage) table name
-     * @param firstRowString table first row contains cell which starts with given text
-     * @param lastRowString table last row contains cell which starts with given text
+     * @param firstRowString    table first row should contain cell which starts with given text
+     * @param lastRowString     table's last row should contain cell which starts with given text
      */
     Table createNameless(ReportPage reportPage,
                          String providedTableName,
@@ -104,13 +161,66 @@ public interface TableFactory {
                          int headersRowCount);
 
     /**
-     * Creates table without name which starts with header and ends with empty row or last row of report page.
+     * Creates table with predefined name which starts with header and ends with empty row or last row of report page.
+     *
      * @param providedTableName predefined (not existing in reportPage) table name
-     * @param firstRowString table first row contains cell which starts with given text
+     * @param firstRowString    table first row should contain cell which starts with given text
      */
     Table createNameless(ReportPage reportPage,
                          String providedTableName,
                          String firstRowString,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount);
+
+    /**
+     * Creates table without name. Table first and last row will be found by predicate.
+     *
+     * @param firstRowFinder table first row should contain cell satisfying predicate
+     * @param lastRowFinder  table's last row should contain cell satisfying predicate
+     */
+    default Table createNameless(ReportPage reportPage,
+                                 Predicate<Object> firstRowFinder,
+                                 Predicate<Object> lastRowFinder,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return createNameless(reportPage, "undefined", firstRowFinder, lastRowFinder, headerDescription, 1);
+    }
+
+    /**
+     * Creates table without name. Table first row will be found by predicate, table ends by empty row
+     * or last row of report page.
+     *
+     * @param firstRowFinder table first row should contain cell satisfying predicate
+     */
+    default Table createNameless(ReportPage reportPage,
+                                 Predicate<Object> firstRowFinder,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return createNameless(reportPage, "undefined", firstRowFinder, headerDescription, 1);
+    }
+
+    /**
+     * Creates table with predefined name. Table first and last row will be found by predicate.
+     *
+     * @param providedTableName predefined (not existing in reportPage) table name
+     * @param firstRowFinder    table first row should contain cell satisfying predicate
+     * @param lastRowFinder     table's last row should contain cell satisfying predicate
+     */
+    Table createNameless(ReportPage reportPage,
+                         String providedTableName,
+                         Predicate<Object> firstRowFinder,
+                         Predicate<Object> lastRowFinder,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount);
+
+    /**
+     * Creates table with predefined name. Table first row will be found by predicate, table ends by empty row
+     * or last row of report page.
+     *
+     * @param providedTableName predefined (not existing in reportPage) table name
+     * @param firstRowFinder    table first row should contain cell satisfying predicate
+     */
+    Table createNameless(ReportPage reportPage,
+                         String providedTableName,
+                         Predicate<Object> firstRowFinder,
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount);
 }

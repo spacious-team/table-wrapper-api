@@ -190,21 +190,18 @@ public interface ReportPage {
     }
 
     /**
-     * Returns table range. Table's first row starts with 'tableName' prefix in one of the cells
+     * Returns table range. Table's first row starts with 'firstRowPrefix' prefix in one of the cells
      * and table ends with predefined prefix in one of the last row cells.
      */
-    default TableCellRange getTableCellRange(String tableName, int headersRowCount, String tableFooterPrefix) {
-        if (tableFooterPrefix == null) {
+    default TableCellRange getTableCellRange(String firstRowPrefix, int headersRowCount, String lastRowPrefix) {
+        if (firstRowPrefix == null || lastRowPrefix == null) {
             return TableCellRange.EMPTY_RANGE;
         }
-        TableCellAddress startAddress = findByPrefix(tableName);
+        TableCellAddress startAddress = findByPrefix(firstRowPrefix);
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
-        TableCellAddress endAddress = findByPrefix(
-                tableFooterPrefix,
-                startAddress.getRow() + headersRowCount + 1,
-                getLastRowNum());
+        TableCellAddress endAddress = findByPrefix(lastRowPrefix, startAddress.getRow() + headersRowCount + 1);
         if (endAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
@@ -216,11 +213,65 @@ public interface ReportPage {
     }
 
     /**
-     * Returns table range. Table's first row starts with 'tableName' prefix in one of the cells
-     * and ends with empty row or last row of report page.
+     * Returns table range. First and last row will be found by predicate.
      */
-    default TableCellRange getTableCellRange(String tableName, int headersRowCount) {
-        TableCellAddress startAddress = findByPrefix(tableName);
+    default TableCellRange getTableCellRange(Predicate<Object> firstRowFinder,
+                                             int headersRowCount,
+                                             Predicate<Object> lastRowFinder) {
+        if (firstRowFinder == null || lastRowFinder == null) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        TableCellAddress startAddress = find(firstRowFinder);
+        if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        TableCellAddress endAddress = find(startAddress.getRow() + headersRowCount + 1, lastRowFinder);
+        if (endAddress.equals(TableCellAddress.NOT_FOUND)) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        return new TableCellRange(
+                startAddress.getRow(),
+                endAddress.getRow(),
+                getRow(startAddress.getRow()).getFirstCellNum(),
+                getRow(endAddress.getRow()).getLastCellNum());
+    }
+
+    /**
+     * Returns table range. First row starts with 'firstRowPrefix' prefix in one of the cells,
+     * range ends with empty row or last row of report page.
+     */
+    default TableCellRange getTableCellRange(String firstRowPrefix, int headersRowCount) {
+        if (firstRowPrefix == null) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        TableCellAddress startAddress = findByPrefix(firstRowPrefix);
+        if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        int lastRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
+        if (lastRowNum == -1) {
+            lastRowNum = getLastRowNum(); // empty row not found
+        } else if (lastRowNum <= getLastRowNum()) {
+            lastRowNum--; // exclude last row from table
+        }
+        if (lastRowNum < startAddress.getRow()) {
+            lastRowNum = startAddress.getRow();
+        }
+        return new TableCellRange(
+                startAddress.getRow(),
+                lastRowNum,
+                getRow(startAddress.getRow()).getFirstCellNum(),
+                getRow(lastRowNum).getLastCellNum());
+    }
+
+    /**
+     * Returns table range. First row will be found by predicate, range ends with empty row or last row of report page.
+     */
+    default TableCellRange getTableCellRange(Predicate<Object> firstRowFinder, int headersRowCount) {
+        if (firstRowFinder == null) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        TableCellAddress startAddress = find(firstRowFinder);
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
@@ -297,6 +348,34 @@ public interface ReportPage {
                 .create(this, tableName, headerDescription, headersRowCount);
     }
 
+    default Table create(Predicate<Object> tableNameFinder,
+                         Predicate<Object> tableFooterFinder,
+                         Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, tableFooterFinder, headerDescription);
+    }
+
+    default Table create(Predicate<Object> tableNameFinder,
+                         Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, headerDescription);
+    }
+
+    default Table create(Predicate<Object> tableNameFinder,
+                         Predicate<Object> tableFooterFinder,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, tableFooterFinder, headerDescription, headersRowCount);
+    }
+
+    default Table create(Predicate<Object> tableNameFinder,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, headerDescription, headersRowCount);
+    }
+
     default Table createNameless(String firstLineText,
                                  String lastRowString,
                                  Class<? extends TableColumnDescription> headerDescription) {
@@ -325,5 +404,35 @@ public interface ReportPage {
                                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, providedTableName, firstLineText, headerDescription, headersRowCount);
+    }
+
+    default Table createNameless(Predicate<Object> firstLineFinder,
+                                 Predicate<Object> lastRowFinder,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineFinder, lastRowFinder, headerDescription);
+    }
+
+    default Table createNameless(Predicate<Object> firstLineFinder,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineFinder, headerDescription);
+    }
+
+    default Table createNameless(String providedTableName,
+                                 Predicate<Object> firstLineFinder,
+                                 Predicate<Object> lastRowFinder,
+                                 Class<? extends TableColumnDescription> headerDescription,
+                                 int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstLineFinder, lastRowFinder, headerDescription, headersRowCount);
+    }
+
+    default Table createNameless(String providedTableName,
+                                 Predicate<Object> firstLineFinder,
+                                 Class<? extends TableColumnDescription> headerDescription,
+                                 int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstLineFinder, headerDescription, headersRowCount);
     }
 }
