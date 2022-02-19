@@ -20,6 +20,8 @@ package org.spacious_team.table_wrapper.api;
 
 import java.util.function.Predicate;
 
+import static org.spacious_team.table_wrapper.api.ReportPageHelper.getCellStringValueIgnoreCasePrefixPredicate;
+
 public interface ReportPage {
 
     /**
@@ -149,13 +151,9 @@ public interface ReportPage {
      * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress findByPrefix(String prefix, int startRow, int endRow, int startColumn, int endColumn) {
-        if (prefix != null) {
-            String lowercasePrefix = prefix.trim().toLowerCase();
-            Predicate<Object> cellPredicate = (cell) -> (cell instanceof String) &&
-                    ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
-            return find(startRow, endRow, startColumn, endColumn, cellPredicate);
-        }
-        return TableCellAddress.NOT_FOUND;
+        return prefix == null ?
+                TableCellAddress.NOT_FOUND :
+                find(startRow, endRow, startColumn, endColumn, getCellStringValueIgnoreCasePrefixPredicate(prefix));
     }
 
     /**
@@ -197,19 +195,10 @@ public interface ReportPage {
         if (firstRowPrefix == null || lastRowPrefix == null) {
             return TableCellRange.EMPTY_RANGE;
         }
-        TableCellAddress startAddress = findByPrefix(firstRowPrefix);
-        if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
-            return TableCellRange.EMPTY_RANGE;
-        }
-        TableCellAddress endAddress = findByPrefix(lastRowPrefix, startAddress.getRow() + headersRowCount + 1);
-        if (endAddress.equals(TableCellAddress.NOT_FOUND)) {
-            return TableCellRange.EMPTY_RANGE;
-        }
-        return new TableCellRange(
-                startAddress.getRow(),
-                endAddress.getRow(),
-                getRow(startAddress.getRow()).getFirstCellNum(),
-                getRow(endAddress.getRow()).getLastCellNum());
+        return getTableCellRange(
+                getCellStringValueIgnoreCasePrefixPredicate(firstRowPrefix),
+                headersRowCount,
+                getCellStringValueIgnoreCasePrefixPredicate(lastRowPrefix));
     }
 
     /**
@@ -244,24 +233,9 @@ public interface ReportPage {
         if (firstRowPrefix == null) {
             return TableCellRange.EMPTY_RANGE;
         }
-        TableCellAddress startAddress = findByPrefix(firstRowPrefix);
-        if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
-            return TableCellRange.EMPTY_RANGE;
-        }
-        int lastRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
-        if (lastRowNum == -1) {
-            lastRowNum = getLastRowNum(); // empty row not found
-        } else if (lastRowNum <= getLastRowNum()) {
-            lastRowNum--; // exclude last row from table
-        }
-        if (lastRowNum < startAddress.getRow()) {
-            lastRowNum = startAddress.getRow();
-        }
-        return new TableCellRange(
-                startAddress.getRow(),
-                lastRowNum,
-                getRow(startAddress.getRow()).getFirstCellNum(),
-                getRow(lastRowNum).getLastCellNum());
+        return getTableCellRange(
+                getCellStringValueIgnoreCasePrefixPredicate(firstRowPrefix),
+                headersRowCount);
     }
 
     /**
