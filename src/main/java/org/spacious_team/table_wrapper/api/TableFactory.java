@@ -120,11 +120,14 @@ public interface TableFactory {
                          Predicate<Object> lastRowFinder,
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount) {
-        return create(reportPage,
-                reportPage.getCell(reportPage.find(tableNameFinder)).getStringValue(),
-                reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder),
-                headerDescription,
-                headersRowCount);
+        String tableName = "<not found>";
+        TableCellRange tableCellRange = TableCellRange.EMPTY_RANGE;
+        TableCellAddress tableNameCell = reportPage.find(tableNameFinder);
+        if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
+            tableName = reportPage.getCell(tableNameCell).getStringValue();
+            tableCellRange = reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder);
+        }
+        return create(reportPage, tableName, tableCellRange, headerDescription, headersRowCount);
     }
 
     /**
@@ -137,11 +140,14 @@ public interface TableFactory {
                          Predicate<Object> tableNameFinder,
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount) {
-        return create(reportPage,
-                reportPage.getCell(reportPage.find(tableNameFinder)).getStringValue(),
-                reportPage.getTableCellRange(tableNameFinder, headersRowCount),
-                headerDescription,
-                headersRowCount);
+        String tableName = "<not found>";
+        TableCellRange tableCellRange = TableCellRange.EMPTY_RANGE;
+        TableCellAddress tableNameCell = reportPage.find(tableNameFinder);
+        if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
+            tableName = reportPage.getCell(tableNameCell).getStringValue();
+            tableCellRange = reportPage.getTableCellRange(tableNameFinder, headersRowCount);
+        }
+        return create(reportPage, tableName, tableCellRange, headerDescription, headersRowCount);
     }
 
     /**

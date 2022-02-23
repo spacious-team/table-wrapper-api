@@ -267,7 +267,7 @@ public interface ReportPage {
 
     /**
      * Returns zero-based index of empty row.
-     * This implementation generates a huge amount of garbage. May be override for improve performance.
+     * This implementation generates a huge amount of garbage. May be overridden for improve performance.
      *
      * @param startRow first row for check
      * @return index of first empty row or -1 if not found
