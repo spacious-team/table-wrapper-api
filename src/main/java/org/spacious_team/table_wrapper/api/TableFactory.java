@@ -121,13 +121,14 @@ public interface TableFactory {
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount) {
         String tableName = "<not found>";
-        TableCellRange tableCellRange = TableCellRange.EMPTY_RANGE;
-        TableCellAddress tableNameCell = reportPage.find(tableNameFinder);
-        if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
-            tableName = reportPage.getCell(tableNameCell).getStringValue();
-            tableCellRange = reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder);
+        TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder);
+        if (!range.equals(TableCellRange.EMPTY_RANGE)) {
+            TableCellAddress tableNameCell =
+                    reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
+            tableName = tableNameCell.equals(TableCellAddress.NOT_FOUND) ? "<not found>" :
+                    reportPage.getCell(tableNameCell).getStringValue();
         }
-        return create(reportPage, tableName, tableCellRange, headerDescription, headersRowCount);
+        return create(reportPage, tableName, range, headerDescription, headersRowCount);
     }
 
     /**
@@ -141,13 +142,14 @@ public interface TableFactory {
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount) {
         String tableName = "<not found>";
-        TableCellRange tableCellRange = TableCellRange.EMPTY_RANGE;
-        TableCellAddress tableNameCell = reportPage.find(tableNameFinder);
-        if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
-            tableName = reportPage.getCell(tableNameCell).getStringValue();
-            tableCellRange = reportPage.getTableCellRange(tableNameFinder, headersRowCount);
+        TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount);
+        if (!range.equals(TableCellRange.EMPTY_RANGE)) {
+            TableCellAddress tableNameCell =
+                    reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
+            tableName = tableNameCell.equals(TableCellAddress.NOT_FOUND) ? "<not found>" :
+                    reportPage.getCell(tableNameCell).getStringValue();
         }
-        return create(reportPage, tableName, tableCellRange, headerDescription, headersRowCount);
+        return create(reportPage, tableName, range, headerDescription, headersRowCount);
     }
 
     /**
