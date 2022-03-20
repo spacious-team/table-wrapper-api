@@ -18,12 +18,13 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 class ReportPageHelper {
 
-    static final BiPredicate<String, Object> CELL_STARTS_WITH_IGNORE_CASE = (cell, lowercasePrefix) ->
-            cell == lowercasePrefix ||
-                    (lowercasePrefix != null && cell.trim().toLowerCase().startsWith(lowercasePrefix.toString()));
-
+    static Predicate<Object> getCellStringValueIgnoreCasePrefixPredicate(String prefix) {
+        String lowercasePrefix = prefix.trim().toLowerCase();
+        return (cell) -> (cell instanceof String) &&
+                ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
+    }
 }

@@ -47,6 +47,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
      * @throws RuntimeException if can't extract Double value
      */
     double getDoubleCellValue(TableColumnDescription column);
+
     /**
      * @throws RuntimeException if can't extract BigDecimal value
      */
