@@ -65,8 +65,8 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     }
 
     @Override
-    public boolean rowContains(Object value) {
-        return row.rowContains(value);
+    public boolean rowContains(Object expected) {
+        return row.rowContains(expected);
     }
 
     @Override

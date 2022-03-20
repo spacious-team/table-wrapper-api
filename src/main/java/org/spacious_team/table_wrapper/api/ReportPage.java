@@ -18,64 +18,149 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+
+import static org.spacious_team.table_wrapper.api.ReportPageHelper.getCellStringValueIgnoreCasePrefixPredicate;
 
 public interface ReportPage {
 
-    BiPredicate<String, Object> CELL_STRING_STARTS_WITH = (cell, searchingValue) ->
-            searchingValue != null && cell.trim().toLowerCase().startsWith(searchingValue.toString().trim().toLowerCase());
-
     /**
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * Finds cell address containing exact value.
+     *
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress find(Object value) {
         return find(value, 0);
     }
 
     /**
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * Finds cell address containing exact value.
+     *
+     * @param startRow search rows start from this
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress find(Object value, int startRow) {
         return find(value, startRow, Integer.MAX_VALUE);
     }
 
     /**
+     * Finds cell address containing exact value.
+     *
      * @param startRow search rows start from this
      * @param endRow   search rows excluding this, can handle values greater than real rows count
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress find(Object value, int startRow, int endRow) {
-        return find(value, startRow, endRow, ReportPage.CELL_STRING_STARTS_WITH);
+        return find(value, startRow, endRow, 0, Integer.MAX_VALUE);
     }
 
     /**
-     * @param startRow        search rows start from this
-     * @param endRow          search rows excluding this, can handle values greater than real rows count
-     * @param stringPredicate cell and value comparing bi-predicate if cell value type is string
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
-     */
-    default TableCellAddress find(Object value, int startRow, int endRow, BiPredicate<String, Object> stringPredicate) {
-        return find(value, startRow, endRow, 0, Integer.MAX_VALUE, stringPredicate);
-    }
-
-    /**
+     * Finds cell address containing exact value.
+     *
      * @param value       searching value
      * @param startRow    search rows start from this
      * @param endRow      search rows excluding this, can handle values greater than real rows count
      * @param startColumn search columns start from this
      * @param endColumn   search columns excluding this, can handle values greater than real columns count
-     * @return table table cell address or {@link TableCellAddress#NOT_FOUND}
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
-    TableCellAddress find(Object value, int startRow, int endRow,
-                          int startColumn, int endColumn,
-                          BiPredicate<String, Object> stringPredicate);
+    TableCellAddress find(Object value, int startRow, int endRow, int startColumn, int endColumn);
 
+    /**
+     * Finds cell by predicate.
+     *
+     * @param cellValuePredicate predicate for testing cell value
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress find(Predicate<Object> cellValuePredicate) {
+        return find(0, cellValuePredicate);
+    }
+
+    /**
+     * Finds cell by predicate.
+     *
+     * @param startRow search rows start from this
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress find(int startRow, Predicate<Object> cellValuePredicate) {
+        return find(startRow, Integer.MAX_VALUE, cellValuePredicate);
+    }
+
+    /**
+     * Finds cell by predicate.
+     *
+     * @param startRow search rows start from this
+     * @param endRow   search rows excluding this, can handle values greater than real rows count
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress find(int startRow, int endRow, Predicate<Object> cellValuePredicate) {
+        return find(startRow, endRow, 0, Integer.MAX_VALUE, cellValuePredicate);
+    }
+
+    /**
+     * Finds cell by predicate.
+     *
+     * @param startRow           search rows start from this
+     * @param endRow             search rows excluding this, can handle values greater than real rows count
+     * @param startColumn        search columns start from this
+     * @param endColumn          search columns excluding this, can handle values greater than real columns count
+     * @param cellValuePredicate predicate for testing cell value
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    TableCellAddress find(int startRow, int endRow,
+                          int startColumn, int endColumn,
+                          Predicate<Object> cellValuePredicate);
+
+    /**
+     * Finds cell address staring with value (ignore case, trims leading spaces).
+     *
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress findByPrefix(String prefix) {
+        return findByPrefix(prefix, 0);
+    }
+
+    /**
+     * Finds cell address staring with value (ignore case, trims leading spaces).
+     *
+     * @param startRow search rows start from this
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress findByPrefix(String prefix, int startRow) {
+        return findByPrefix(prefix, startRow, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Finds cell address staring with value (ignore case, trims leading spaces).
+     *
+     * @param startRow search rows start from this
+     * @param endRow   search rows excluding this, can handle values greater than real rows count
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress findByPrefix(String prefix, int startRow, int endRow) {
+        return findByPrefix(prefix, startRow, endRow, 0, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Finds cell address staring with value (ignore case, trims leading spaces).
+     *
+     * @param startRow    search rows start from this
+     * @param endRow      search rows excluding this, can handle values greater than real rows count
+     * @param startColumn search columns start from this
+     * @param endColumn   search columns excluding this, can handle values greater than real columns count
+     * @return cell address or {@link TableCellAddress#NOT_FOUND}
+     */
+    default TableCellAddress findByPrefix(String prefix, int startRow, int endRow, int startColumn, int endColumn) {
+        return prefix == null ?
+                TableCellAddress.NOT_FOUND :
+                find(startRow, endRow, startColumn, endColumn, getCellStringValueIgnoreCasePrefixPredicate(prefix));
+    }
 
     /**
      * For vertical table of key-value records (table with two columns), search and return value for requested key.
      */
-    default Object getNextColumnValue(String firstColumnValue) {
-        TableCellAddress address = find(firstColumnValue);
+    default Object getNextColumnValue(String firstColumnValuePrefix) {
+        TableCellAddress address = findByPrefix(firstColumnValuePrefix);
         for (TableCell cell : getRow(address.getRow())) {
             if (cell != null && cell.getColumnIndex() > address.getColumn()) {
                 Object value = cell.getValue();
@@ -103,15 +188,33 @@ public interface ReportPage {
     }
 
     /**
-     * Returns table range, table ends with predefined string in one of the row cells.
+     * Returns table range. Table's first row starts with 'firstRowPrefix' prefix in one of the cells
+     * and table ends with predefined prefix in one of the last row cells.
      */
-    default TableCellRange getTableCellRange(String tableName, int headersRowCount, String tableFooterString) {
-        TableCellAddress startAddress = find(tableName);
+    default TableCellRange getTableCellRange(String firstRowPrefix, int headersRowCount, String lastRowPrefix) {
+        if (firstRowPrefix == null || lastRowPrefix == null) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        return getTableCellRange(
+                getCellStringValueIgnoreCasePrefixPredicate(firstRowPrefix),
+                headersRowCount,
+                getCellStringValueIgnoreCasePrefixPredicate(lastRowPrefix));
+    }
+
+    /**
+     * Returns table range. First and last row will be found by predicate.
+     */
+    default TableCellRange getTableCellRange(Predicate<Object> firstRowFinder,
+                                             int headersRowCount,
+                                             Predicate<Object> lastRowFinder) {
+        if (firstRowFinder == null || lastRowFinder == null) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        TableCellAddress startAddress = find(firstRowFinder);
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
-        TableCellAddress endAddress = find(tableFooterString, startAddress.getRow() + headersRowCount + 1,
-                getLastRowNum(), ReportPage.CELL_STRING_STARTS_WITH);
+        TableCellAddress endAddress = find(startAddress.getRow() + headersRowCount + 1, lastRowFinder);
         if (endAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
@@ -123,10 +226,26 @@ public interface ReportPage {
     }
 
     /**
-     * Returns table range, table ends with empty row or last row of report page.
+     * Returns table range. First row starts with 'firstRowPrefix' prefix in one of the cells,
+     * range ends with empty row or last row of report page.
      */
-    default TableCellRange getTableCellRange(String tableName, int headersRowCount) {
-        TableCellAddress startAddress = find(tableName);
+    default TableCellRange getTableCellRange(String firstRowPrefix, int headersRowCount) {
+        if (firstRowPrefix == null) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        return getTableCellRange(
+                getCellStringValueIgnoreCasePrefixPredicate(firstRowPrefix),
+                headersRowCount);
+    }
+
+    /**
+     * Returns table range. First row will be found by predicate, range ends with empty row or last row of report page.
+     */
+    default TableCellRange getTableCellRange(Predicate<Object> firstRowFinder, int headersRowCount) {
+        if (firstRowFinder == null) {
+            return TableCellRange.EMPTY_RANGE;
+        }
+        TableCellAddress startAddress = find(firstRowFinder);
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
@@ -148,7 +267,7 @@ public interface ReportPage {
 
     /**
      * Returns zero-based index of empty row.
-     * This implementation generates a huge amount of garbage. May be override for improve performance.
+     * This implementation generates a huge amount of garbage. May be overridden for improve performance.
      *
      * @param startRow first row for check
      * @return index of first empty row or -1 if not found
@@ -203,11 +322,45 @@ public interface ReportPage {
                 .create(this, tableName, headerDescription, headersRowCount);
     }
 
+    default Table create(Predicate<Object> tableNameFinder,
+                         Predicate<Object> tableFooterFinder,
+                         Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, tableFooterFinder, headerDescription);
+    }
+
+    default Table create(Predicate<Object> tableNameFinder,
+                         Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, headerDescription);
+    }
+
+    default Table create(Predicate<Object> tableNameFinder,
+                         Predicate<Object> tableFooterFinder,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, tableFooterFinder, headerDescription, headersRowCount);
+    }
+
+    default Table create(Predicate<Object> tableNameFinder,
+                         Class<? extends TableColumnDescription> headerDescription,
+                         int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, headerDescription, headersRowCount);
+    }
+
     default Table createNameless(String firstLineText,
                                  String lastRowString,
                                  Class<? extends TableColumnDescription> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, firstLineText, lastRowString, headerDescription);
+    }
+
+    default Table createNameless(String firstLineText,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineText, headerDescription);
     }
 
     default Table createNameless(String providedTableName,
@@ -219,17 +372,41 @@ public interface ReportPage {
                 .createNameless(this, providedTableName, firstLineText, lastRowString, headerDescription, headersRowCount);
     }
 
-    default Table createNameless(String firstLineText,
-                                 Class<? extends TableColumnDescription> headerDescription) {
-        return TableFactoryRegistry.get(this)
-                .createNameless(this, firstLineText, headerDescription);
-    }
-
     default Table createNameless(String providedTableName,
                                  String firstLineText,
                                  Class<? extends TableColumnDescription> headerDescription,
                                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, providedTableName, firstLineText, headerDescription, headersRowCount);
+    }
+
+    default Table createNameless(Predicate<Object> firstLineFinder,
+                                 Predicate<Object> lastRowFinder,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineFinder, lastRowFinder, headerDescription);
+    }
+
+    default Table createNameless(Predicate<Object> firstLineFinder,
+                                 Class<? extends TableColumnDescription> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, firstLineFinder, headerDescription);
+    }
+
+    default Table createNameless(String providedTableName,
+                                 Predicate<Object> firstLineFinder,
+                                 Predicate<Object> lastRowFinder,
+                                 Class<? extends TableColumnDescription> headerDescription,
+                                 int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstLineFinder, lastRowFinder, headerDescription, headersRowCount);
+    }
+
+    default Table createNameless(String providedTableName,
+                                 Predicate<Object> firstLineFinder,
+                                 Class<? extends TableColumnDescription> headerDescription,
+                                 int headersRowCount) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstLineFinder, headerDescription, headersRowCount);
     }
 }

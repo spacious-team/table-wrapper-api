@@ -58,9 +58,14 @@ public interface Table extends Iterable<TableRow> {
     Stream<TableRow> stream();
 
     /**
-     * @return row containing given value or null if not found
+     * @return row containing cell with exact value or null if not found
      */
     TableRow findRow(Object value);
+
+    /**
+     * @return row containing cell starting with prefix or null if not found
+     */
+    TableRow findRowByPrefix(String prefix);
 
     Map<TableColumn, Integer> getHeaderDescription();
 

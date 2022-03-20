@@ -24,7 +24,7 @@
 
     <groupId>org.spacious-team</groupId>
     <artifactId>table-wrapper-api</artifactId>
-    <version>2022.2</version>
+    <version>2022.4</version>
     <packaging>jar</packaging>
 
     <name>Table Wrapper API</name>
@@ -56,14 +56,14 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.18</version>
+            <version>1.18.22</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.30</version>
+            <version>1.7.36</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

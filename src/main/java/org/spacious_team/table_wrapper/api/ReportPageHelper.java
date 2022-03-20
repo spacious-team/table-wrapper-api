@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2022  Vitalii Ananev <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,32 +18,13 @@
 
 package org.spacious_team.table_wrapper.api;
 
-public interface ReportPageRow extends Iterable<TableCell> {
+import java.util.function.Predicate;
 
-    /**
-     * @param i zero-based cell number
-     * @return cell ot null if cell does not exists
-     */
-    TableCell getCell(int i);
+class ReportPageHelper {
 
-    /**
-     * Zero-based row number
-     */
-    int getRowNum();
-
-    /**
-     * Zero-based cell number
-     */
-    int getFirstCellNum();
-
-    /**
-     * @return Zero-based cell number or -1 if row doesn't contain cells
-     */
-    int getLastCellNum();
-
-    /**
-     * @param expected searching value
-     * @return true if any cell of this row has exact value, false otherwise
-     */
-    boolean rowContains(Object expected);
+    static Predicate<Object> getCellStringValueIgnoreCasePrefixPredicate(String prefix) {
+        String lowercasePrefix = prefix.trim().toLowerCase();
+        return (cell) -> (cell instanceof String) &&
+                ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
+    }
 }
