@@ -69,6 +69,7 @@ public class TableCellRange {
      * Adds columns without range check. First column index of range may become negative.
      * @param number positive or negative values
      */
+    @SuppressWarnings("unused")
     public TableCellRange addColumnsToLeft(int number) {
         return new TableCellRange(firstRow, lastRow, firstColumn - number, lastColumn);
     }
@@ -76,6 +77,7 @@ public class TableCellRange {
     /**
      * @param number positive or negative values
      */
+    @SuppressWarnings("unused")
     public TableCellRange addColumnsToRight(int number) {
         return new TableCellRange(firstRow, lastRow, firstColumn, lastColumn + number);
     }

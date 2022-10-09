@@ -58,6 +58,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     /**
      * @param tableRange only first and last row numbers matters
      */
+    @SuppressWarnings("unused")
     protected AbstractTable(AbstractReportPage<R> reportPage,
                             String tableName,
                             TableCellRange tableRange,
@@ -79,6 +80,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                         getColumnIndices(this.headerDescription).max().orElse(tableRange.getLastColumn()));
     }
 
+    @SuppressWarnings("unused")
     protected AbstractTable(AbstractTable<R> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
         this.reportPage = table.reportPage;
         this.tableName = table.tableName;

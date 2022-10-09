@@ -30,6 +30,7 @@ public class TableFactoryRegistry {
         factories.add(tableFactory);
     }
 
+    @SuppressWarnings("unused")
     public static Collection<TableFactory> getAll() {
         return Collections.unmodifiableCollection(factories);
     }

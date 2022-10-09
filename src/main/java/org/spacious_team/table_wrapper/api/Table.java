@@ -26,6 +26,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+@SuppressWarnings("unused")
 public interface Table extends Iterable<TableRow> {
 
     /**

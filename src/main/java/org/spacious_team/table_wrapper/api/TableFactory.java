@@ -122,6 +122,7 @@ public interface TableFactory {
                          int headersRowCount) {
         String tableName = "<not found>";
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder);
+        //noinspection DuplicatedCode
         if (!range.equals(TableCellRange.EMPTY_RANGE)) {
             TableCellAddress tableNameCell =
                     reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
@@ -143,6 +144,7 @@ public interface TableFactory {
                          int headersRowCount) {
         String tableName = "<not found>";
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount);
+        //noinspection DuplicatedCode
         if (!range.equals(TableCellRange.EMPTY_RANGE)) {
             TableCellAddress tableNameCell =
                     reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);

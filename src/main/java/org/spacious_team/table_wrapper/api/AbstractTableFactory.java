@@ -38,7 +38,7 @@ public abstract class AbstractTableFactory<T extends ReportPage> implements Tabl
     /**
      * Safe cast operation if {@link #canHandle(ReportPage)} is true
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unused"})
     protected T cast(ReportPage reportPage) {
         return (T) reportPage;
     }

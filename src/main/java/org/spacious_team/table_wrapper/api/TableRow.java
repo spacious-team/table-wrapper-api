@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 /**
  * {@link TableRow} subclass can be mutable. Use {@link #clone()} to make copy.
  */
+@SuppressWarnings("unused")
 public interface TableRow extends ReportPageRow, Cloneable {
 
     Table getTable();
