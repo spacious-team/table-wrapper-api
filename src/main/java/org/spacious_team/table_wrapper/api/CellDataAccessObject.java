@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -85,8 +86,10 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if can't extract BigDecimal value
      */
     default BigDecimal getBigDecimalValue(C cell) {
-        double number = getDoubleValue(cell);
-        return (number == 0) ? BigDecimal.ZERO : BigDecimal.valueOf(number);
+        String number = getStringValue(cell);
+        number = number.replace(',', '.');
+        return (Objects.equals(number, "0") || Objects.equals(number, "0.0")) ?
+                BigDecimal.ZERO : new BigDecimal(number);
     }
 
     /**
