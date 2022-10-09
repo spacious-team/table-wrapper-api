@@ -82,8 +82,11 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
             throw new NullPointerException(NO_CELL_VALUE_EXCEPTION_MESSAGE);
         }
     }
+
     /**
      * @throws RuntimeException if can't extract BigDecimal value
+     * @see <a href="https://stackoverflow.com/questions/6787142/bigdecimal-equals-versus-compareto">Stack overflow</a>
+     * for BigDecimal values equality
      */
     default BigDecimal getBigDecimalValue(C cell) {
         String number = getStringValue(cell);
@@ -141,6 +144,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
         C cell = getCell(row, cellIndex);
         return getDoubleValue(cell);
     }
+
     /**
      * @throws RuntimeException if can't extract BigDecimal value
      */
