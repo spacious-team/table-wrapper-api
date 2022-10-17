@@ -26,7 +26,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * Implementation is the stateless singleton cell helper class
+ * @apiNote Impl may have parameters that affect how the value is parsed,
+ * for example DataTimeFormat that changes behavior of date time value parser.
  */
 public interface CellDataAccessObject<C, R extends ReportPageRow> {
 
@@ -39,14 +40,14 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     Object getValue(C cell);
 
     /**
-     * @throws RuntimeException if can't extract int value
+     * @throws RuntimeException if method can't extract int value
      */
     default int getIntValue(C cell) {
         return (int) getLongValue(cell);
     }
 
     /**
-     * @throws RuntimeException if can't extract long value
+     * @throws RuntimeException if method can't extract long value
      */
     default long getLongValue(C cell) {
         Object value = getValue(cell);
@@ -60,7 +61,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract Double value
+     * @throws RuntimeException if method can't extract Double value
      */
     default double getDoubleValue(C cell) {
         Object value = getValue(cell);
@@ -84,7 +85,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract BigDecimal value
+     * @throws RuntimeException if method can't extract BigDecimal value
      * @see <a href="https://stackoverflow.com/questions/6787142/bigdecimal-equals-versus-compareto">Stack overflow</a>
      * for BigDecimal values equality
      */
@@ -96,19 +97,19 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract string value
+     * @throws RuntimeException if method can't extract string value
      */
     default String getStringValue(C cell) {
         return getValue(cell).toString();
     }
 
     /**
-     * @throws RuntimeException if can't extract instant value
+     * @throws RuntimeException if method can't extract instant value
      */
     Instant getInstantValue(C cell);
 
     /**
-     * @throws RuntimeException if can't extract local date time value
+     * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(C cell) {
         return getInstantValue(cell)
@@ -122,7 +123,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract int value
+     * @throws RuntimeException if method can't extract int value
      */
     default int getIntValue(R row, Integer cellIndex) {
         C cell = getCell(row, cellIndex);
@@ -130,7 +131,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract long value
+     * @throws RuntimeException if method can't extract long value
      */
     default long getLongValue(R row, Integer cellIndex) {
         C cell = getCell(row, cellIndex);
@@ -138,7 +139,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract Double value
+     * @throws RuntimeException if method can't extract Double value
      */
     default double getDoubleValue(R row, Integer cellIndex) {
         C cell = getCell(row, cellIndex);
@@ -146,7 +147,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract BigDecimal value
+     * @throws RuntimeException if method can't extract BigDecimal value
      */
     default BigDecimal getBigDecimalValue(R row, Integer cellIndex) {
         C cell = getCell(row, cellIndex);
@@ -154,7 +155,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract string value
+     * @throws RuntimeException if method can't extract string value
      */
     default String getStringValue(R row, Integer cellIndex) {
         C cell = getCell(row, cellIndex);
@@ -162,7 +163,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract instant value
+     * @throws RuntimeException if method can't extract instant value
      */
     default Instant getInstantValue(R row, Integer cellIndex) {
         C cell = getCell(row, cellIndex);
@@ -170,7 +171,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
-     * @throws RuntimeException if can't extract local date time value
+     * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex) {
         C cell = getCell(row, cellIndex);

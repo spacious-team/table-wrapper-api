@@ -30,6 +30,11 @@ import java.util.stream.Stream;
 public interface Table extends Iterable<TableRow> {
 
     /**
+     * Report page this table belongs to
+     */
+    ReportPage getReportPage();
+
+    /**
      * Extracts exactly one object from excel row
      */
     default <T> List<T> getData(Function<TableRow, T> rowExtractor) {
@@ -59,6 +64,13 @@ public interface Table extends Iterable<TableRow> {
     Stream<TableRow> stream();
 
     /**
+     * @param i zero-based index
+     * @return row object or null is row does not exist
+     * @apiNote Method impl should return {@link CellDataAccessObject} aware {@link ReportPageRow} impl
+     */
+    ReportPageRow getRow(int i);
+
+    /**
      * @return row containing cell with exact value or null if not found
      */
     TableRow findRow(Object value);
@@ -71,7 +83,7 @@ public interface Table extends Iterable<TableRow> {
     Map<TableColumn, Integer> getHeaderDescription();
 
     /**
-     * By default table iterates throw all rows, call method if last row is "total" row and it should be excluded
+     * By default, table iterates throw all rows, call method if last row is "total" row, and it should be excluded
      */
     default Table excludeTotalRow() {
         return subTable(0, -1);

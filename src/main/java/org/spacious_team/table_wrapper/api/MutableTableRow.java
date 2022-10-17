@@ -29,7 +29,9 @@ import java.util.Iterator;
 
 /**
  * Mutable implementation. Used by {@link AbstractTable#iterator()} and {@link AbstractTable#stream()} to eliminate
- * heap pollution. Use {@link #clone()} for using variable outside iterator or stream.
+ * heap pollution. On each iteration {@link #row} field is updated. Call {@link #clone()} instead of using this object
+ * outside iterator or stream, that safer in outside code, because {@link #row} field holds value even if iterator
+ * will continue to work.
  */
 @Data
 class MutableTableRow<T extends ReportPageRow> implements TableRow {
@@ -78,51 +80,30 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
         return dao.getValue(row, getCellIndex(column));
     }
 
-    /**
-     * @throws RuntimeException if can't extract int value
-     */
     public int getIntCellValue(TableColumnDescription column) {
         return dao.getIntValue(row, getCellIndex(column));
     }
 
-    /**
-     * @throws RuntimeException if can't extract long value
-     */
     public long getLongCellValue(TableColumnDescription column) {
         return dao.getLongValue(row, getCellIndex(column));
     }
 
-    /**
-     * @throws RuntimeException if can't extract Double value
-     */
     public double getDoubleCellValue(TableColumnDescription column) {
         return dao.getDoubleValue(row, getCellIndex(column));
     }
 
-    /**
-     * @throws RuntimeException if can't extract BigDecimal value
-     */
     public BigDecimal getBigDecimalCellValue(TableColumnDescription column) {
         return dao.getBigDecimalValue(row, getCellIndex(column));
     }
 
-    /**
-     * @throws RuntimeException if can't extract string value
-     */
     public String getStringCellValue(TableColumnDescription column) {
         return dao.getStringValue(row, getCellIndex(column));
     }
 
-    /**
-     * @throws RuntimeException if can't extract instant value
-     */
     public Instant getInstantCellValue(TableColumnDescription column) {
         return dao.getInstantValue(row, getCellIndex(column));
     }
 
-    /**
-     * @throws RuntimeException if can't extract local date time value
-     */
     public LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column) {
         return dao.getLocalDateTimeValue(row, getCellIndex(column));
     }
@@ -133,15 +114,15 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     }
 
     /**
-     * Object is mutable.
-     * Clone it if it should be outside table rows loop block, {@link Table#iterator()} or {@link Table#stream()}
+     * This object is mutable.
+     * Clone it if it should be used outside table rows loop block ({@link Table#iterator()} or {@link Table#stream()}).
+     * Cloned  object is safe use everywhere, this object should be used oly inside of one iteration
+     * of {@link Table#iterator()} or {@link Table#stream()}
      */
     @SuppressWarnings("unchecked")
     public MutableTableRow<T> clone() {
         try {
-            MutableTableRow<T> tableRow = (MutableTableRow<T>) super.clone();
-            tableRow.setRow(row);
-            return tableRow;
+            return (MutableTableRow<T>) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Can't clone " + this.getClass().getName());
         }

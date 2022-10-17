@@ -32,40 +32,43 @@ public interface TableRow extends ReportPageRow, Cloneable {
 
     TableCell getCell(TableColumnDescription column);
 
+    /**
+     * Returns cell's native value
+     */
     Object getCellValue(TableColumnDescription column);
 
     /**
-     * @throws RuntimeException if can't extract int value
+     * @throws RuntimeException if method can't extract int value
      */
     int getIntCellValue(TableColumnDescription column);
 
     /**
-     * @throws RuntimeException if can't extract long value
+     * @throws RuntimeException if method can't extract long value
      */
     long getLongCellValue(TableColumnDescription column);
 
     /**
-     * @throws RuntimeException if can't extract Double value
+     * @throws RuntimeException if method can't extract Double value
      */
     double getDoubleCellValue(TableColumnDescription column);
 
     /**
-     * @throws RuntimeException if can't extract BigDecimal value
+     * @throws RuntimeException if method can't extract BigDecimal value
      */
     BigDecimal getBigDecimalCellValue(TableColumnDescription column);
 
     /**
-     * @throws RuntimeException if can't extract string value
+     * @throws RuntimeException if method can't extract string value
      */
     String getStringCellValue(TableColumnDescription column);
 
     /**
-     * @throws RuntimeException if can't extract instant value
+     * @throws RuntimeException if method can't extract instant value
      */
     Instant getInstantCellValue(TableColumnDescription column);
 
     /**
-     * @throws RuntimeException if can't extract local date time value
+     * @throws RuntimeException if method can't extract local date time value
      */
     LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column);
 
