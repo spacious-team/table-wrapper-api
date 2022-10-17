@@ -176,6 +176,7 @@ public interface ReportPage {
     /**
      * @param i zero-based index
      * @return row object or null is row does not exist
+     * @apiNote Method impl should return {@link CellDataAccessObject} aware {@link ReportPageRow} impl
      */
     ReportPageRow getRow(int i);
 

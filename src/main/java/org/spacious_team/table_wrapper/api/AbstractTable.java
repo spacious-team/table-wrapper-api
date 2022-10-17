@@ -42,6 +42,7 @@ import java.util.stream.StreamSupport;
 @ToString(of = {"tableName"})
 public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
+    @Getter
     protected final AbstractReportPage<R> reportPage;
     protected final String tableName;
     @Getter
@@ -223,11 +224,16 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         public TableRow next() {
             R row;
             do {
-                row = reportPage.getRow(tableRange.getFirstRow() + (i++));
+                row = getRow(tableRange.getFirstRow() + (i++));
             } while (row == null && hasNext());
             tableRow.setRow(row);
             return tableRow;
         }
+    }
+
+    @Override
+    public R getRow(int i) {
+        return reportPage.getRow(i);
     }
 
     @Override
@@ -245,7 +251,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     private MutableTableRow<R> getMutableTableRow(TableCellAddress address) {
         if (tableRange.contains(address)) {
             MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
-            tableRow.setRow(reportPage.getRow(address.getRow()));
+            tableRow.setRow(getRow(address.getRow()));
             return tableRow;
         }
         return null;
