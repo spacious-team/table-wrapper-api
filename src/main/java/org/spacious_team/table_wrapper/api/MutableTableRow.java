@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -42,6 +43,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     @Setter(AccessLevel.PACKAGE)
     private volatile T row;
 
+    @Nullable
     public TableCell getCell(TableColumnDescription column) {
         return getCell(getCellIndex(column));
     }
@@ -76,6 +78,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
         return row.iterator();
     }
 
+    @Nullable
     public Object getCellValue(TableColumnDescription column) {
         return dao.getValue(row, getCellIndex(column));
     }

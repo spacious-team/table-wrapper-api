@@ -18,12 +18,15 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import javax.annotation.Nullable;
+
 public interface ReportPageRow extends Iterable<TableCell> {
 
     /**
      * @param i zero-based cell number
-     * @return cell ot null if cell does not exists
+     * @return cell ot null if cell does not exist
      */
+    @Nullable
     TableCell getCell(int i);
 
     /**

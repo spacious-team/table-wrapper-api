@@ -18,12 +18,15 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @apiNote Impl may have parameters that affect how the value is parsed,
@@ -35,8 +38,10 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     Pattern spacePattern = Pattern.compile("\\s");
     String NO_CELL_VALUE_EXCEPTION_MESSAGE = "Cell doesn't contains value";
 
+    @Nullable
     C getCell(R row, Integer cellIndex);
 
+    @Nullable
     Object getValue(C cell);
 
     /**
@@ -50,7 +55,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract long value
      */
     default long getLongValue(C cell) {
-        Object value = getValue(cell);
+        @Nullable Object value = getValue(cell);
         if (value instanceof Number) {
             return ((Number) value).longValue();
         } else if (value != null) {
@@ -64,7 +69,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract Double value
      */
     default double getDoubleValue(C cell) {
-        Object value = getValue(cell);
+        @Nullable Object value = getValue(cell);
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
         } else if (value != null) {
@@ -100,7 +105,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract string value
      */
     default String getStringValue(C cell) {
-        return getValue(cell).toString();
+        return requireNonNull(getValue(cell), "Not a string").toString();
     }
 
     /**
@@ -117,16 +122,17 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
                 .toLocalDateTime();
     }
 
+    @Nullable
     default Object getValue(R row, Integer cellIndex) {
-        C cell = getCell(row, cellIndex);
-        return getValue(cell);
+        @Nullable C cell = getCell(row, cellIndex);
+        return (cell == null) ? null : getValue(cell);
     }
 
     /**
      * @throws RuntimeException if method can't extract int value
      */
     default int getIntValue(R row, Integer cellIndex) {
-        C cell = getCell(row, cellIndex);
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getIntValue(cell);
     }
 
@@ -134,7 +140,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract long value
      */
     default long getLongValue(R row, Integer cellIndex) {
-        C cell = getCell(row, cellIndex);
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getLongValue(cell);
     }
 
@@ -142,7 +148,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract Double value
      */
     default double getDoubleValue(R row, Integer cellIndex) {
-        C cell = getCell(row, cellIndex);
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getDoubleValue(cell);
     }
 
@@ -150,7 +156,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract BigDecimal value
      */
     default BigDecimal getBigDecimalValue(R row, Integer cellIndex) {
-        C cell = getCell(row, cellIndex);
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getBigDecimalValue(cell);
     }
 
@@ -158,7 +164,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract string value
      */
     default String getStringValue(R row, Integer cellIndex) {
-        C cell = getCell(row, cellIndex);
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getStringValue(cell);
     }
 
@@ -166,7 +172,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract instant value
      */
     default Instant getInstantValue(R row, Integer cellIndex) {
-        C cell = getCell(row, cellIndex);
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getInstantValue(cell);
     }
 
@@ -174,8 +180,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex) {
-        C cell = getCell(row, cellIndex);
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getLocalDateTimeValue(cell);
     }
-
 }
