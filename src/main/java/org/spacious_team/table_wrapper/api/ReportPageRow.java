@@ -35,7 +35,7 @@ public interface ReportPageRow extends Iterable<TableCell> {
     int getRowNum();
 
     /**
-     * Zero-based cell number
+     * Zero-based cell number or -1 if row doesn't contain cells
      */
     int getFirstCellNum();
 

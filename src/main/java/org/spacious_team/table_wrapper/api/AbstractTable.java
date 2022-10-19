@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -227,6 +228,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
             do {
                 row = getRow(tableRange.getFirstRow() + (i++));
             } while (row == null && hasNext());
+            Objects.requireNonNull(row, "Last row is empty");
             tableRow.setRow(row);
             return tableRow;
         }
