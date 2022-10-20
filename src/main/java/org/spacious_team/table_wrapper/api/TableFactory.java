@@ -20,6 +20,8 @@ package org.spacious_team.table_wrapper.api;
 
 import java.util.function.Predicate;
 
+import static java.util.Objects.requireNonNull;
+
 public interface TableFactory {
 
     boolean canHandle(ReportPage reportPage);
@@ -128,8 +130,9 @@ public interface TableFactory {
                     reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
             if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
                 try {
-                    //noinspection ConstantConditions
-                    tableName = reportPage.getCell(tableNameCell).getStringValue();
+                    @SuppressWarnings({"nullness", "ConstantConditions"})
+                    TableCell cell = requireNonNull(reportPage.getCell(tableNameCell));
+                    tableName = cell.getStringValue();
                 } catch (Exception ignore) {
                 }
             }
@@ -155,8 +158,9 @@ public interface TableFactory {
                     reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
             if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
                 try {
-                    //noinspection ConstantConditions
-                    tableName = reportPage.getCell(tableNameCell).getStringValue();
+                    @SuppressWarnings({"nullness", "ConstantConditions"})
+                    TableCell cell = requireNonNull(reportPage.getCell(tableNameCell));
+                    tableName = cell.getStringValue();
                 } catch (Exception ignore) {
                 }
             }

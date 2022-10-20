@@ -18,7 +18,7 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
@@ -167,7 +167,7 @@ public interface ReportPage {
         TableCellAddress address = findByPrefix(firstColumnValuePrefix);
         @Nullable ReportPageRow row = getRow(address.getRow());
         if (row != null) {
-            for (@Nullable TableCell cell : row) {
+            for (@SuppressWarnings("NullableProblems") @Nullable TableCell cell : row) {
                 if (cell != null && cell.getColumnIndex() > address.getColumn()) {
                     @Nullable Object value = cell.getValue();
                     if (value != null && (!(value instanceof String) || !((String) value).isBlank())) {
@@ -227,11 +227,13 @@ public interface ReportPage {
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row not found");
         TableCellAddress endAddress = find(startAddress.getRow() + headersRowCount + 1, lastRowFinder);
         if (endAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow lastRow = requireNonNull(getRow(endAddress.getRow()), "Row not found");
         return new TableCellRange(
                 startAddress.getRow(),
@@ -264,6 +266,7 @@ public interface ReportPage {
         if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row not found");
         int lastRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
         if (lastRowNum == -1) {
@@ -274,6 +277,7 @@ public interface ReportPage {
         if (lastRowNum < startAddress.getRow()) {
             lastRowNum = startAddress.getRow();
         }
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow lastRow = requireNonNull(getRow(lastRowNum), "Row not found");
         return new TableCellRange(
                 startAddress.getRow(),
@@ -297,7 +301,7 @@ public interface ReportPage {
             if (row == null || row.getLastCellNum() == -1) {
                 return lastRowNum; // all row cells blank
             }
-            for (@Nullable TableCell cell : row) {
+            for (@SuppressWarnings("NullableProblems") @Nullable TableCell cell : row) {
                 @Nullable Object value;
                 if (!(cell == null
                         || ((value = cell.getValue()) == null)

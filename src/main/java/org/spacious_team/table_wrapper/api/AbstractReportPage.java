@@ -18,7 +18,7 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * {@link ReportPage} with specified {@link ReportPageRow}
