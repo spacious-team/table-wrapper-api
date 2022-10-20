@@ -1,5 +1,6 @@
 ![java-version](https://img.shields.io/badge/Java-11-brightgreen?style=flat-square)
 ![jitpack-last-release](https://jitpack.io/v/spacious-team/table-wrapper-api.svg?style=flat-square)
+[![Unit tests](https://github.com/spacious-team/table-wrapper-api/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/spacious-team/table-wrapper-api/actions/workflows/unit-tests.yml)
 
 #### Оглавление
 - [Назначение](#назначение)
