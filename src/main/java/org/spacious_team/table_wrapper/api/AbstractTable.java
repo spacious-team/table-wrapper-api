@@ -21,8 +21,8 @@ package org.spacious_team.table_wrapper.api;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -39,6 +38,8 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @ToString(of = {"tableName"})
@@ -108,8 +109,12 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
         ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
         for (int i = 0; i < headersRowCount; i++) {
-            headerRows[i] = reportPage.getRow(tableRange.getFirstRow() + 1 + i);
+            @Nullable ReportPageRow row = reportPage.getRow(tableRange.getFirstRow() + 1 + i);
+            @SuppressWarnings({"nullness"})
+            ReportPageRow notNullRow = requireNonNull(row, "Header row is absent");
+            headerRows[i] = notNullRow;
         }
+        @SuppressWarnings("nullness")
         TableColumn[] columns = Arrays.stream(headerDescription.getEnumConstants())
                 .map(TableColumnDescription::getColumn)
                 .toArray(TableColumn[]::new);
@@ -126,29 +131,29 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                 .filter(i -> i != TableColumn.NOCOLUMN_INDEX);
     }
 
-    public <T> List<T> getData(Object report, Function<TableRow, T> rowExtractor) {
+    public <T> List<T> getData(Object report, Function<TableRow, @Nullable T> rowExtractor) {
         return getDataCollection(report, (row, data) -> {
-            T result = rowExtractor.apply(row);
+            @Nullable T result = rowExtractor.apply(row);
             if (result != null) {
                 data.add(result);
             }
         });
     }
 
-    public <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor) {
+    public <T> List<T> getDataCollection(Object report, Function<TableRow, @Nullable Collection<T>> rowExtractor) {
         return getDataCollection(report, (row, data) -> {
-            Collection<T> result = rowExtractor.apply(row);
+            @Nullable Collection<T> result = rowExtractor.apply(row);
             if (result != null) {
                 data.addAll(result);
             }
         });
     }
 
-    public <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor,
+    public <T> List<T> getDataCollection(Object report, Function<TableRow, @Nullable Collection<T>> rowExtractor,
                                          BiPredicate<T, T> equalityChecker,
-                                         BiFunction<T, T, Collection<T>> mergeDuplicates) {
+                                         BiFunction<T, T, @Nullable Collection<T>> mergeDuplicates) {
         return getDataCollection(report, (row, data) -> {
-            Collection<T> result = rowExtractor.apply(row);
+            @Nullable Collection<T> result = rowExtractor.apply(row);
             if (result != null) {
                 for (T r : result) {
                     addWithEqualityChecker(r, data, equalityChecker, mergeDuplicates);
@@ -159,7 +164,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
     private <T> List<T> getDataCollection(Object report, BiConsumer<TableRow, Collection<T>> rowHandler) {
         List<T> data = new ArrayList<>();
-        for (@Nullable TableRow row : this) {
+        for (@SuppressWarnings("NullableProblems") @Nullable TableRow row : this) {
             if (row != null) {
                 try {
                     rowHandler.accept(row, data);
@@ -175,7 +180,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     public static <T> void addWithEqualityChecker(T element,
                                                   Collection<T> collection,
                                                   BiPredicate<T, T> equalityChecker,
-                                                  BiFunction<T, T, Collection<T>> duplicatesMerger) {
+                                                  BiFunction<T, T, @Nullable Collection<T>> duplicatesMerger) {
         @Nullable T equalsObject = null;
         for (T e : collection) {
             if (equalityChecker.test(e, element)) {
@@ -185,7 +190,10 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         }
         if (equalsObject != null) {
             collection.remove(equalsObject);
-            collection.addAll(duplicatesMerger.apply(equalsObject, element));
+            @Nullable Collection<T> mergedCollection = duplicatesMerger.apply(equalsObject, element);
+            if (mergedCollection != null) {
+                collection.addAll(mergedCollection);
+            }
         } else {
             collection.add(element);
         }
@@ -262,7 +270,9 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     private MutableTableRow<R> getMutableTableRow(TableCellAddress address) {
         if (tableRange.contains(address)) {
             MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
-            tableRow.setRow(getRow(address.getRow()));
+            @SuppressWarnings({"nullness", "ConstantConditions"})
+            R row = requireNonNull(getRow(address.getRow()), "Row is empty");
+            tableRow.setRow(row);
             return tableRow;
         }
         return null;

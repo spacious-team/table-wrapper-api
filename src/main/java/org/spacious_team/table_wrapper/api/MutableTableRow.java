@@ -21,12 +21,14 @@ package org.spacious_team.table_wrapper.api;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Iterator;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Mutable implementation. Used by {@link AbstractTable#iterator()} and {@link AbstractTable#stream()} to eliminate
@@ -48,6 +50,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
         return getCell(getCellIndex(column));
     }
 
+    @Nullable
     @Override
     public TableCell getCell(int i) {
         return row.getCell(i);
@@ -112,8 +115,9 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     }
 
     private Integer getCellIndex(TableColumnDescription column) {
-        return table.getHeaderDescription()
+        @Nullable Integer cellIndex = table.getHeaderDescription()
                 .get(column.getColumn());
+        return requireNonNull(cellIndex, "Cell not found");
     }
 
     /**

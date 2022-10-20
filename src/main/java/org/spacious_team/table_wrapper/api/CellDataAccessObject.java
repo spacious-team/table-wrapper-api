@@ -18,7 +18,7 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -104,8 +104,11 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     /**
      * @throws RuntimeException if method can't extract string value
      */
+
     default String getStringValue(C cell) {
-        return requireNonNull(getValue(cell), "Not a string").toString();
+        @SuppressWarnings({"nullness", "ConstantConditions"})
+        Object value = requireNonNull(getValue(cell), "Not a string");
+        return value.toString();
     }
 
     /**
@@ -132,6 +135,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract int value
      */
     default int getIntValue(R row, Integer cellIndex) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getIntValue(cell);
     }
@@ -140,6 +144,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract long value
      */
     default long getLongValue(R row, Integer cellIndex) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getLongValue(cell);
     }
@@ -148,6 +153,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract Double value
      */
     default double getDoubleValue(R row, Integer cellIndex) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getDoubleValue(cell);
     }
@@ -156,6 +162,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract BigDecimal value
      */
     default BigDecimal getBigDecimalValue(R row, Integer cellIndex) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getBigDecimalValue(cell);
     }
@@ -164,6 +171,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract string value
      */
     default String getStringValue(R row, Integer cellIndex) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getStringValue(cell);
     }
@@ -172,6 +180,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract instant value
      */
     default Instant getInstantValue(R row, Integer cellIndex) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getInstantValue(cell);
     }
@@ -180,6 +189,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
         C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getLocalDateTimeValue(cell);
     }
