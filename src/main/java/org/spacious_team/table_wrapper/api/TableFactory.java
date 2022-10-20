@@ -126,8 +126,13 @@ public interface TableFactory {
         if (!range.equals(TableCellRange.EMPTY_RANGE)) {
             TableCellAddress tableNameCell =
                     reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
-            tableName = tableNameCell.equals(TableCellAddress.NOT_FOUND) ? "<not found>" :
-                    reportPage.getCell(tableNameCell).getStringValue();
+            if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
+                try {
+                    //noinspection ConstantConditions
+                    tableName = reportPage.getCell(tableNameCell).getStringValue();
+                } catch (Exception ignore) {
+                }
+            }
         }
         return create(reportPage, tableName, range, headerDescription, headersRowCount);
     }
@@ -148,8 +153,13 @@ public interface TableFactory {
         if (!range.equals(TableCellRange.EMPTY_RANGE)) {
             TableCellAddress tableNameCell =
                     reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
-            tableName = tableNameCell.equals(TableCellAddress.NOT_FOUND) ? "<not found>" :
-                    reportPage.getCell(tableNameCell).getStringValue();
+            if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
+                try {
+                    //noinspection ConstantConditions
+                    tableName = reportPage.getCell(tableNameCell).getStringValue();
+                } catch (Exception ignore) {
+                }
+            }
         }
         return create(reportPage, tableName, range, headerDescription, headersRowCount);
     }

@@ -21,6 +21,7 @@ package org.spacious_team.table_wrapper.api;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 
 @ToString
@@ -44,9 +45,10 @@ public class TableColumnImpl implements TableColumn {
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         for (ReportPageRow header : headerRows) {
             next_cell:
-            for (TableCell cell : header) {
-                Object value;
-                if (cell != null && cell.getColumnIndex() >= firstColumnForSearch && ((value = cell.getValue()) instanceof String)) {
+            for (@Nullable TableCell cell : header) {
+                @Nullable Object value;
+                if (cell != null && cell.getColumnIndex() >= firstColumnForSearch &&
+                        ((value = cell.getValue()) instanceof String)) {
                     String colName = value.toString().toLowerCase();
                     for (String word : words) {
                         if (!containsWord(colName, word)) {

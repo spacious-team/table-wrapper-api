@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -157,7 +159,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
     private <T> List<T> getDataCollection(Object report, BiConsumer<TableRow, Collection<T>> rowHandler) {
         List<T> data = new ArrayList<>();
-        for (TableRow row : this) {
+        for (@Nullable TableRow row : this) {
             if (row != null) {
                 try {
                     rowHandler.accept(row, data);
@@ -174,7 +176,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                                                   Collection<T> collection,
                                                   BiPredicate<T, T> equalityChecker,
                                                   BiFunction<T, T, Collection<T>> duplicatesMerger) {
-        T equalsObject = null;
+        @Nullable T equalsObject = null;
         for (T e : collection) {
             if (equalityChecker.test(e, element)) {
                 equalsObject = e;
@@ -192,7 +194,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     /**
      * {@link TableRow} impl is mutable.
      * For performance issue same object with changed state is provided in each loop cycle.
-     * Call {@link TableRow#clone()} if you want use row object outside stream() block.
+     * Call {@link TableRow#clone()} if you want to use row object outside stream() block.
      */
     @Override
     public Stream<TableRow> stream() {
@@ -202,7 +204,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     /**
      * {@link TableRow} impl is mutable.
      * For performance issue same object with changed state is provided in each loop cycle.
-     * Call {@link TableRow#clone()} if you want use row object outside iterator() block.
+     * Call {@link TableRow#clone()} if you want to use row object outside iterator() block.
      */
     @Override
     public Iterator<TableRow> iterator() {
@@ -222,32 +224,41 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
         @Override
         public TableRow next() {
-            R row;
+            int rowNum;
+            @Nullable R row;
             do {
-                row = getRow(tableRange.getFirstRow() + (i++));
+                rowNum = tableRange.getFirstRow() + (i++);
+                row = getRow(rowNum);
             } while (row == null && hasNext());
+            if (row == null) { // Last row is empty
+                return new EmptyTableRow(AbstractTable.this, rowNum);
+            }
             tableRow.setRow(row);
             return tableRow;
         }
     }
 
+    @Nullable
     @Override
     public R getRow(int i) {
         return reportPage.getRow(i);
     }
 
+    @Nullable
     @Override
     public TableRow findRow(Object value) {
         TableCellAddress address = reportPage.find(value);
         return getMutableTableRow(address);
     }
 
+    @Nullable
     @Override
     public TableRow findRowByPrefix(String prefix) {
         TableCellAddress address = reportPage.findByPrefix(prefix);
         return getMutableTableRow(address);
     }
 
+    @Nullable
     private MutableTableRow<R> getMutableTableRow(TableCellAddress address) {
         if (tableRange.contains(address)) {
             MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());

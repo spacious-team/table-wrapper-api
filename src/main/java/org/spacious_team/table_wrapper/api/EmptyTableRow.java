@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
+ * Copyright (C) 2022  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,114 +18,98 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Setter;
-
 import javax.annotation.Nullable;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 
-/**
- * Mutable implementation. Used by {@link AbstractTable#iterator()} and {@link AbstractTable#stream()} to eliminate
- * heap pollution. On each iteration {@link #row} field is updated. Call {@link #clone()} instead of using this object
- * outside iterator or stream, that safer in outside code, because {@link #row} field holds value even if iterator
- * will continue to work.
- */
+import static java.util.Collections.emptyIterator;
+
 @Data
-class MutableTableRow<T extends ReportPageRow> implements TableRow {
-
+class EmptyTableRow implements TableRow {
     private final Table table;
-    private final CellDataAccessObject<?, T> dao;
-
-    @Setter(AccessLevel.PACKAGE)
-    private volatile T row;
+    private final int rowNum;
 
     @Nullable
+    @Override
     public TableCell getCell(TableColumnDescription column) {
-        return getCell(getCellIndex(column));
+        return null;
     }
 
+    @Nullable
     @Override
     public TableCell getCell(int i) {
-        return row.getCell(i);
-    }
-
-    @Override
-    public int getRowNum() {
-        return row.getRowNum();
+        return null;
     }
 
     @Override
     public int getFirstCellNum() {
-        return row.getFirstCellNum();
+        return -1;
     }
 
     @Override
     public int getLastCellNum() {
-        return row.getLastCellNum();
+        return -1;
     }
 
     @Override
     public boolean rowContains(Object expected) {
-        return row.rowContains(expected);
+        return false;
     }
 
     @Override
     public Iterator<TableCell> iterator() {
-        return row.iterator();
+        return emptyIterator();
     }
 
     @Nullable
+    @Override
     public Object getCellValue(TableColumnDescription column) {
-        return dao.getValue(row, getCellIndex(column));
+        return null;
     }
 
+    @Override
     public int getIntCellValue(TableColumnDescription column) {
-        return dao.getIntValue(row, getCellIndex(column));
+        throw new NullPointerException("Cell not found");
     }
 
+    @Override
     public long getLongCellValue(TableColumnDescription column) {
-        return dao.getLongValue(row, getCellIndex(column));
+        throw new NullPointerException("Cell not found");
     }
 
+    @Override
     public double getDoubleCellValue(TableColumnDescription column) {
-        return dao.getDoubleValue(row, getCellIndex(column));
+        throw new NullPointerException("Cell not found");
     }
 
+    @Override
     public BigDecimal getBigDecimalCellValue(TableColumnDescription column) {
-        return dao.getBigDecimalValue(row, getCellIndex(column));
+        throw new NullPointerException("Cell not found");
     }
 
+    @Override
     public String getStringCellValue(TableColumnDescription column) {
-        return dao.getStringValue(row, getCellIndex(column));
+        throw new NullPointerException("Cell not found");
     }
 
+    @Override
     public Instant getInstantCellValue(TableColumnDescription column) {
-        return dao.getInstantValue(row, getCellIndex(column));
+        throw new NullPointerException("Cell not found");
     }
 
+    @Override
     public LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column) {
-        return dao.getLocalDateTimeValue(row, getCellIndex(column));
+        throw new NullPointerException("Cell not found");
     }
 
-    private Integer getCellIndex(TableColumnDescription column) {
-        return table.getHeaderDescription()
-                .get(column.getColumn());
-    }
-
-    /**
-     * This object is mutable.
-     * Clone it if it should be used outside table rows loop block ({@link Table#iterator()} or {@link Table#stream()}).
-     * Cloned  object is safe use everywhere, this object should be used oly inside of one iteration
-     * of {@link Table#iterator()} or {@link Table#stream()}
-     */
-    @SuppressWarnings("unchecked")
-    public MutableTableRow<T> clone() {
+    @Override
+    public TableRow clone() {
         try {
-            return (MutableTableRow<T>) super.clone();
+            return (TableRow) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Can't clone " + this.getClass().getName());
         }
