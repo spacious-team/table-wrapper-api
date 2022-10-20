@@ -224,11 +224,15 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
         @Override
         public TableRow next() {
+            int rowNum;
             @Nullable R row;
             do {
-                row = getRow(tableRange.getFirstRow() + (i++));
+                rowNum = tableRange.getFirstRow() + (i++);
+                row = getRow(rowNum);
             } while (row == null && hasNext());
-            Objects.requireNonNull(row, "Last row is empty");
+            if (row == null) { // Last row is empty
+                return new EmptyTableRow(AbstractTable.this, rowNum);
+            }
             tableRow.setRow(row);
             return tableRow;
         }
