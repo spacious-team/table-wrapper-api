@@ -19,6 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.math.BigDecimal;
@@ -30,6 +31,7 @@ import static java.util.Collections.emptyIterator;
 
 @Data
 class EmptyTableRow implements TableRow {
+    private static final String CELL_NOT_FOUND = "Cell not found";
     private final Table table;
     private final int rowNum;
 
@@ -70,45 +72,42 @@ class EmptyTableRow implements TableRow {
 
     @Override
     public int getIntCellValue(TableColumnDescription column) {
-        throw new NullPointerException("Cell not found");
+        throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
     public long getLongCellValue(TableColumnDescription column) {
-        throw new NullPointerException("Cell not found");
+        throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
     public double getDoubleCellValue(TableColumnDescription column) {
-        throw new NullPointerException("Cell not found");
+        throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
     public BigDecimal getBigDecimalCellValue(TableColumnDescription column) {
-        throw new NullPointerException("Cell not found");
+        throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
     public String getStringCellValue(TableColumnDescription column) {
-        throw new NullPointerException("Cell not found");
+        throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
     public Instant getInstantCellValue(TableColumnDescription column) {
-        throw new NullPointerException("Cell not found");
+        throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
     public LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column) {
-        throw new NullPointerException("Cell not found");
+        throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
+    @SneakyThrows
     public TableRow clone() {
-        try {
-            return (TableRow) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("Can't clone " + this.getClass().getName());
-        }
+        return (TableRow) super.clone();
     }
 }
