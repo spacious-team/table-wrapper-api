@@ -122,21 +122,8 @@ public interface TableFactory {
                          Predicate<Object> lastRowFinder,
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount) {
-        String tableName = "<not found>";
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder);
-        //noinspection DuplicatedCode
-        if (!range.equals(TableCellRange.EMPTY_RANGE)) {
-            TableCellAddress tableNameCell =
-                    reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
-            if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
-                try {
-                    @SuppressWarnings({"nullness", "ConstantConditions"})
-                    TableCell cell = requireNonNull(reportPage.getCell(tableNameCell));
-                    tableName = cell.getStringValue();
-                } catch (Exception ignore) {
-                }
-            }
-        }
+        String tableName = getTableName(reportPage, tableNameFinder, range);
         return create(reportPage, tableName, range, headerDescription, headersRowCount);
     }
 
@@ -150,9 +137,12 @@ public interface TableFactory {
                          Predicate<Object> tableNameFinder,
                          Class<? extends TableColumnDescription> headerDescription,
                          int headersRowCount) {
-        String tableName = "<not found>";
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount);
-        //noinspection DuplicatedCode
+        String tableName = getTableName(reportPage, tableNameFinder, range);
+        return create(reportPage, tableName, range, headerDescription, headersRowCount);
+    }
+
+    private static String getTableName(ReportPage reportPage, Predicate<Object> tableNameFinder, TableCellRange range) {
         if (!range.equals(TableCellRange.EMPTY_RANGE)) {
             TableCellAddress tableNameCell =
                     reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
@@ -160,12 +150,13 @@ public interface TableFactory {
                 try {
                     @SuppressWarnings({"nullness", "ConstantConditions"})
                     TableCell cell = requireNonNull(reportPage.getCell(tableNameCell));
-                    tableName = cell.getStringValue();
+                    return cell.getStringValue();
                 } catch (Exception ignore) {
+                    return "<not found>";
                 }
             }
         }
-        return create(reportPage, tableName, range, headerDescription, headersRowCount);
+        return "<not found>";
     }
 
     /**
