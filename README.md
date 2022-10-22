@@ -3,6 +3,8 @@
 https://jitpack.io/#spacious-team/table-wrapper-api)
 [![Unit tests](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fspacious-team%2Ftable-wrapper-api%2Fbadge%3Fref%3Ddevelop&style=flat-square&label=Test&logo=none)](
 https://github.com/spacious-team/table-wrapper-api/actions/workflows/unit-tests.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/spacious-team/table-wrapper-api/develop?style=flat-square&token=SIOIDt0TcY)](
+https://codecov.io/gh/spacious-team/table-wrapper-api)
 
 #### Оглавление
 - [Назначение](#назначение)
