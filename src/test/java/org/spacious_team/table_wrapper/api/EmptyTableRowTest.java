@@ -28,7 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings("nullness") // TODO exclude test sources entirely
 @ExtendWith(MockitoExtension.class)
 class EmptyTableRowTest {
 
