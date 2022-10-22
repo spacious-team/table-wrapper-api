@@ -18,7 +18,6 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-@Getter
 @SuppressWarnings("nullness") // TODO exclude test sources entirely
 @ExtendWith(MockitoExtension.class)
 class EmptyTableRowTest {
@@ -49,90 +46,90 @@ class EmptyTableRowTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 1000_000})
     void getCell(int col) {
-        assertNull(getRow().getCell(col));
+        assertNull(row.getCell(col));
     }
 
     @Test
     void testGetCell() {
-        assertNull(getRow().getCell(getColumn()));
+        assertNull(row.getCell(column));
     }
 
     @Test
     void getFirstCellNum() {
-        assertEquals(-1, getRow().getFirstCellNum());
+        assertEquals(-1, row.getFirstCellNum());
     }
 
     @Test
     void getLastCellNum() {
-        assertEquals(-1, getRow().getLastCellNum());
+        assertEquals(-1, row.getLastCellNum());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"1", "abc"})
     void rowContains(String value) {
-        assertFalse(getRow().rowContains(value));
+        assertFalse(row.rowContains(value));
     }
 
     @Test
     void iterator() {
-        assertFalse(getRow().iterator().hasNext());
+        assertFalse(row.iterator().hasNext());
     }
 
     @Test
     void getCellValue() {
-        assertNull(getRow().getCellValue(getColumn()));
+        assertNull(row.getCellValue(column));
     }
 
     @Test
     void getIntCellValue() {
         assertThrows(NullPointerException.class,
-                () -> getRow().getIntCellValue(getColumn()));
+                () -> row.getIntCellValue(column));
     }
 
     @Test
     void getLongCellValue() {
         assertThrows(NullPointerException.class,
-                () -> getRow().getLongCellValue(getColumn()));
+                () -> row.getLongCellValue(column));
     }
 
     @Test
     void getDoubleCellValue() {
         assertThrows(NullPointerException.class,
-                () -> getRow().getDoubleCellValue(getColumn()));
+                () -> row.getDoubleCellValue(column));
     }
 
     @Test
     void getBigDecimalCellValue() {
         assertThrows(NullPointerException.class,
-                () -> getRow().getBigDecimalCellValue(getColumn()));
+                () -> row.getBigDecimalCellValue(column));
     }
 
     @Test
     void getStringCellValue() {
         assertThrows(NullPointerException.class,
-                () -> getRow().getStringCellValue(getColumn()));
+                () -> row.getStringCellValue(column));
     }
 
     @Test
     void getInstantCellValue() {
         assertThrows(NullPointerException.class,
-                () -> getRow().getInstantCellValue(getColumn()));
+                () -> row.getInstantCellValue(column));
     }
 
     @Test
     void getLocalDateTimeCellValue() {
         assertThrows(NullPointerException.class,
-                () -> getRow().getLocalDateTimeCellValue(getColumn()));
+                () -> row.getLocalDateTimeCellValue(column));
     }
 
     @Test
     void testClone() {
-        assertEquals(getRow(), getRow().clone());
+        assertEquals(row, row.clone());
     }
 
     @Test
     void testGetTable() {
-        assertEquals(getTable(), getRow().getTable());
+        assertEquals(table, row.getTable());
     }
 
     @ParameterizedTest
@@ -143,18 +140,18 @@ class EmptyTableRowTest {
 
     @Test
     void testEquals() {
-        assertEquals(new EmptyTableRow(getTable(), 0), getRow());
-        assertNotEquals(new EmptyTableRow(getTable(), 1), getRow());
+        assertEquals(new EmptyTableRow(table, 0), row);
+        assertNotEquals(new EmptyTableRow(table, 1), row);
     }
 
     @Test
     void testHashCode() {
-        assertEquals(new EmptyTableRow(getTable(), 0).hashCode(), getRow().hashCode());
-        assertNotEquals(new EmptyTableRow(getTable(), 1).hashCode(), getRow().hashCode());
+        assertEquals(new EmptyTableRow(table, 0).hashCode(), row.hashCode());
+        assertNotEquals(new EmptyTableRow(table, 1).hashCode(), row.hashCode());
     }
 
     @Test
     void testToString() {
-        assertNotNull(getRow().toString());
+        assertNotNull(row.toString());
     }
 }
