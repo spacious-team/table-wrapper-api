@@ -246,28 +246,24 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         }
     }
 
-    @Nullable
     @Override
-    public R getRow(int i) {
+    public @Nullable R getRow(int i) {
         return reportPage.getRow(i);
     }
 
-    @Nullable
     @Override
-    public TableRow findRow(Object value) {
+    public @Nullable TableRow findRow(Object value) {
         TableCellAddress address = reportPage.find(value);
         return getMutableTableRow(address);
     }
 
-    @Nullable
     @Override
-    public TableRow findRowByPrefix(String prefix) {
+    public @Nullable TableRow findRowByPrefix(String prefix) {
         TableCellAddress address = reportPage.findByPrefix(prefix);
         return getMutableTableRow(address);
     }
 
-    @Nullable
-    private MutableTableRow<R> getMutableTableRow(TableCellAddress address) {
+    private @Nullable MutableTableRow<R> getMutableTableRow(TableCellAddress address) {
         if (tableRange.contains(address)) {
             MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
             @SuppressWarnings({"nullness", "ConstantConditions"})

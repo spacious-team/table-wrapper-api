@@ -45,14 +45,12 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     @Setter(AccessLevel.PACKAGE)
     private volatile T row;
 
-    @Nullable
-    public TableCell getCell(TableColumnDescription column) {
+    public @Nullable TableCell getCell(TableColumnDescription column) {
         return getCell(getCellIndex(column));
     }
 
-    @Nullable
     @Override
-    public TableCell getCell(int i) {
+    public @Nullable TableCell getCell(int i) {
         return row.getCell(i);
     }
 
@@ -81,8 +79,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
         return row.iterator();
     }
 
-    @Nullable
-    public Object getCellValue(TableColumnDescription column) {
+    public @Nullable Object getCellValue(TableColumnDescription column) {
         return dao.getValue(row, getCellIndex(column));
     }
 

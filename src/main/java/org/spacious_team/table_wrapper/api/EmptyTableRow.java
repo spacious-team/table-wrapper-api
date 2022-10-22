@@ -33,15 +33,13 @@ class EmptyTableRow implements TableRow {
     private final Table table;
     private final int rowNum;
 
-    @Nullable
     @Override
-    public TableCell getCell(TableColumnDescription column) {
+    public @Nullable TableCell getCell(TableColumnDescription column) {
         return null;
     }
 
-    @Nullable
     @Override
-    public TableCell getCell(int i) {
+    public @Nullable TableCell getCell(int i) {
         return null;
     }
 
@@ -65,9 +63,8 @@ class EmptyTableRow implements TableRow {
         return emptyIterator();
     }
 
-    @Nullable
     @Override
-    public Object getCellValue(TableColumnDescription column) {
+    public @Nullable Object getCellValue(TableColumnDescription column) {
         return null;
     }
 
