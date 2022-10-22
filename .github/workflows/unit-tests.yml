@@ -1,7 +1,4 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
-name: Unit tests
+name: Unit Tests
 
 on:
   workflow_dispatch:
@@ -15,19 +12,34 @@ on:
       - 'develop'
 
 jobs:
-  build:
+  tests:
 
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '18'
           distribution: 'liberica'
           cache: maven
-      - name: Maven tests
-        run: mvn -B clean test
-      - name: Test coverage
+
+      - name: Maven Tests
+        run: mvn --batch-mode clean test
+
+      - name: Test Coverage
         uses: codecov/codecov-action@v3
+
+      - name: SonarCloud Analyze
+        run: >
+          mvn --batch-mode sonar:sonar
+          -Dsonar.projectKey=spacious-team_table-wrapper-api
+          -Dsonar.organization=spacious-team
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.login=$SONAR_TOKEN
+          -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
