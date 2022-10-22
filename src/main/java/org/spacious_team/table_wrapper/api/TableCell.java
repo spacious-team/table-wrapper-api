@@ -72,8 +72,7 @@ public interface TableCell {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    @Nullable
-    default Object getValueOrDefault(@Nullable Object defaultValue) {
+    default @Nullable Object getValueOrDefault(@Nullable Object defaultValue) {
         try {
             return getValue();
         } catch (Exception e) {

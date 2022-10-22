@@ -78,8 +78,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    @Nullable
-    default Object getCellValueOrDefault(TableColumnDescription column, @Nullable Object defaultValue) {
+    default @Nullable Object getCellValueOrDefault(TableColumnDescription column, @Nullable Object defaultValue) {
         try {
             return getCellValue(column);
         } catch (Exception e) {

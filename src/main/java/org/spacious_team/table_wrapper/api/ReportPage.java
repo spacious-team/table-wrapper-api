@@ -162,8 +162,7 @@ public interface ReportPage {
     /**
      * For vertical table of key-value records (table with two columns), search and return value for requested key.
      */
-    @Nullable
-    default Object getNextColumnValue(String firstColumnValuePrefix) {
+    default @Nullable Object getNextColumnValue(String firstColumnValuePrefix) {
         TableCellAddress address = findByPrefix(firstColumnValuePrefix);
         @Nullable ReportPageRow row = getRow(address.getRow());
         if (row != null) {
@@ -192,8 +191,7 @@ public interface ReportPage {
      */
     int getLastRowNum();
 
-    @Nullable
-    default TableCell getCell(TableCellAddress address) {
+    default @Nullable TableCell getCell(TableCellAddress address) {
         @Nullable ReportPageRow row = getRow(address.getRow());
         return (row == null) ? null : row.getCell(address.getColumn());
     }

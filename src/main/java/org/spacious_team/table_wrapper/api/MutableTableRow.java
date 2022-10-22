@@ -21,6 +21,7 @@ package org.spacious_team.table_wrapper.api;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.math.BigDecimal;
@@ -45,14 +46,13 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     @Setter(AccessLevel.PACKAGE)
     private volatile T row;
 
-    @Nullable
-    public TableCell getCell(TableColumnDescription column) {
+    @Override
+    public @Nullable TableCell getCell(TableColumnDescription column) {
         return getCell(getCellIndex(column));
     }
 
-    @Nullable
     @Override
-    public TableCell getCell(int i) {
+    public @Nullable TableCell getCell(int i) {
         return row.getCell(i);
     }
 
@@ -81,35 +81,42 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
         return row.iterator();
     }
 
-    @Nullable
-    public Object getCellValue(TableColumnDescription column) {
+    @Override
+    public @Nullable Object getCellValue(TableColumnDescription column) {
         return dao.getValue(row, getCellIndex(column));
     }
 
+    @Override
     public int getIntCellValue(TableColumnDescription column) {
         return dao.getIntValue(row, getCellIndex(column));
     }
 
+    @Override
     public long getLongCellValue(TableColumnDescription column) {
         return dao.getLongValue(row, getCellIndex(column));
     }
 
+    @Override
     public double getDoubleCellValue(TableColumnDescription column) {
         return dao.getDoubleValue(row, getCellIndex(column));
     }
 
+    @Override
     public BigDecimal getBigDecimalCellValue(TableColumnDescription column) {
         return dao.getBigDecimalValue(row, getCellIndex(column));
     }
 
+    @Override
     public String getStringCellValue(TableColumnDescription column) {
         return dao.getStringValue(row, getCellIndex(column));
     }
 
+    @Override
     public Instant getInstantCellValue(TableColumnDescription column) {
         return dao.getInstantValue(row, getCellIndex(column));
     }
 
+    @Override
     public LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column) {
         return dao.getLocalDateTimeValue(row, getCellIndex(column));
     }
@@ -117,7 +124,9 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     private Integer getCellIndex(TableColumnDescription column) {
         @Nullable Integer cellIndex = table.getHeaderDescription()
                 .get(column.getColumn());
-        return requireNonNull(cellIndex, "Cell not found");
+        @SuppressWarnings("nullness")
+        Integer cell = requireNonNull(cellIndex, "Cell not found");
+        return cell;
     }
 
     /**
@@ -126,12 +135,10 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
      * Cloned  object is safe use everywhere, this object should be used oly inside of one iteration
      * of {@link Table#iterator()} or {@link Table#stream()}
      */
+    @Override
+    @SneakyThrows
     @SuppressWarnings("unchecked")
     public MutableTableRow<T> clone() {
-        try {
-            return (MutableTableRow<T>) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("Can't clone " + this.getClass().getName());
-        }
+        return (MutableTableRow<T>) super.clone();
     }
 }

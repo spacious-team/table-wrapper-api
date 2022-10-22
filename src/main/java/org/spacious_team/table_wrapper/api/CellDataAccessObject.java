@@ -125,8 +125,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
                 .toLocalDateTime();
     }
 
-    @Nullable
-    default Object getValue(R row, Integer cellIndex) {
+    default @Nullable Object getValue(R row, Integer cellIndex) {
         @Nullable C cell = getCell(row, cellIndex);
         return (cell == null) ? null : getValue(cell);
     }
