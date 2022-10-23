@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -232,6 +233,9 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
         @Override
         public TableRow next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             int rowNum;
             @Nullable R row;
             do {
