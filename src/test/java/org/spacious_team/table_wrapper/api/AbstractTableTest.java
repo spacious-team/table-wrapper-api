@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +48,8 @@ class AbstractTableTest {
     TableCellRange tableRange;
     @Mock
     TableColumnDescription headerDescription;
+    @Mock
+    CellDataAccessObject<?, EmptyTableRow> dao;
     AbstractTable<EmptyTableRow> table;
 
     @BeforeEach
@@ -143,14 +145,47 @@ class AbstractTableTest {
 
     @Test
     void getRow() {
+        table.getRow(1);
+        verify(report).getRow(1);
     }
 
     @Test
+    void findRowNotFound() {
+        when(tableRange.contains(any())).thenReturn(false);
+        assertNull(table.findRow("row value"));
+    }
+
+    @Test
+    void findRowFoundEmptyRow() {
+        when(tableRange.contains(any())).thenReturn(true);
+        assertThrows(NullPointerException.class, () -> table.findRow("row value"));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
     void findRow() {
+        TableCellAddress address = new TableCellAddress(1, 0);
+        EmptyTableRow row = new EmptyTableRow(table, address.getRow());
+        MutableTableRow<EmptyTableRow> mutableRow = new MutableTableRow<>(table, dao);
+        mutableRow.setRow(row);
+        when(report.find("row value")).thenReturn(address);
+        when(tableRange.contains(address)).thenReturn(true);
+        when(table.getRow(address.getRow())).thenReturn(row);
+
+        assertEquals(mutableRow, table.findRow("row value"));
+        verify(report).find("row value");
+        verify(tableRange).contains(address);
+        verify(table).getRow(address.getRow());
     }
 
     @Test
     void findRowByPrefix() {
+        TableCellAddress address = new TableCellAddress(1, 0);
+        when(report.findByPrefix("row value")).thenReturn(address);
+
+        table.findRowByPrefix("row value");
+
+        verify(report).findByPrefix("row value");
     }
 
     @Test
@@ -177,10 +212,7 @@ class AbstractTableTest {
     void isEmpty() {
     }
 
-    static class TableImpl extends AbstractTable<EmptyTableRow> {
-
-        @Mock
-        CellDataAccessObject<?, EmptyTableRow> dao;
+    class TableImpl extends AbstractTable<EmptyTableRow> {
 
         protected TableImpl(AbstractReportPage<EmptyTableRow> reportPage,
                             String tableName,
