@@ -27,8 +27,8 @@ import lombok.ToString;
  * Zero-based table cell range
  */
 @Getter
-@EqualsAndHashCode
 @ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class TableCellRange {
     public static final TableCellRange EMPTY_RANGE = new EmptyTableCellRange();

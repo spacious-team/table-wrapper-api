@@ -18,6 +18,8 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +30,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -38,6 +42,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.spacious_team.table_wrapper.api.TableColumn.LEFTMOST_COLUMN;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractTableTest {
@@ -46,15 +51,87 @@ class AbstractTableTest {
     AbstractReportPage<EmptyTableRow> report;
     @Mock
     TableCellRange tableRange;
-    @Mock
-    TableColumnDescription headerDescription;
+    Class<Columns> headerDescription = Columns.class;
     @Mock
     CellDataAccessObject<?, EmptyTableRow> dao;
     AbstractTable<EmptyTableRow> table;
 
     @BeforeEach
     void beforeEach() {
-        table = spy(new TableImpl(report, "table name", tableRange, headerDescription.getClass(), 1));
+        table = spy(new TableImpl(report, "table name", tableRange, headerDescription, 1));
+    }
+
+    @Test
+    void testEmptyRangeConstructor() {
+        AbstractTable<EmptyTableRow> table = getEmptyTable();
+
+        assertEquals(report, table.getReportPage());
+        assertEquals(new TableCellRange(2, 3, 0, 100), table.getTableRange());
+        assertTrue(table.getHeaderDescription().isEmpty());
+        assertTrue(table.isEmpty());
+    }
+
+    /**
+     * Builds not empty table of 2 columns, row #2 contains table name, row #3 - header, no data rows
+     */
+    private AbstractTable<EmptyTableRow> getEmptyTable() {
+        TableCellRange tableRange = new TableCellRange(2, 3, 0, 100);
+        return new TableImpl(report, "table name", tableRange, headerDescription, 1);
+    }
+
+    @Test
+    void testNotEmptyRangeConstructor() {
+        AbstractTable<EmptyTableRow> table = getNotEmptyTable();
+        TableCellRange range = new TableCellRange(2, 6, 0, 1);
+        ReportPageRow[] headerRows = new EmptyTableRow[0]; // mock
+        Map<TableColumn, Integer> headerDescriptionMap = Map.of(
+                Columns.FIRST.getColumn(),
+                Columns.FIRST.getColumn().getColumnIndex(headerRows),
+                Columns.SECOND.getColumn(),
+                Columns.SECOND.getColumn().getColumnIndex(headerRows));
+
+        assertEquals(report, table.getReportPage());
+        assertEquals(range, table.getTableRange());
+        assertEquals(headerDescriptionMap, table.getHeaderDescription());
+        assertFalse(table.isEmpty());
+    }
+
+    /**
+     * Builds not empty table of 2 columns, row #2 contains table name, row #3 and #4 - header, row #5 - data,
+     * row #6 - data with is equals to null
+     */
+    @SuppressWarnings("ConstantConditions")
+    private AbstractTable<EmptyTableRow> getNotEmptyTable() {
+        // 2-th row - table name, 3-st and 4-nd rows - table header
+        TableCellRange tableRange = new TableCellRange(2, 6, 0, 100);
+        when(report.getRow(3)).thenReturn(new EmptyTableRow(table, 3));
+        when(report.getRow(4)).thenReturn(new EmptyTableRow(table, 4));
+        return new TableImpl(report, "table name", tableRange, headerDescription, 2);
+    }
+
+    @Test
+    void testEmptyRangeConstructor2() {
+        AbstractTable<EmptyTableRow> originalTable = getNotEmptyTable();
+        AbstractTable<EmptyTableRow> table = new TableImpl(originalTable, -1, -1);
+        TableCellRange range = new TableCellRange(3, 5, 0, 1);
+
+        assertEquals(report, table.getReportPage());
+        assertEquals(range, table.getTableRange());
+        assertEquals(originalTable.getHeaderDescription(), table.getHeaderDescription());
+        assertTrue(table.isEmpty());
+    }
+
+    @Test
+    void testNotEmptyRangeConstructor2() {
+        AbstractTable<EmptyTableRow> originalTable = getEmptyTable();
+        AbstractTable<EmptyTableRow> table = new TableImpl(originalTable, 1, 2);
+        TableCellRange range = new TableCellRange(1, 5,
+                table.getTableRange().getFirstColumn(), table.getTableRange().getLastColumn());
+
+        assertEquals(report, table.getReportPage());
+        assertEquals(range, table.getTableRange());
+        assertEquals(originalTable.getHeaderDescription(), table.getHeaderDescription());
+        assertFalse(table.isEmpty());
     }
 
     @Test
@@ -107,23 +184,26 @@ class AbstractTableTest {
     @SuppressWarnings("unchecked")
     void testGetDataCollection() {
         TableRow sourceRow = mock(TableRow.class);
-        EmptyTableRow internalRow = mock(EmptyTableRow.class);
-        EmptyTableRow resultRow = mock(EmptyTableRow.class);
+        EmptyTableRow internalRow1 = mock(EmptyTableRow.class);
+        EmptyTableRow internalRow2 = mock(EmptyTableRow.class);
+        EmptyTableRow mergedRow = mock(EmptyTableRow.class);
         Iterator<TableRow> iterator = Arrays.asList(sourceRow, null).iterator();
         when(table.iterator()).thenReturn(iterator);
         Function<TableRow, Collection<EmptyTableRow>> rowExtractor = mock(Function.class);
-        when(rowExtractor.apply(sourceRow)).thenReturn(List.of(internalRow, internalRow)); // more than one object
+        when(rowExtractor.apply(sourceRow)).thenReturn(List.of(internalRow1, internalRow1, internalRow2)); // has duplicated
         BiPredicate<EmptyTableRow, EmptyTableRow> equalityChecker = mock(BiPredicate.class);
-        when(equalityChecker.test(internalRow, internalRow)).thenReturn(true);
+        when(equalityChecker.test(internalRow1, internalRow1)).thenReturn(true);
+        when(equalityChecker.test(mergedRow, internalRow2)).thenReturn(false);
         BiFunction<EmptyTableRow, EmptyTableRow, Collection<EmptyTableRow>> mergeDuplicates = mock(BiFunction.class);
-        when(mergeDuplicates.apply(internalRow, internalRow)).thenReturn(singleton(resultRow));
+        when(mergeDuplicates.apply(internalRow1, internalRow1)).thenReturn(singleton(mergedRow));
 
         Collection<EmptyTableRow> result = table.getDataCollection(report, rowExtractor, equalityChecker, mergeDuplicates);
 
-        assertEquals(List.of(resultRow), result);
+        assertEquals(List.of(mergedRow, internalRow2), result);
         verify(rowExtractor).apply(sourceRow);
-        verify(equalityChecker).test(internalRow, internalRow);
-        verify(mergeDuplicates).apply(internalRow, internalRow);
+        verify(equalityChecker).test(internalRow1, internalRow1);
+        verify(equalityChecker).test(mergedRow, internalRow2);
+        verify(mergeDuplicates).apply(internalRow1, internalRow1);
     }
 
     @Test
@@ -141,6 +221,31 @@ class AbstractTableTest {
     void iterator() {
         Iterator<TableRow> iterator = table.iterator();
         assertEquals(AbstractTable.TableIterator.class, iterator.getClass());
+    }
+
+    @Test
+    void testIteration() {
+        table = getNotEmptyTable();
+        //noinspection ConstantConditions
+        when(report.getRow(5)).thenReturn(new EmptyTableRow(table, 5));
+        // report.getRow(6) == null
+
+        Iterator<TableRow> iterator = table.iterator();
+        boolean nextA = iterator.hasNext();
+        TableRow rowA = iterator.next();
+        boolean nextB = iterator.hasNext();
+        TableRow rowB = iterator.next();
+        boolean nextC = iterator.hasNext();
+
+        assertEquals(AbstractTable.TableIterator.class, iterator.getClass());
+        assertTrue(nextA);
+        assertTrue(nextB);
+        assertFalse(nextC);
+        assertEquals(MutableTableRow.class, rowA.getClass());
+        assertEquals(EmptyTableRow.class, rowB.getClass());
+        assertThrows(NoSuchElementException.class, iterator::next);
+        assertEquals(5, rowA.getRowNum());
+        assertEquals(6, rowB.getRowNum());
     }
 
     @Test
@@ -189,27 +294,8 @@ class AbstractTableTest {
     }
 
     @Test
-    void getCellDataAccessObject() {
-    }
-
-    @Test
     void testToString() {
-    }
-
-    @Test
-    void getReportPage() {
-    }
-
-    @Test
-    void getTableRange() {
-    }
-
-    @Test
-    void getHeaderDescription() {
-    }
-
-    @Test
-    void isEmpty() {
+        assertEquals("AbstractTable(tableName=table name)", table.toString());
     }
 
     class TableImpl extends AbstractTable<EmptyTableRow> {
@@ -235,5 +321,13 @@ class AbstractTableTest {
         public Table subTable(int topRows, int bottomRows) {
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    enum Columns implements TableColumnDescription {
+        FIRST(LEFTMOST_COLUMN),
+        SECOND(ConstantPositionTableColumn.of(1));
+        private final TableColumn column;
     }
 }
