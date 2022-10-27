@@ -35,11 +35,11 @@ class AbstractTableCellTest {
     CellDataAccessObject<Object, ?> dao;
     @Mock
     Object cellValue;
-    TableCellImpl cell;
+    TableCellTestImpl cell;
 
     @BeforeEach
     void setUp() {
-        cell = new TableCellImpl(cellValue, dao);
+        cell = new TableCellTestImpl(cellValue, dao);
     }
 
     @Test
@@ -102,8 +102,8 @@ class AbstractTableCellTest {
 
     @Test
     void testEquals() {
-        TableCellImpl expected = new TableCellImpl(cellValue, dao);
-        TableCellImpl notExpected = new TableCellImpl(new Object(), dao);
+        TableCellTestImpl expected = new TableCellTestImpl(cellValue, dao);
+        TableCellTestImpl notExpected = new TableCellTestImpl(new Object(), dao);
 
         assertEquals(expected, cell);
         assertNotEquals(notExpected, cell);
@@ -111,8 +111,8 @@ class AbstractTableCellTest {
 
     @Test
     void testHashCode() {
-        TableCellImpl expected = new TableCellImpl(cellValue, dao);
-        TableCellImpl notExpected = new TableCellImpl(new Object(), dao);
+        TableCellTestImpl expected = new TableCellTestImpl(cellValue, dao);
+        TableCellTestImpl notExpected = new TableCellTestImpl(new Object(), dao);
 
         assertEquals(expected.hashCode(), cell.hashCode());
         assertNotEquals(notExpected.hashCode(), cell.hashCode());
@@ -123,9 +123,9 @@ class AbstractTableCellTest {
         assertEquals("AbstractTableCell(cell=cellValue, dao=dao)", cell.toString());
     }
 
-    static class TableCellImpl extends AbstractTableCell<Object> {
+    static class TableCellTestImpl extends AbstractTableCell<Object> {
 
-        protected TableCellImpl(Object cell, CellDataAccessObject<Object, ?> dao) {
+        protected TableCellTestImpl(Object cell, CellDataAccessObject<Object, ?> dao) {
             super(cell, dao);
         }
 

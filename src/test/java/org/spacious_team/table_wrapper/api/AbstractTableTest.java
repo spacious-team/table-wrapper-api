@@ -58,7 +58,7 @@ class AbstractTableTest {
 
     @BeforeEach
     void beforeEach() {
-        table = spy(new TableImpl(report, "table name", tableRange, headerDescription, 1));
+        table = spy(new TableTestImpl(report, "table name", tableRange, headerDescription, 1));
     }
 
     @Test
@@ -76,7 +76,7 @@ class AbstractTableTest {
      */
     private AbstractTable<EmptyTableRow> getEmptyTable() {
         TableCellRange tableRange = new TableCellRange(2, 3, 0, 100);
-        return new TableImpl(report, "table name", tableRange, headerDescription, 1);
+        return new TableTestImpl(report, "table name", tableRange, headerDescription, 1);
     }
 
     @Test
@@ -106,13 +106,13 @@ class AbstractTableTest {
         TableCellRange tableRange = new TableCellRange(2, 6, 0, 100);
         when(report.getRow(3)).thenReturn(new EmptyTableRow(table, 3));
         when(report.getRow(4)).thenReturn(new EmptyTableRow(table, 4));
-        return new TableImpl(report, "table name", tableRange, headerDescription, 2);
+        return new TableTestImpl(report, "table name", tableRange, headerDescription, 2);
     }
 
     @Test
     void testEmptyRangeConstructor2() {
         AbstractTable<EmptyTableRow> originalTable = getNotEmptyTable();
-        AbstractTable<EmptyTableRow> table = new TableImpl(originalTable, -1, -1);
+        AbstractTable<EmptyTableRow> table = new TableTestImpl(originalTable, -1, -1);
         TableCellRange range = new TableCellRange(3, 5, 0, 1);
 
         assertEquals(report, table.getReportPage());
@@ -124,7 +124,7 @@ class AbstractTableTest {
     @Test
     void testNotEmptyRangeConstructor2() {
         AbstractTable<EmptyTableRow> originalTable = getEmptyTable();
-        AbstractTable<EmptyTableRow> table = new TableImpl(originalTable, 1, 2);
+        AbstractTable<EmptyTableRow> table = new TableTestImpl(originalTable, 1, 2);
         TableCellRange range = new TableCellRange(1, 5,
                 table.getTableRange().getFirstColumn(), table.getTableRange().getLastColumn());
 
@@ -310,17 +310,17 @@ class AbstractTableTest {
         assertNotEquals(getNotEmptyTable().hashCode(), getEmptyTable().hashCode());
     }
 
-    class TableImpl extends AbstractTable<EmptyTableRow> {
+    class TableTestImpl extends AbstractTable<EmptyTableRow> {
 
-        protected TableImpl(AbstractReportPage<EmptyTableRow> reportPage,
-                            String tableName,
-                            TableCellRange tableRange,
-                            Class<? extends TableColumnDescription> headerDescription,
-                            int headersRowCount) {
+        protected TableTestImpl(AbstractReportPage<EmptyTableRow> reportPage,
+                                String tableName,
+                                TableCellRange tableRange,
+                                Class<? extends TableColumnDescription> headerDescription,
+                                int headersRowCount) {
             super(reportPage, tableName, tableRange, headerDescription, headersRowCount);
         }
 
-        public TableImpl(AbstractTable<EmptyTableRow> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
+        public TableTestImpl(AbstractTable<EmptyTableRow> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
             super(table, appendDataRowsToTop, appendDataRowsToBottom);
         }
 
