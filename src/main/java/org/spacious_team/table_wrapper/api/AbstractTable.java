@@ -18,6 +18,7 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ import java.util.stream.StreamSupport;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
+@EqualsAndHashCode
 @ToString(of = {"tableName"})
 public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
@@ -96,8 +98,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     }
 
     private static boolean isEmpty(TableCellRange tableRange, int dataRowOffset) {
-        return tableRange.equals(TableCellRange.EMPTY_RANGE) ||
-                (getNumberOfTableRows(tableRange) - dataRowOffset) <= 0;
+        return getNumberOfTableRows(tableRange) <= dataRowOffset;
     }
 
     private static int getNumberOfTableRows(TableCellRange tableRange) {

@@ -298,6 +298,18 @@ class AbstractTableTest {
         assertEquals("AbstractTable(tableName=table name)", table.toString());
     }
 
+    @Test
+    void testEquals() {
+        assertEquals(getNotEmptyTable(), getNotEmptyTable());
+        assertNotEquals(getNotEmptyTable(), getEmptyTable());
+    }
+
+    @Test
+    void testHashCode() {
+        assertEquals(getNotEmptyTable().hashCode(), getNotEmptyTable().hashCode());
+        assertNotEquals(getNotEmptyTable().hashCode(), getEmptyTable().hashCode());
+    }
+
     class TableImpl extends AbstractTable<EmptyTableRow> {
 
         protected TableImpl(AbstractReportPage<EmptyTableRow> reportPage,

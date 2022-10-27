@@ -42,7 +42,7 @@ public interface Table extends Iterable<TableRow> {
         return getData("unknown", rowExtractor);
     }
 
-    <T> List<T> getData(Object report, Function<TableRow, T> rowExtractor);
+    <T> List<T> getData(Object report, Function<TableRow, @Nullable T> rowExtractor);
 
     /**
      * Extracts objects from table without duplicate objects handling (duplicated row are both will be returned)
@@ -51,14 +51,14 @@ public interface Table extends Iterable<TableRow> {
         return getDataCollection("unknown", rowExtractor);
     }
 
-    <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor);
+    <T> List<T> getDataCollection(Object report, Function<TableRow, @Nullable Collection<T>> rowExtractor);
 
     /**
      * Extracts objects from table with duplicate objects handling logic
      */
-    <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor,
+    <T> List<T> getDataCollection(Object report, Function<TableRow, @Nullable Collection<T>> rowExtractor,
                                   BiPredicate<T, T> equalityChecker,
-                                  BiFunction<T, T, Collection<T>> mergeDuplicates);
+                                  BiFunction<T, T, @Nullable Collection<T>> mergeDuplicates);
 
     boolean isEmpty();
 
@@ -82,6 +82,7 @@ public interface Table extends Iterable<TableRow> {
      * @return row containing cell starting with prefix or null if not found
      */
     @Nullable
+    @SuppressWarnings("UnusedReturnValue")
     TableRow findRowByPrefix(String prefix);
 
     Map<TableColumn, Integer> getHeaderDescription();
