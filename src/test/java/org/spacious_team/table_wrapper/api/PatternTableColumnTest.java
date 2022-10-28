@@ -32,7 +32,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.spacious_team.table_wrapper.api.TableColumn.LEFTMOST_COLUMN;
 
-class TableColumnImplTest {
+class PatternTableColumnTest {
 
     @Mock
     CellDataAccessObject<Object, ?> dao;
@@ -60,47 +60,47 @@ class TableColumnImplTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     void testZeroArg() {
-        assertEquals(LEFTMOST_COLUMN, TableColumnImpl.of());
-        //assertEquals(LEFTMOST_COLUMN, TableColumnImpl.of((String[]) null));
-        assertEquals(LEFTMOST_COLUMN, TableColumnImpl.of(new String[]{null}));
-        //assertEquals(LEFTMOST_COLUMN, TableColumnImpl.of(null, null));
+        assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of());
+        //assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of((String[]) null));
+        assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(new String[]{null}));
+        //assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(null, null));
     }
 
     @Test
     void getColumnIndex() {
-        assertEquals(0, TableColumnImpl.of().getColumnIndex(row));
-        assertEquals(9, TableColumnImpl.of("test").getColumnIndex(row));
-        assertEquals(9, TableColumnImpl.of("WORD").getColumnIndex(row));
-        assertEquals(10, TableColumnImpl.of("is\\s*sparta").getColumnIndex(row));
-        assertEquals(20, TableColumnImpl.of("is the").getColumnIndex(row));
-        assertEquals(20, TableColumnImpl.of("(old|Gr..t)").getColumnIndex(row));
-        assertEquals(20,   TableColumnImpl.of("of").getColumnIndex(row));
-        assertEquals(21, TableColumnImpl.of("mac").getColumnIndex(row));
-        assertEquals(22, TableColumnImpl.of("windows").getColumnIndex(row));
-        assertThrows(RuntimeException.class, () -> TableColumnImpl.of("not found").getColumnIndex(row));
+        assertEquals(0, PatternTableColumn.of().getColumnIndex(row));
+        assertEquals(9, PatternTableColumn.of("test").getColumnIndex(row));
+        assertEquals(9, PatternTableColumn.of("WORD").getColumnIndex(row));
+        assertEquals(10, PatternTableColumn.of("is\\s*sparta").getColumnIndex(row));
+        assertEquals(20, PatternTableColumn.of("is the").getColumnIndex(row));
+        assertEquals(20, PatternTableColumn.of("(old|Gr..t)").getColumnIndex(row));
+        assertEquals(20,   PatternTableColumn.of("of").getColumnIndex(row));
+        assertEquals(21, PatternTableColumn.of("mac").getColumnIndex(row));
+        assertEquals(22, PatternTableColumn.of("windows").getColumnIndex(row));
+        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("not found").getColumnIndex(row));
     }
 
     @Test
     void testEquals() {
-        TableColumn expected = TableColumnImpl.of("test");
-        TableColumn notExpected = TableColumnImpl.of("abc");
+        TableColumn expected = PatternTableColumn.of("test");
+        TableColumn notExpected = PatternTableColumn.of("abc");
 
-        assertEquals(expected, TableColumnImpl.of("test"));
-        assertNotEquals(notExpected, TableColumnImpl.of("test"));
+        assertEquals(expected, PatternTableColumn.of("test"));
+        assertNotEquals(notExpected, PatternTableColumn.of("test"));
     }
 
     @Test
     void testHashCode() {
-        TableColumn expected = TableColumnImpl.of("test");
-        TableColumn notExpected = TableColumnImpl.of("abc");
+        TableColumn expected = PatternTableColumn.of("test");
+        TableColumn notExpected = PatternTableColumn.of("abc");
 
-        assertEquals(expected.hashCode(), TableColumnImpl.of("test").hashCode());
-        assertNotEquals(notExpected.hashCode(), TableColumnImpl.of("test").hashCode());
+        assertEquals(expected.hashCode(), PatternTableColumn.of("test").hashCode());
+        assertNotEquals(notExpected.hashCode(), PatternTableColumn.of("test").hashCode());
     }
 
     @Test
     void testToString() {
-        assertEquals("TableColumnImpl(words=[test])", TableColumnImpl.of("test").toString());
+        assertEquals("PatternTableColumn(words=[test])", PatternTableColumn.of("test").toString());
     }
 
     @Getter

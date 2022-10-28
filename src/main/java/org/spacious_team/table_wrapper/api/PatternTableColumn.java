@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 @ToString
 @EqualsAndHashCode
-public class TableColumnImpl implements TableColumn {
+public class PatternTableColumn implements TableColumn {
     private final String[] words;
 
     public static TableColumn of(String... words) {
@@ -34,10 +34,10 @@ public class TableColumnImpl implements TableColumn {
         if (words.length == 0 || (words.length == 1 && (words[0] == null || words[0].isEmpty()))) {
             return LEFTMOST_COLUMN;
         }
-        return new TableColumnImpl(words);
+        return new PatternTableColumn(words);
     }
 
-    private TableColumnImpl(String... words) {
+    private PatternTableColumn(String... words) {
         this.words = Arrays.stream(words)
                 .map(String::toLowerCase)
                 .toArray(String[]::new);
