@@ -66,23 +66,29 @@ public class PatternTableColumn implements TableColumn {
 
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         for (ReportPageRow header : headerRows) {
-            next_cell:
             for (@SuppressWarnings("NullableProblems") @Nullable TableCell cell : header) {
                 @Nullable Object value;
-                if ((cell != null) && (cell.getColumnIndex() >= firstColumnForSearch) &&
-                        (((value = cell.getValue()) != null) && (value instanceof String))) {
-                    String cellText = value.toString();
-                    for (Pattern pattern : patterns) {
-                        if (!pattern.matcher(cellText).find()) {
-                            continue next_cell;
-                        }
-                    }
+                if (cell != null &&
+                        cell.getColumnIndex() >= firstColumnForSearch &&
+                        (value = cell.getValue()) != null &&
+                        value instanceof CharSequence &&
+                        matches((CharSequence) value)) {
                     return cell.getColumnIndex();
                 }
             }
         }
         throw new RuntimeException("Не обнаружен заголовок таблицы, включающий слова: " + String.join(", ", words));
     }
+
+    private boolean matches(CharSequence cellText) {
+        for (Pattern pattern : patterns) {
+            if (!pattern.matcher(cellText).find()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     private static Pattern toPattern(String pattern) {
         return Pattern.compile(pattern, CASE_INSENSITIVE | UNICODE_CASE);
