@@ -30,6 +30,9 @@ import java.util.regex.Pattern;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.UNICODE_CASE;
 
+/**
+ * Finds cell column index by case-insensitive checks by all the predefined regexp patterns.
+ */
 @ToString(of = "words")
 @RequiredArgsConstructor
 @EqualsAndHashCode(of = "words")
@@ -37,6 +40,9 @@ public class PatternTableColumn implements TableColumn {
     private final Pattern[] patterns;
     private final String[] words;
 
+    /**
+     * Cell text should match to all regexp patterns.
+     */
     public static TableColumn of(@Nullable String... words) {
         //noinspection ConstantConditions
         if (words == null) {
@@ -63,9 +69,9 @@ public class PatternTableColumn implements TableColumn {
                 @Nullable Object value;
                 if ((cell != null) && (cell.getColumnIndex() >= firstColumnForSearch) &&
                         (((value = cell.getValue()) != null) && (value instanceof String))) {
-                    String colName = value.toString();
+                    String cellText = value.toString();
                     for (Pattern pattern : patterns) {
-                        if (!containsWord(colName, pattern)) {
+                        if (!pattern.matcher(cellText).find()) {
                             continue next_cell;
                         }
                     }
@@ -76,13 +82,7 @@ public class PatternTableColumn implements TableColumn {
         throw new RuntimeException("Не обнаружен заголовок таблицы, включающий слова: " + String.join(", ", words));
     }
 
-    private boolean containsWord(String text, Pattern pattern) {
-        return pattern.matcher(text).matches();
-    }
-
     private static Pattern toPattern(String pattern) {
-        String leftBoundary = "(^|(.|\\n)*\\b|(.|\\n)*\\s)"; // '.' not matches new lines
-        String rightBoundary = "(\\b(.|\\n)*|\\s(.|\\n)*|$)";
-        return Pattern.compile(leftBoundary + pattern + rightBoundary, CASE_INSENSITIVE | UNICODE_CASE);
+        return Pattern.compile(pattern, CASE_INSENSITIVE | UNICODE_CASE);
     }
 }
