@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -42,13 +42,14 @@ class PatternTableColumnTest {
     @SuppressWarnings("ConstantConditions")
     void setUp() {
         row = mock(ReportPageRow.class);
-        Collection<TableCell> cells = List.of(
+        Collection<TableCell> cells = Arrays.asList(
+                null,
                 new TableCellTestImpl(null, 1),
                 new TableCellTestImpl(123, 2),
                 new TableCellTestImpl(1.23, 3),
                 new TableCellTestImpl(BigDecimal.valueOf(1), 4),
                 new TableCellTestImpl("", 5),
-                new TableCellTestImpl( " ", 6),
+                new TableCellTestImpl(" ", 6),
                 new TableCellTestImpl("test word", 9),
                 new TableCellTestImpl("This Is Sparta", 10),
                 new TableCellTestImpl("London\nis the\ncapital\nof Great Britain", 20),
@@ -61,6 +62,7 @@ class PatternTableColumnTest {
     @SuppressWarnings("ConstantConditions")
     void testZeroArg() {
         assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of());
+        assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(""));
         //assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of((String[]) null));
         assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(new String[]{null}));
         //assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(null, null));
@@ -71,13 +73,20 @@ class PatternTableColumnTest {
         assertEquals(0, PatternTableColumn.of().getColumnIndex(row));
         assertEquals(9, PatternTableColumn.of("test").getColumnIndex(row));
         assertEquals(9, PatternTableColumn.of("WORD").getColumnIndex(row));
-        assertEquals(10, PatternTableColumn.of("is\\s*sparta").getColumnIndex(row));
+        assertEquals(10, PatternTableColumn.of("this is\\s*sparta").getColumnIndex(row));
+        assertEquals(10, PatternTableColumn.of("this is").getColumnIndex(row));
+        assertEquals(10, PatternTableColumn.of("is sparta").getColumnIndex(row));
         assertEquals(20, PatternTableColumn.of("is the").getColumnIndex(row));
         assertEquals(20, PatternTableColumn.of("(old|Gr..t)").getColumnIndex(row));
         assertEquals(20,   PatternTableColumn.of("of").getColumnIndex(row));
         assertEquals(21, PatternTableColumn.of("mac").getColumnIndex(row));
         assertEquals(22, PatternTableColumn.of("windows").getColumnIndex(row));
+        assertEquals(22, PatternTableColumn.of("windows").getColumnIndex(21, row));
+        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("windows").getColumnIndex(23, row));
         assertThrows(RuntimeException.class, () -> PatternTableColumn.of("not found").getColumnIndex(row));
+        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("london is").getColumnIndex(row));
+        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("mac new").getColumnIndex(row));
+        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("windows new").getColumnIndex(row));
     }
 
     @Test

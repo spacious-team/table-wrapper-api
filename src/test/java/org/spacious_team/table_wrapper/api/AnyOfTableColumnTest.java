@@ -60,7 +60,7 @@ class AnyOfTableColumnTest {
 
     @Test
     void testToString() {
-        assertEquals("AnyOfTableColumn(columns=[TableColumnImpl(words=[test word])])",
+        assertEquals("AnyOfTableColumn(columns=[PatternTableColumn(words=[test word])])",
                 AnyOfTableColumn.of(PatternTableColumn.of("test word")).toString());
     }
 }
