@@ -19,9 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.Getter;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -34,14 +32,9 @@ import static org.spacious_team.table_wrapper.api.TableColumn.LEFTMOST_COLUMN;
 
 class PatternTableColumnTest {
 
-    @Mock
-    CellDataAccessObject<Object, ?> dao;
-    ReportPageRow row;
-
-    @BeforeEach
     @SuppressWarnings("ConstantConditions")
-    void setUp() {
-        row = mock(ReportPageRow.class);
+    ReportPageRow getRow() {
+        ReportPageRow row = mock(ReportPageRow.class);
         Collection<TableCell> cells = Arrays.asList(
                 null,
                 new TableCellTestImpl(null, 1),
@@ -56,6 +49,7 @@ class PatternTableColumnTest {
                 new TableCellTestImpl("The Mac\rnew line", 21),
                 new TableCellTestImpl("The Windows\r\nnew line", 22));
         when(row.iterator()).then($ -> cells.iterator());
+        return row;
     }
 
     @Test
@@ -70,6 +64,7 @@ class PatternTableColumnTest {
 
     @Test
     void getColumnIndex() {
+        ReportPageRow row = getRow();
         assertEquals(0, PatternTableColumn.of().getColumnIndex(row));
         assertEquals(9, PatternTableColumn.of("test").getColumnIndex(row));
         assertEquals(9, PatternTableColumn.of("WORD").getColumnIndex(row));
@@ -115,12 +110,12 @@ class PatternTableColumnTest {
     }
 
     @Getter
-    class TableCellTestImpl extends AbstractTableCell<Object> {
+    static class TableCellTestImpl extends AbstractTableCell<Object> {
         private final Object value;
         private final int columnIndex;
 
         TableCellTestImpl(Object value, int columnIndex) {
-            super(value, dao);
+            super(value, null);
             this.value = value;
             this.columnIndex = columnIndex;
         }
