@@ -25,7 +25,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.UNICODE_CASE;
@@ -38,7 +40,7 @@ import static java.util.regex.Pattern.UNICODE_CASE;
 @EqualsAndHashCode(of = "words")
 public class PatternTableColumn implements TableColumn {
     private final Pattern[] patterns;
-    private final String[] words;
+    private final Set<String> words;
 
     /**
      * Cell text should match to all regexp patterns.
@@ -49,11 +51,11 @@ public class PatternTableColumn implements TableColumn {
             return LEFTMOST_COLUMN;
         }
         @SuppressWarnings("nullness")
-        String[] nonNullWords = Arrays.stream(words)
+        Set<String> nonNullWords = Arrays.stream(words)
                 .filter(Objects::nonNull)
                 .filter(s -> !s.isEmpty())
-                .toArray(String[]::new);
-        Pattern[] patterns = Arrays.stream(nonNullWords)
+                .collect(Collectors.toUnmodifiableSet());
+        Pattern[] patterns = nonNullWords.stream()
                 .map(PatternTableColumn::toPattern)
                 .toArray(Pattern[]::new);
         if (patterns.length == 0) {

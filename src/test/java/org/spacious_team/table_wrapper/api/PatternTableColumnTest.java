@@ -97,10 +97,10 @@ class PatternTableColumnTest {
 
     @Test
     void testHashCode() {
-        TableColumn expected = PatternTableColumn.of("test");
+        TableColumn expected = PatternTableColumn.of("test", "word");
         TableColumn notExpected = PatternTableColumn.of("abc");
 
-        assertEquals(expected.hashCode(), PatternTableColumn.of("test").hashCode());
+        assertEquals(expected.hashCode(), PatternTableColumn.of("word", "test").hashCode());
         assertNotEquals(notExpected.hashCode(), PatternTableColumn.of("test").hashCode());
     }
 
