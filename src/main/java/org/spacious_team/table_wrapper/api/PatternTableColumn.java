@@ -19,28 +19,41 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
-@ToString
-@EqualsAndHashCode
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static java.util.regex.Pattern.UNICODE_CASE;
+
+@ToString(of = "words")
+@RequiredArgsConstructor
+@EqualsAndHashCode(of = "words")
 public class PatternTableColumn implements TableColumn {
+    private final Pattern[] patterns;
     private final String[] words;
 
-    public static TableColumn of(String... words) {
+    public static TableColumn of(@Nullable String... words) {
         //noinspection ConstantConditions
-        if (words.length == 0 || (words.length == 1 && (words[0] == null || words[0].isEmpty()))) {
+        if (words == null) {
             return LEFTMOST_COLUMN;
         }
-        return new PatternTableColumn(words);
-    }
-
-    private PatternTableColumn(String... words) {
-        this.words = Arrays.stream(words)
-                .map(String::toLowerCase)
+        @SuppressWarnings("nullness")
+        String[] nonNullWords = Arrays.stream(words)
+                .filter(Objects::nonNull)
+                .filter(s -> !s.isEmpty())
                 .toArray(String[]::new);
+        Pattern[] patterns = Arrays.stream(nonNullWords)
+                .map(PatternTableColumn::toPattern)
+                .toArray(Pattern[]::new);
+        if (patterns.length == 0) {
+            return LEFTMOST_COLUMN;
+        }
+        return new PatternTableColumn(patterns, nonNullWords);
     }
 
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
@@ -50,9 +63,9 @@ public class PatternTableColumn implements TableColumn {
                 @Nullable Object value;
                 if ((cell != null) && (cell.getColumnIndex() >= firstColumnForSearch) &&
                         (((value = cell.getValue()) != null) && (value instanceof String))) {
-                    String colName = value.toString().toLowerCase();
-                    for (String word : words) {
-                        if (!containsWord(colName, word)) {
+                    String colName = value.toString();
+                    for (Pattern pattern : patterns) {
+                        if (!containsWord(colName, pattern)) {
                             continue next_cell;
                         }
                     }
@@ -63,7 +76,13 @@ public class PatternTableColumn implements TableColumn {
         throw new RuntimeException("Не обнаружен заголовок таблицы, включающий слова: " + String.join(", ", words));
     }
 
-    private boolean containsWord(String text, @Nullable String word) {
-        return word != null && text.matches("(^|(.|\\n)*\\b|(.|\\n)*\\s)" + word + "(\\b(.|\\n)*|\\s(.|\\n)*|$)");
+    private boolean containsWord(String text, Pattern pattern) {
+        return pattern.matcher(text).matches();
+    }
+
+    private static Pattern toPattern(String pattern) {
+        String leftBoundary = "(^|(.|\\n)*\\b|(.|\\n)*\\s)"; // '.' not matches new lines
+        String rightBoundary = "(\\b(.|\\n)*|\\s(.|\\n)*|$)";
+        return Pattern.compile(leftBoundary + pattern + rightBoundary, CASE_INSENSITIVE | UNICODE_CASE);
     }
 }

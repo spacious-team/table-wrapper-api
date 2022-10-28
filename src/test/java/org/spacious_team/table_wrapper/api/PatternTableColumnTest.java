@@ -63,9 +63,9 @@ class PatternTableColumnTest {
     void testZeroArg() {
         assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of());
         assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(""));
-        //assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of((String[]) null));
+        assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of((String[]) null));
         assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(new String[]{null}));
-        //assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(null, null));
+        assertEquals(LEFTMOST_COLUMN, PatternTableColumn.of(null, null));
     }
 
     @Test
@@ -77,6 +77,8 @@ class PatternTableColumnTest {
         assertEquals(10, PatternTableColumn.of("this is").getColumnIndex(row));
         assertEquals(10, PatternTableColumn.of("is sparta").getColumnIndex(row));
         assertEquals(20, PatternTableColumn.of("is the").getColumnIndex(row));
+        assertEquals(20, PatternTableColumn.of("is", "the").getColumnIndex(row));
+        assertEquals(20, PatternTableColumn.of("is", null, "the").getColumnIndex(row));
         assertEquals(20, PatternTableColumn.of("(old|Gr..t)").getColumnIndex(row));
         assertEquals(20,   PatternTableColumn.of("of").getColumnIndex(row));
         assertEquals(21, PatternTableColumn.of("mac").getColumnIndex(row));
