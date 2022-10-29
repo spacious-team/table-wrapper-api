@@ -18,6 +18,7 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -138,15 +140,11 @@ class EmptyTableRowTest {
     }
 
     @Test
-    void testEquals() {
-        assertEquals(new EmptyTableRow(table, 0), row);
-        assertNotEquals(new EmptyTableRow(table, 1), row);
-    }
-
-    @Test
-    void testHashCode() {
-        assertEquals(new EmptyTableRow(table, 0).hashCode(), row.hashCode());
-        assertNotEquals(new EmptyTableRow(table, 1).hashCode(), row.hashCode());
+    void testEqualsAndHashCode() {
+        EqualsVerifier
+                .forClass(EmptyTableRow.class)
+                .suppress(STRICT_INHERITANCE) // no subclass for test
+                .verify();
     }
 
     @Test

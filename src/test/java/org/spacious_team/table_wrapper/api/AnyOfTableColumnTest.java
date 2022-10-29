@@ -18,8 +18,10 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
+import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.spacious_team.table_wrapper.api.TableColumn.LEFTMOST_COLUMN;
@@ -45,17 +47,11 @@ class AnyOfTableColumnTest {
     }
 
     @Test
-    void testEquals() {
-        assertEquals(
-                AnyOfTableColumn.of(LEFTMOST_COLUMN, NOT_FOUND),
-                AnyOfTableColumn.of(LEFTMOST_COLUMN, NOT_FOUND));
-    }
-
-    @Test
-    void testHashCode() {
-        assertEquals(
-                AnyOfTableColumn.of(LEFTMOST_COLUMN, NOT_FOUND).hashCode(),
-                AnyOfTableColumn.of(LEFTMOST_COLUMN, NOT_FOUND).hashCode());
+    void testEqualsAndHashCode() {
+        EqualsVerifier
+                .forClass(AnyOfTableColumn.class)
+                .suppress(STRICT_INHERITANCE) // no subclass for test
+                .verify();
     }
 
     @Test

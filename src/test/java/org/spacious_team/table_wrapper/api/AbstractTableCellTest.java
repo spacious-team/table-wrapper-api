@@ -18,6 +18,7 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +26,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractTableCellTest {
@@ -101,21 +102,11 @@ class AbstractTableCellTest {
     }
 
     @Test
-    void testEquals() {
-        TableCellTestImpl expected = new TableCellTestImpl(cellValue, dao);
-        TableCellTestImpl notExpected = new TableCellTestImpl(new Object(), dao);
-
-        assertEquals(expected, cell);
-        assertNotEquals(notExpected, cell);
-    }
-
-    @Test
-    void testHashCode() {
-        TableCellTestImpl expected = new TableCellTestImpl(cellValue, dao);
-        TableCellTestImpl notExpected = new TableCellTestImpl(new Object(), dao);
-
-        assertEquals(expected.hashCode(), cell.hashCode());
-        assertNotEquals(notExpected.hashCode(), cell.hashCode());
+    void testEqualsAndHashCode() {
+        EqualsVerifier
+                .forClass(AbstractTableCell.class)
+                .suppress(STRICT_INHERITANCE) // no subclass for test
+                .verify();
     }
 
     @Test

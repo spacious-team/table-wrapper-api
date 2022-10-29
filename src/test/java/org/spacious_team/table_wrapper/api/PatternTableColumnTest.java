@@ -19,13 +19,17 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.Getter;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static nl.jqno.equalsverifier.Warning.ALL_FIELDS_SHOULD_BE_USED;
+import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.spacious_team.table_wrapper.api.TableColumn.LEFTMOST_COLUMN;
@@ -93,21 +97,12 @@ class PatternTableColumnTest {
     }
 
     @Test
-    void testEquals() {
-        TableColumn expected = PatternTableColumn.of("test");
-        TableColumn notExpected = PatternTableColumn.of("abc");
-
-        assertEquals(expected, PatternTableColumn.of("test"));
-        assertNotEquals(notExpected, PatternTableColumn.of("test"));
-    }
-
-    @Test
-    void testHashCode() {
-        TableColumn expected = PatternTableColumn.of("test", "word");
-        TableColumn notExpected = PatternTableColumn.of("abc");
-
-        assertEquals(expected.hashCode(), PatternTableColumn.of("word", "test").hashCode());
-        assertNotEquals(notExpected.hashCode(), PatternTableColumn.of("test").hashCode());
+    void testEqualsAndHashCode() {
+        EqualsVerifier
+                .forClass(PatternTableColumn.class)
+                .suppress(STRICT_INHERITANCE) // no subclass for test
+                .suppress(ALL_FIELDS_SHOULD_BE_USED)
+                .verify();
     }
 
     @Test

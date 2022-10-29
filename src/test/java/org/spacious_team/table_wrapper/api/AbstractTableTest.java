@@ -20,6 +20,7 @@ package org.spacious_team.table_wrapper.api;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,7 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
+import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.spacious_team.table_wrapper.api.TableColumn.LEFTMOST_COLUMN;
@@ -294,20 +296,16 @@ class AbstractTableTest {
     }
 
     @Test
+    void testEqualsAndHashCode() {
+        EqualsVerifier
+                .forClass(AbstractTable.class)
+                .suppress(STRICT_INHERITANCE) // no subclass for test
+                .verify();
+    }
+
+    @Test
     void testToString() {
         assertEquals("AbstractTable(tableName=table name)", table.toString());
-    }
-
-    @Test
-    void testEquals() {
-        assertEquals(getNotEmptyTable(), getNotEmptyTable());
-        assertNotEquals(getNotEmptyTable(), getEmptyTable());
-    }
-
-    @Test
-    void testHashCode() {
-        assertEquals(getNotEmptyTable().hashCode(), getNotEmptyTable().hashCode());
-        assertNotEquals(getNotEmptyTable().hashCode(), getEmptyTable().hashCode());
     }
 
     class TableTestImpl extends AbstractTable<EmptyTableRow> {

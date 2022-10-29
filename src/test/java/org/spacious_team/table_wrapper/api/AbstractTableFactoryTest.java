@@ -18,12 +18,14 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
@@ -52,19 +54,11 @@ class AbstractTableFactoryTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testEquals() {
-        TableFactoryTestImpl expected = new TableFactoryTestImpl(
-                (Class<AbstractReportPage<ReportPageRow>>) reportPage.getClass());
-        assertEquals(expected, factory);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testHashCode() {
-        TableFactoryTestImpl expected = new TableFactoryTestImpl(
-                (Class<AbstractReportPage<ReportPageRow>>) reportPage.getClass());
-        assertEquals(expected.hashCode(), factory.hashCode());
+    void testEqualsAndHashCode() {
+        EqualsVerifier
+                .forClass(AbstractTableFactory.class)
+                .suppress(STRICT_INHERITANCE) // no subclass for test
+                .verify();
     }
 
     static class TableFactoryTestImpl extends AbstractTableFactory<AbstractReportPage<ReportPageRow>> {
