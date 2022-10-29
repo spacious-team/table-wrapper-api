@@ -22,39 +22,13 @@ import lombok.Getter;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collection;
-
 import static nl.jqno.equalsverifier.Warning.ALL_FIELDS_SHOULD_BE_USED;
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.spacious_team.table_wrapper.api.TableColumn.LEFTMOST_COLUMN;
 
 class PatternTableColumnTest {
-
-    @SuppressWarnings("ConstantConditions")
-    ReportPageRow getRow() {
-        ReportPageRow row = mock(ReportPageRow.class);
-        Collection<TableCell> cells = Arrays.asList(
-                null,
-                new TableCellTestImpl(null, 1),
-                new TableCellTestImpl(123, 2),
-                new TableCellTestImpl(1.23, 3),
-                new TableCellTestImpl(BigDecimal.valueOf(1), 4),
-                new TableCellTestImpl("", 5),
-                new TableCellTestImpl(" ", 6),
-                new TableCellTestImpl("test word", 9),
-                new TableCellTestImpl("This Is Sparta", 10),
-                new TableCellTestImpl("London\nis the\ncapital\nof Great Britain", 20),
-                new TableCellTestImpl("The Mac\rnew line", 21),
-                new TableCellTestImpl("The Windows\r\nnew line", 22));
-        when(row.iterator()).then($ -> cells.iterator());
-        return row;
-    }
 
     @Test
     @SuppressWarnings("ConstantConditions")
@@ -68,7 +42,7 @@ class PatternTableColumnTest {
 
     @Test
     void getColumnIndex() {
-        ReportPageRow row = getRow();
+        ReportPageRow row = TableColumnHelperTest.getRow();
         assertEquals(0, PatternTableColumn.of().getColumnIndex(row));
         assertEquals(9, PatternTableColumn.of("test").getColumnIndex(row));
         assertEquals(9, PatternTableColumn.of("WORD").getColumnIndex(row));
