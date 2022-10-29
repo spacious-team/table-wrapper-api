@@ -75,15 +75,21 @@ class PatternTableColumnTest {
         assertEquals(20, PatternTableColumn.of("is", "the").getColumnIndex(row));
         assertEquals(20, PatternTableColumn.of("is", null, "the").getColumnIndex(row));
         assertEquals(20, PatternTableColumn.of("(old|Gr..t)").getColumnIndex(row));
-        assertEquals(20,   PatternTableColumn.of("of").getColumnIndex(row));
+        assertEquals(20, PatternTableColumn.of("of").getColumnIndex(row));
         assertEquals(21, PatternTableColumn.of("mac").getColumnIndex(row));
         assertEquals(22, PatternTableColumn.of("windows").getColumnIndex(row));
         assertEquals(22, PatternTableColumn.of("windows").getColumnIndex(21, row));
-        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("windows").getColumnIndex(23, row));
-        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("not found").getColumnIndex(row));
-        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("london is").getColumnIndex(row));
-        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("mac new").getColumnIndex(row));
-        assertThrows(RuntimeException.class, () -> PatternTableColumn.of("windows new").getColumnIndex(row));
+
+        TableColumn column1 = PatternTableColumn.of("windows");
+        assertThrows(RuntimeException.class, () -> column1.getColumnIndex(23, row));
+        TableColumn column2 = PatternTableColumn.of("not found");
+        assertThrows(RuntimeException.class, () -> column2.getColumnIndex(row));
+        TableColumn column3 = PatternTableColumn.of("london is");
+        assertThrows(RuntimeException.class, () -> column3.getColumnIndex(row));
+        TableColumn column4 = PatternTableColumn.of("mac new");
+        assertThrows(RuntimeException.class, () -> column4.getColumnIndex(row));
+        TableColumn column5 = PatternTableColumn.of("windows new");
+        assertThrows(RuntimeException.class, () -> column5.getColumnIndex(row));
     }
 
     @Test
