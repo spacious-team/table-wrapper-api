@@ -25,6 +25,8 @@ import lombok.ToString;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static lombok.AccessLevel.PRIVATE;
+
 /**
  * Implements table header kind of
  * <pre>
@@ -36,7 +38,7 @@ import java.util.Objects;
  */
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PRIVATE)
 public class MultiLineTableColumn implements TableColumn {
     private final TableColumn[] rowDescriptors;
 

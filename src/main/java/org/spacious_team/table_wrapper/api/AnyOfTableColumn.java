@@ -24,14 +24,16 @@ import lombok.ToString;
 
 import java.util.Arrays;
 
+import static lombok.AccessLevel.PRIVATE;
+
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PRIVATE)
 public class AnyOfTableColumn implements TableColumn {
 
     private final TableColumn[] columns;
 
-    public static TableColumn of(TableColumn... columns) {
+    public static AnyOfTableColumn of(TableColumn... columns) {
         return new AnyOfTableColumn(columns);
     }
 

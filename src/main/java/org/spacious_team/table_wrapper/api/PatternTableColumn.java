@@ -31,13 +31,14 @@ import java.util.stream.Collectors;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.UNICODE_CASE;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Finds cell column index by case-insensitive checks by all the predefined regexp patterns.
  */
 @ToString(of = "words")
-@RequiredArgsConstructor
 @EqualsAndHashCode(of = "words")
+@RequiredArgsConstructor(access = PRIVATE)
 public class PatternTableColumn implements TableColumn {
     private final Pattern[] patterns;
     private final Set<String> words;
