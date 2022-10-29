@@ -18,10 +18,12 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Implements table header kind of
@@ -33,6 +35,7 @@ import java.util.Arrays;
  * Can find index for (Two -> a3 -> b1) column
  */
 @ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class MultiLineTableColumn implements TableColumn {
     private final TableColumn[] rowDescriptors;
@@ -45,9 +48,11 @@ public class MultiLineTableColumn implements TableColumn {
     }
 
     public static MultiLineTableColumn of(String... rowDescriptors) {
-        return new MultiLineTableColumn(Arrays.stream(rowDescriptors)
+        TableColumn[] descriptors = Arrays.stream(rowDescriptors)
+                .map(Objects::requireNonNull)
                 .map(PatternTableColumn::of)
-                .toArray(TableColumn[]::new));
+                .toArray(TableColumn[]::new);
+        return new MultiLineTableColumn(descriptors);
     }
 
     /**

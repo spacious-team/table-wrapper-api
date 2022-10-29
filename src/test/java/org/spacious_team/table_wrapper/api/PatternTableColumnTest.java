@@ -18,7 +18,6 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.Getter;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -82,17 +81,5 @@ class PatternTableColumnTest {
     @Test
     void testToString() {
         assertEquals("PatternTableColumn(words=[test])", PatternTableColumn.of("test").toString());
-    }
-
-    @Getter
-    static class TableCellTestImpl extends AbstractTableCell<Object> {
-        private final Object value;
-        private final int columnIndex;
-
-        TableCellTestImpl(Object value, int columnIndex) {
-            super(value, null);
-            this.value = value;
-            this.columnIndex = columnIndex;
-        }
     }
 }
