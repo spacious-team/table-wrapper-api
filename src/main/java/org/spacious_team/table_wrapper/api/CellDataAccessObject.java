@@ -19,6 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -96,8 +97,9 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default BigDecimal getBigDecimalValue(C cell) {
         String number = getStringValue(cell);
+        number = spacePattern.matcher(number).replaceAll("");
         number = number.replace(',', '.');
-        return (Objects.equals(number, "0") || Objects.equals(number, "0.0")) ?
+        return (Objects.equals(number, "0") || Objects.equals(number, "0.0") || Objects.equals(number, "0.00")) ?
                 BigDecimal.ZERO : new BigDecimal(number);
     }
 
