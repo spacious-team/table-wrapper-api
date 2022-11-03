@@ -23,6 +23,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
@@ -116,13 +117,21 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
 
     /**
      * Returns local date time at default time zone.
-     * To return date time at other timezone user {@link #getInstantValue(C)}.
      *
      * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(C cell) {
         return getInstantValue(cell)
                 .atZone(defaultZoneId)
+                .toLocalDateTime();
+    }
+
+    /**
+     * @throws RuntimeException if method can't extract local date time value
+     */
+    default LocalDateTime getLocalDateTimeValue(C cell, ZoneId zoneId) {
+        return getInstantValue(cell)
+                .atZone(zoneId)
                 .toLocalDateTime();
     }
 
@@ -186,11 +195,23 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     }
 
     /**
+     * Returns local date time at default time zone.
+     *
      * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
         C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
         return getLocalDateTimeValue(cell);
+    }
+
+    /**
+     * @throws RuntimeException if method can't extract local date time value
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex, ZoneId zoneId) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        return getLocalDateTimeValue(cell, zoneId);
     }
 }

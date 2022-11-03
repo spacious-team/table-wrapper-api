@@ -31,6 +31,7 @@ import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -186,6 +187,17 @@ class CellDataAccessObjectTest {
     }
 
     @Test
+    void getLocalDateTimeValueAtTimeZone() {
+        int zoneOffset = 3;
+        Instant instant = LocalDateTime.of(2000, 1, 2, zoneOffset, 4, 5)
+                .atZone(ZoneOffset.ofHours(zoneOffset))
+                .toInstant();
+        LocalDateTime expectedAtUtc = LocalDateTime.of(2000, 1, 2, 0, 4, 5);
+        when(dao.getInstantValue(any())).thenReturn(instant);
+        assertEquals(expectedAtUtc, dao.getLocalDateTimeValue(instant, ZoneOffset.UTC));
+    }
+
+    @Test
     void getValueNull() {
         assertNull(dao.getValue(row, NOT_EXISTS_CELL_INDEX));
         verify(dao, never()).getValue(any());
@@ -267,5 +279,15 @@ class CellDataAccessObjectTest {
 
         verify(dao).getLocalDateTimeValue(cell);
         assertThrows(NullPointerException.class, () -> dao.getLocalDateTimeValue(row, NOT_EXISTS_CELL_INDEX));
+    }
+
+    @Test
+    void testGetLocalDateTimeValueAtTimeZone() {
+        doReturn(null).when(dao).getLocalDateTimeValue(cell, ZoneOffset.UTC);
+
+        dao.getLocalDateTimeValue(row, EXISTS_CELL_INDEX, ZoneOffset.UTC);
+
+        verify(dao).getLocalDateTimeValue(cell, ZoneOffset.UTC);
+        assertThrows(NullPointerException.class, () -> dao.getLocalDateTimeValue(row, NOT_EXISTS_CELL_INDEX, ZoneOffset.UTC));
     }
 }
