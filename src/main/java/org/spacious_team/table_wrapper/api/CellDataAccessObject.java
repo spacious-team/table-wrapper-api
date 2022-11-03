@@ -23,21 +23,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
+import static org.spacious_team.table_wrapper.api.CellDataAccessObjectHelper.*;
 
 /**
  * @apiNote Impl may have parameters that affect how the value is parsed,
  * for example DataTimeFormat that changes behavior of date time value parser.
  */
 public interface CellDataAccessObject<C, R extends ReportPageRow> {
-
-    ZoneId defaultZoneId = ZoneId.systemDefault();
-    Pattern spacePattern = Pattern.compile("\\s");
-    String NO_CELL_VALUE_EXCEPTION_MESSAGE = "Cell doesn't contains value";
 
     @Nullable
     C getCell(R row, Integer cellIndex);
@@ -60,7 +55,8 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
         if (value instanceof Number) {
             return ((Number) value).longValue();
         } else if (value != null) {
-            return Long.parseLong(spacePattern.matcher((CharSequence) value).replaceAll(""));
+            String str = spacePattern.matcher(value.toString()).replaceAll("");
+            return Long.parseLong(str);
         } else {
             throw new NullPointerException(NO_CELL_VALUE_EXCEPTION_MESSAGE);
         }
@@ -74,7 +70,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
         } else if (value != null) {
-            String str = spacePattern.matcher((CharSequence) value).replaceAll("");
+            String str = spacePattern.matcher(value.toString()).replaceAll("");
             try {
                 return Double.parseDouble(str);
             } catch (NumberFormatException e) {
@@ -119,6 +115,9 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     Instant getInstantValue(C cell);
 
     /**
+     * Returns local date time at default time zone.
+     * To return date time at other timezone user {@link #getInstantValue(C)}.
+     *
      * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(C cell) {

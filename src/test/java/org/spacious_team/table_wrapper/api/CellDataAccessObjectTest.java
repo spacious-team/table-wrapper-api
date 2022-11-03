@@ -18,16 +18,19 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,13 +38,21 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CellDataAccessObjectTest {
 
+    final int EXISTS_CELL_INDEX = 0;
+    final int NOT_EXISTS_CELL_INDEX = 1_000_000;
+    @Mock
+    ReportPageRow row;
+    @Mock
+    Object cell;
     CellDataAccessObject<Object, ReportPageRow> dao;
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
     void setUp() {
         dao = spy(CellDataAccessObject.class);
-        when(dao.getValue(any())).then(invocation -> invocation.getArguments()[0]);
+        lenient().when(dao.getValue(any())).then(invocation -> invocation.getArguments()[0]);
+        lenient().when(dao.getCell(row, EXISTS_CELL_INDEX)).thenReturn(cell);
+        lenient().when(dao.getCell(row, NOT_EXISTS_CELL_INDEX)).thenReturn(null);
     }
 
     @Test
@@ -86,6 +97,7 @@ class CellDataAccessObjectTest {
     void getDoubleValueException() {
         assertThrows(NullPointerException.class, () -> dao.getDoubleValue(null));
         assertThrows(NumberFormatException.class, () -> dao.getDoubleValue("abc"));
+        assertThrows(NumberFormatException.class, () -> dao.getDoubleValue("a.bc"));
         assertThrows(NumberFormatException.class, () -> dao.getDoubleValue("0xFF"));
     }
 
@@ -153,5 +165,107 @@ class CellDataAccessObjectTest {
                 {BigDecimal.valueOf(10.1), "10,1"},
                 {BigDecimal.valueOf(1000.1), "1 000.1"},
         };
+    }
+
+    @Test
+    void getStringValue() {
+        //noinspection ConstantConditions
+        assertThrows(NullPointerException.class, () -> dao.getStringValue(null));
+        assertEquals("Abc", dao.getStringValue("Abc"));
+        assertEquals("12", dao.getStringValue(12));
+    }
+
+    @Test
+    void getLocalDateTimeValue() {
+        LocalDateTime expected = LocalDateTime.of(2000, 1, 2, 3, 4, 5);
+        Instant instant = expected
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
+        when(dao.getInstantValue(any())).thenReturn(instant);
+        assertEquals(expected, dao.getLocalDateTimeValue(instant));
+    }
+
+    @Test
+    void getValueNull() {
+        assertNull(dao.getValue(row, NOT_EXISTS_CELL_INDEX));
+        verify(dao, never()).getValue(any());
+    }
+
+    @Test
+    void getValue() {
+        dao.getValue(row, EXISTS_CELL_INDEX);
+
+        verify(dao).getCell(row, EXISTS_CELL_INDEX);
+        verify(dao).getValue(cell);
+    }
+
+    @Test
+    void testGetIntValue() {
+        doReturn(10).when(dao).getIntValue(cell);
+
+        dao.getIntValue(row, EXISTS_CELL_INDEX);
+
+        verify(dao).getIntValue(cell);
+        assertThrows(NullPointerException.class, () -> dao.getIntValue(row, NOT_EXISTS_CELL_INDEX));
+    }
+
+    @Test
+    void testGetLongValue() {
+        doReturn(10L).when(dao).getLongValue(cell);
+
+        dao.getLongValue(row, EXISTS_CELL_INDEX);
+
+        verify(dao).getLongValue(cell);
+        assertThrows(NullPointerException.class, () -> dao.getLongValue(row, NOT_EXISTS_CELL_INDEX));
+    }
+
+    @Test
+    void testGetDoubleValue() {
+        doReturn(10.0).when(dao).getDoubleValue(cell);
+
+        dao.getDoubleValue(row, EXISTS_CELL_INDEX);
+
+        verify(dao).getDoubleValue(cell);
+        assertThrows(NullPointerException.class, () -> dao.getDoubleValue(row, NOT_EXISTS_CELL_INDEX));
+    }
+
+    @Test
+    void testGetBigDecimalValue() {
+        doReturn(null).when(dao).getBigDecimalValue(cell);
+
+        dao.getBigDecimalValue(row, EXISTS_CELL_INDEX);
+
+        verify(dao).getBigDecimalValue(cell);
+        assertThrows(NullPointerException.class, () -> dao.getBigDecimalValue(row, NOT_EXISTS_CELL_INDEX));
+    }
+
+    @Test
+    void testGetStringValue() {
+        doReturn(null).when(dao).getStringValue(cell);
+
+        dao.getStringValue(row, EXISTS_CELL_INDEX);
+
+        verify(dao).getStringValue(cell);
+        assertThrows(NullPointerException.class, () -> dao.getStringValue(row, NOT_EXISTS_CELL_INDEX));
+    }
+
+    @Test
+    void getInstantValue() {
+        doReturn(null).when(dao).getInstantValue(cell);
+
+        dao.getInstantValue(row, EXISTS_CELL_INDEX);
+
+        verify(dao).getInstantValue(cell);
+        assertThrows(NullPointerException.class, () -> dao.getInstantValue(row, NOT_EXISTS_CELL_INDEX));
+    }
+
+    @Test
+    void testGetLocalDateTimeValue() {
+        doReturn(null).when(dao).getLocalDateTimeValue(cell);
+
+        dao.getLocalDateTimeValue(row, EXISTS_CELL_INDEX);
+
+        verify(dao).getLocalDateTimeValue(cell);
+        assertThrows(NullPointerException.class, () -> dao.getLocalDateTimeValue(row, NOT_EXISTS_CELL_INDEX));
     }
 }
