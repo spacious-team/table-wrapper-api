@@ -68,7 +68,7 @@ class AbstractTableTest {
         AbstractTable<EmptyTableRow> table = getEmptyTable();
 
         assertEquals(report, table.getReportPage());
-        assertEquals(new TableCellRange(2, 3, 0, 100), table.getTableRange());
+        assertEquals(TableCellRange.of(2, 3, 0, 100), table.getTableRange());
         assertTrue(table.getHeaderDescription().isEmpty());
         assertTrue(table.isEmpty());
     }
@@ -77,14 +77,14 @@ class AbstractTableTest {
      * Builds not empty table of 2 columns, row #2 contains table name, row #3 - header, no data rows
      */
     private AbstractTable<EmptyTableRow> getEmptyTable() {
-        TableCellRange tableRange = new TableCellRange(2, 3, 0, 100);
+        TableCellRange tableRange = TableCellRange.of(2, 3, 0, 100);
         return new TableTestImpl(report, "table name", tableRange, headerDescription, 1);
     }
 
     @Test
     void testNotEmptyRangeConstructor() {
         AbstractTable<EmptyTableRow> table = getNotEmptyTable();
-        TableCellRange range = new TableCellRange(2, 6, 0, 1);
+        TableCellRange range = TableCellRange.of(2, 6, 0, 1);
         ReportPageRow[] headerRows = new EmptyTableRow[0]; // mock
         Map<TableColumn, Integer> headerDescriptionMap = Map.of(
                 Columns.FIRST.getColumn(),
@@ -105,7 +105,7 @@ class AbstractTableTest {
     @SuppressWarnings("ConstantConditions")
     private AbstractTable<EmptyTableRow> getNotEmptyTable() {
         // 2-th row - table name, 3-st and 4-nd rows - table header
-        TableCellRange tableRange = new TableCellRange(2, 6, 0, 100);
+        TableCellRange tableRange = TableCellRange.of(2, 6, 0, 100);
         when(report.getRow(3)).thenReturn(new EmptyTableRow(table, 3));
         when(report.getRow(4)).thenReturn(new EmptyTableRow(table, 4));
         return new TableTestImpl(report, "table name", tableRange, headerDescription, 2);
@@ -115,7 +115,7 @@ class AbstractTableTest {
     void testEmptyRangeConstructor2() {
         AbstractTable<EmptyTableRow> originalTable = getNotEmptyTable();
         AbstractTable<EmptyTableRow> table = new TableTestImpl(originalTable, -1, -1);
-        TableCellRange range = new TableCellRange(3, 5, 0, 1);
+        TableCellRange range = TableCellRange.of(3, 5, 0, 1);
 
         assertEquals(report, table.getReportPage());
         assertEquals(range, table.getTableRange());
@@ -127,7 +127,7 @@ class AbstractTableTest {
     void testNotEmptyRangeConstructor2() {
         AbstractTable<EmptyTableRow> originalTable = getEmptyTable();
         AbstractTable<EmptyTableRow> table = new TableTestImpl(originalTable, 1, 2);
-        TableCellRange range = new TableCellRange(1, 5,
+        TableCellRange range = TableCellRange.of(1, 5,
                 table.getTableRange().getFirstColumn(), table.getTableRange().getLastColumn());
 
         assertEquals(report, table.getReportPage());
@@ -271,7 +271,7 @@ class AbstractTableTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     void findRow() {
-        TableCellAddress address = new TableCellAddress(1, 0);
+        TableCellAddress address = TableCellAddress.of(1, 0);
         EmptyTableRow row = new EmptyTableRow(table, address.getRow());
         MutableTableRow<EmptyTableRow> mutableRow = new MutableTableRow<>(table, dao);
         mutableRow.setRow(row);
@@ -287,7 +287,7 @@ class AbstractTableTest {
 
     @Test
     void findRowByPrefix() {
-        TableCellAddress address = new TableCellAddress(1, 0);
+        TableCellAddress address = TableCellAddress.of(1, 0);
         when(report.findByPrefix("row value")).thenReturn(address);
 
         table.findRowByPrefix("row value");

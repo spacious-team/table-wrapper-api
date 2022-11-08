@@ -155,7 +155,7 @@ public interface ReportPage {
      * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
     default TableCellAddress findByPrefix(@Nullable String prefix, int startRow, int endRow, int startColumn, int endColumn) {
-        return prefix == null ?
+        return (prefix == null || prefix.isEmpty()) ?
                 TableCellAddress.NOT_FOUND :
                 find(startRow, endRow, startColumn, endColumn, getCellStringValueIgnoreCasePrefixPredicate(prefix));
     }
@@ -204,7 +204,7 @@ public interface ReportPage {
     default TableCellRange getTableCellRange(@Nullable String firstRowPrefix,
                                              int headersRowCount,
                                              @Nullable String lastRowPrefix) {
-        if (firstRowPrefix == null || lastRowPrefix == null) {
+        if (firstRowPrefix == null || lastRowPrefix == null || firstRowPrefix.isEmpty() || lastRowPrefix.isEmpty()) {
             return TableCellRange.EMPTY_RANGE;
         }
         return getTableCellRange(
@@ -234,7 +234,7 @@ public interface ReportPage {
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow lastRow = requireNonNull(getRow(endAddress.getRow()), "Row not found");
-        return new TableCellRange(
+        return TableCellRange.of(
                 startAddress.getRow(),
                 endAddress.getRow(),
                 firstRow.getFirstCellNum(),
@@ -246,7 +246,7 @@ public interface ReportPage {
      * range ends with empty row or last row of report page.
      */
     default TableCellRange getTableCellRange(@Nullable String firstRowPrefix, int headersRowCount) {
-        if (firstRowPrefix == null) {
+        if (firstRowPrefix == null || firstRowPrefix.isEmpty()) {
             return TableCellRange.EMPTY_RANGE;
         }
         return getTableCellRange(
@@ -267,20 +267,24 @@ public interface ReportPage {
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row not found");
-        int lastRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
-        if (lastRowNum == -1) {
-            lastRowNum = getLastRowNum(); // empty row not found
-        } else if (lastRowNum <= getLastRowNum()) {
-            lastRowNum--; // exclude last row from table
+        int emptyRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
+        if (emptyRowNum == -1) {
+            emptyRowNum = getLastRowNum(); // empty row not found, use last row
+        } else if (emptyRowNum <= getLastRowNum()) {
+            emptyRowNum--; // exclude empty row
         }
-        if (lastRowNum < startAddress.getRow()) {
-            lastRowNum = startAddress.getRow();
+        ReportPageRow lastRow;
+        if (emptyRowNum <= startAddress.getRow()) {
+            emptyRowNum = startAddress.getRow();
+            lastRow = firstRow;
+        } else {
+            @SuppressWarnings({"nullness", "ConstantConditions"})
+            ReportPageRow row = requireNonNull(getRow(emptyRowNum), "Row not found");
+            lastRow = row;
         }
-        @SuppressWarnings({"nullness", "ConstantConditions"})
-        ReportPageRow lastRow = requireNonNull(getRow(lastRowNum), "Row not found");
-        return new TableCellRange(
+        return TableCellRange.of(
                 startAddress.getRow(),
-                lastRowNum,
+                emptyRowNum,
                 firstRow.getFirstCellNum(),
                 lastRow.getLastCellNum());
     }
@@ -309,7 +313,7 @@ public interface ReportPage {
                     continue LAST_ROW;
                 }
             }
-            return lastRowNum; // all row cells blank
+            return lastRowNum; // all row cells are blank
         }
         return -1;
     }

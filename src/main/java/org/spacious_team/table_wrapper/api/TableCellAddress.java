@@ -24,9 +24,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Getter
-@EqualsAndHashCode
 @ToString
-@RequiredArgsConstructor
+@EqualsAndHashCode
+@RequiredArgsConstructor(staticName = "of")
 public class TableCellAddress {
     public static final TableCellAddress NOT_FOUND = new TableCellAddress(-1, -1);
 

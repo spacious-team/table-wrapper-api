@@ -29,7 +29,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(staticName = "of")
 public class TableCellRange {
     public static final TableCellRange EMPTY_RANGE = new EmptyTableCellRange();
 
@@ -37,6 +37,14 @@ public class TableCellRange {
     private final int lastRow;
     private final int firstColumn;
     private final int lastColumn;
+
+    public TableCellRange of(TableCellAddress leftUpperCellAddress, TableCellAddress rightBottomCellAddress) {
+        return of(
+                leftUpperCellAddress.getRow(),
+                rightBottomCellAddress.getRow(),
+                leftUpperCellAddress.getColumn(),
+                rightBottomCellAddress.getColumn());
+    }
 
     public boolean contains(TableCellAddress address) {
         return containsRow(address.getRow()) && containsColumn(address.getColumn());
@@ -52,26 +60,28 @@ public class TableCellRange {
 
     /**
      * Adds rows without range check. First rows index of range may become negative.
+     *
      * @param number positive or negative values
      */
     public TableCellRange addRowsToTop(int number) {
-        return new TableCellRange(firstRow - number, lastRow, firstColumn, lastColumn);
+        return TableCellRange.of(firstRow - number, lastRow, firstColumn, lastColumn);
     }
 
     /**
      * @param number positive or negative values
      */
     public TableCellRange addRowsToBottom(int number) {
-        return new TableCellRange(firstRow, lastRow + number, firstColumn, lastColumn);
+        return TableCellRange.of(firstRow, lastRow + number, firstColumn, lastColumn);
     }
 
     /**
      * Adds columns without range check. First column index of range may become negative.
+     *
      * @param number positive or negative values
      */
     @SuppressWarnings("unused")
     public TableCellRange addColumnsToLeft(int number) {
-        return new TableCellRange(firstRow, lastRow, firstColumn - number, lastColumn);
+        return TableCellRange.of(firstRow, lastRow, firstColumn - number, lastColumn);
     }
 
     /**
@@ -79,7 +89,7 @@ public class TableCellRange {
      */
     @SuppressWarnings("unused")
     public TableCellRange addColumnsToRight(int number) {
-        return new TableCellRange(firstRow, lastRow, firstColumn, lastColumn + number);
+        return TableCellRange.of(firstRow, lastRow, firstColumn, lastColumn + number);
     }
 
     private static class EmptyTableCellRange extends TableCellRange {

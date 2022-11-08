@@ -18,13 +18,34 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
 import java.util.function.Predicate;
 
-class ReportPageHelper {
+import static lombok.AccessLevel.PRIVATE;
+
+@RequiredArgsConstructor(access = PRIVATE)
+final class ReportPageHelper {
 
     static Predicate<Object> getCellStringValueIgnoreCasePrefixPredicate(String prefix) {
-        String lowercasePrefix = prefix.trim().toLowerCase();
-        return cell -> (cell instanceof String) &&
-                ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
+        return new StringIgnoreCasePrefixPredicate(prefix);
+    }
+
+    @ToString
+    @EqualsAndHashCode
+    private static class StringIgnoreCasePrefixPredicate implements Predicate<Object> {
+        private final String lowercasePrefix;
+
+        private StringIgnoreCasePrefixPredicate(String prefix) {
+            this.lowercasePrefix = prefix.trim().toLowerCase();
+        }
+
+        @Override
+        public boolean test(Object cell) {
+            return (cell instanceof String) &&
+                    ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
+        }
     }
 }

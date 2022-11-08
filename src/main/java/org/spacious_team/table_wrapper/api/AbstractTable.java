@@ -82,7 +82,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                 getHeaderDescription(reportPage, tableRange, headerDescription, headersRowCount);
         this.tableRange = empty ?
                 tableRange :
-                new TableCellRange(
+                TableCellRange.of(
                         tableRange.getFirstRow(),
                         tableRange.getLastRow(),
                         getColumnIndices(this.headerDescription).min().orElse(tableRange.getFirstColumn()),
