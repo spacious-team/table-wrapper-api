@@ -19,6 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -81,9 +82,8 @@ public interface Table extends Iterable<TableRow> {
     /**
      * @return row containing cell starting with prefix or null if not found
      */
-    @Nullable
     @SuppressWarnings("UnusedReturnValue")
-    TableRow findRowByPrefix(String prefix);
+    @Nullable TableRow findRowByPrefix(String prefix);
 
     Map<TableColumn, Integer> getHeaderDescription();
 
@@ -100,7 +100,8 @@ public interface Table extends Iterable<TableRow> {
      *     subTable(0, -1)
      * </pre>
      * for exclude last "Total" row from iterator or stream.
-     * @param topRows positive value for inclusion, negative for exclusion
+     *
+     * @param topRows    positive value for inclusion, negative for exclusion
      * @param bottomRows positive value for inclusion, negative for exclusion
      */
     Table subTable(int topRows, int bottomRows);

@@ -313,7 +313,7 @@ class AbstractTableTest {
         protected TableTestImpl(AbstractReportPage<EmptyTableRow> reportPage,
                                 String tableName,
                                 TableCellRange tableRange,
-                                Class<? extends TableColumnDescription> headerDescription,
+                                Class<? extends TableHeaderColumn> headerDescription,
                                 int headersRowCount) {
             super(reportPage, tableName, tableRange, headerDescription, headersRowCount);
         }
@@ -335,7 +335,7 @@ class AbstractTableTest {
 
     @Getter
     @RequiredArgsConstructor
-    enum Columns implements TableColumnDescription {
+    enum Columns implements TableHeaderColumn {
         FIRST(LEFTMOST_COLUMN),
         SECOND(ConstantPositionTableColumn.of(1));
         private final TableColumn column;

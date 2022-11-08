@@ -36,7 +36,7 @@ class EmptyTableRowTest {
     @Mock
     Table table;
     @Mock
-    TableColumnDescription column;
+    TableHeaderColumn column;
     EmptyTableRow row;
 
     @BeforeEach

@@ -315,27 +315,27 @@ public interface ReportPage {
 
     default Table create(String tableName,
                          String tableFooterString,
-                         Class<? extends TableColumnDescription> headerDescription) {
+                         Class<? extends TableHeaderColumn> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableName, tableFooterString, headerDescription);
     }
 
     default Table create(String tableName,
-                         Class<? extends TableColumnDescription> headerDescription) {
+                         Class<? extends TableHeaderColumn> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableName, headerDescription);
     }
 
     default Table create(String tableName,
                          String tableFooterString,
-                         Class<? extends TableColumnDescription> headerDescription,
+                         Class<? extends TableHeaderColumn> headerDescription,
                          int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableName, tableFooterString, headerDescription, headersRowCount);
     }
 
     default Table create(String tableName,
-                         Class<? extends TableColumnDescription> headerDescription,
+                         Class<? extends TableHeaderColumn> headerDescription,
                          int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableName, headerDescription, headersRowCount);
@@ -343,27 +343,27 @@ public interface ReportPage {
 
     default Table create(Predicate<Object> tableNameFinder,
                          Predicate<Object> tableFooterFinder,
-                         Class<? extends TableColumnDescription> headerDescription) {
+                         Class<? extends TableHeaderColumn> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableNameFinder, tableFooterFinder, headerDescription);
     }
 
     default Table create(Predicate<Object> tableNameFinder,
-                         Class<? extends TableColumnDescription> headerDescription) {
+                         Class<? extends TableHeaderColumn> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableNameFinder, headerDescription);
     }
 
     default Table create(Predicate<Object> tableNameFinder,
                          Predicate<Object> tableFooterFinder,
-                         Class<? extends TableColumnDescription> headerDescription,
+                         Class<? extends TableHeaderColumn> headerDescription,
                          int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableNameFinder, tableFooterFinder, headerDescription, headersRowCount);
     }
 
     default Table create(Predicate<Object> tableNameFinder,
-                         Class<? extends TableColumnDescription> headerDescription,
+                         Class<? extends TableHeaderColumn> headerDescription,
                          int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableNameFinder, headerDescription, headersRowCount);
@@ -371,13 +371,13 @@ public interface ReportPage {
 
     default Table createNameless(String firstLineText,
                                  String lastRowString,
-                                 Class<? extends TableColumnDescription> headerDescription) {
+                                 Class<? extends TableHeaderColumn> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, firstLineText, lastRowString, headerDescription);
     }
 
     default Table createNameless(String firstLineText,
-                                 Class<? extends TableColumnDescription> headerDescription) {
+                                 Class<? extends TableHeaderColumn> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, firstLineText, headerDescription);
     }
@@ -385,7 +385,7 @@ public interface ReportPage {
     default Table createNameless(String providedTableName,
                                  String firstLineText,
                                  String lastRowString,
-                                 Class<? extends TableColumnDescription> headerDescription,
+                                 Class<? extends TableHeaderColumn> headerDescription,
                                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, providedTableName, firstLineText, lastRowString, headerDescription, headersRowCount);
@@ -393,7 +393,7 @@ public interface ReportPage {
 
     default Table createNameless(String providedTableName,
                                  String firstLineText,
-                                 Class<? extends TableColumnDescription> headerDescription,
+                                 Class<? extends TableHeaderColumn> headerDescription,
                                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, providedTableName, firstLineText, headerDescription, headersRowCount);
@@ -401,13 +401,13 @@ public interface ReportPage {
 
     default Table createNameless(Predicate<Object> firstLineFinder,
                                  Predicate<Object> lastRowFinder,
-                                 Class<? extends TableColumnDescription> headerDescription) {
+                                 Class<? extends TableHeaderColumn> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, firstLineFinder, lastRowFinder, headerDescription);
     }
 
     default Table createNameless(Predicate<Object> firstLineFinder,
-                                 Class<? extends TableColumnDescription> headerDescription) {
+                                 Class<? extends TableHeaderColumn> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, firstLineFinder, headerDescription);
     }
@@ -415,7 +415,7 @@ public interface ReportPage {
     default Table createNameless(String providedTableName,
                                  Predicate<Object> firstLineFinder,
                                  Predicate<Object> lastRowFinder,
-                                 Class<? extends TableColumnDescription> headerDescription,
+                                 Class<? extends TableHeaderColumn> headerDescription,
                                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, providedTableName, firstLineFinder, lastRowFinder, headerDescription, headersRowCount);
@@ -423,7 +423,7 @@ public interface ReportPage {
 
     default Table createNameless(String providedTableName,
                                  Predicate<Object> firstLineFinder,
-                                 Class<? extends TableColumnDescription> headerDescription,
+                                 Class<? extends TableHeaderColumn> headerDescription,
                                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, providedTableName, firstLineFinder, headerDescription, headersRowCount);

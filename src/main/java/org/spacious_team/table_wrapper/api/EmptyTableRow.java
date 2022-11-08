@@ -36,7 +36,7 @@ class EmptyTableRow implements TableRow {
     private final int rowNum;
 
     @Override
-    public @Nullable TableCell getCell(TableColumnDescription column) {
+    public @Nullable TableCell getCell(TableHeaderColumn column) {
         return null;
     }
 
@@ -66,42 +66,42 @@ class EmptyTableRow implements TableRow {
     }
 
     @Override
-    public @Nullable Object getCellValue(TableColumnDescription column) {
+    public @Nullable Object getCellValue(TableHeaderColumn column) {
         return null;
     }
 
     @Override
-    public int getIntCellValue(TableColumnDescription column) {
+    public int getIntCellValue(TableHeaderColumn column) {
         throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
-    public long getLongCellValue(TableColumnDescription column) {
+    public long getLongCellValue(TableHeaderColumn column) {
         throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
-    public double getDoubleCellValue(TableColumnDescription column) {
+    public double getDoubleCellValue(TableHeaderColumn column) {
         throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
-    public BigDecimal getBigDecimalCellValue(TableColumnDescription column) {
+    public BigDecimal getBigDecimalCellValue(TableHeaderColumn column) {
         throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
-    public String getStringCellValue(TableColumnDescription column) {
+    public String getStringCellValue(TableHeaderColumn column) {
         throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
-    public Instant getInstantCellValue(TableColumnDescription column) {
+    public Instant getInstantCellValue(TableHeaderColumn column) {
         throw new NullPointerException(CELL_NOT_FOUND);
     }
 
     @Override
-    public LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column) {
+    public LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column) {
         throw new NullPointerException(CELL_NOT_FOUND);
     }
 

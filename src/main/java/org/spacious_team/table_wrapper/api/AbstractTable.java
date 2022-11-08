@@ -69,7 +69,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     protected AbstractTable(AbstractReportPage<R> reportPage,
                             String tableName,
                             TableCellRange tableRange,
-                            Class<? extends TableColumnDescription> headerDescription,
+                            Class<? extends TableHeaderColumn> headerDescription,
                             int headersRowCount) {
         this.reportPage = reportPage;
         this.tableName = tableName;
@@ -106,7 +106,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     }
 
     private static Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<?> reportPage, TableCellRange tableRange,
-                                                                  Class<? extends TableColumnDescription> headerDescription,
+                                                                  Class<? extends TableHeaderColumn> headerDescription,
                                                                   int headersRowCount) {
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
         ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
@@ -118,7 +118,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         }
         @SuppressWarnings("nullness")
         TableColumn[] columns = Arrays.stream(headerDescription.getEnumConstants())
-                .map(TableColumnDescription::getColumn)
+                .map(TableHeaderColumn::getColumn)
                 .toArray(TableColumn[]::new);
         for (TableColumn column : columns) {
             columnIndices.put(column, column.getColumnIndex(headerRows));

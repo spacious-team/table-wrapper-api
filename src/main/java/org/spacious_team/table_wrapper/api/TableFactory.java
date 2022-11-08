@@ -36,7 +36,7 @@ public interface TableFactory {
     default Table create(ReportPage reportPage,
                          String tableName,
                          String lastRowString,
-                         Class<? extends TableColumnDescription> headerDescription) {
+                         Class<? extends TableHeaderColumn> headerDescription) {
         return create(reportPage, tableName, lastRowString, headerDescription, 1);
     }
 
@@ -47,7 +47,7 @@ public interface TableFactory {
      */
     default Table create(ReportPage reportPage,
                          String tableName,
-                         Class<? extends TableColumnDescription> headerDescription) {
+                         Class<? extends TableHeaderColumn> headerDescription) {
         return create(reportPage, tableName, headerDescription, 1);
     }
 
@@ -61,7 +61,7 @@ public interface TableFactory {
     default Table create(ReportPage reportPage,
                          String tableName,
                          String lastRowString,
-                         Class<? extends TableColumnDescription> headerDescription,
+                         Class<? extends TableHeaderColumn> headerDescription,
                          int headersRowCount) {
         return create(reportPage,
                 tableName,
@@ -77,7 +77,7 @@ public interface TableFactory {
      */
     default Table create(ReportPage reportPage,
                          String tableName,
-                         Class<? extends TableColumnDescription> headerDescription,
+                         Class<? extends TableHeaderColumn> headerDescription,
                          int headersRowCount) {
         return create(reportPage,
                 tableName,
@@ -95,7 +95,7 @@ public interface TableFactory {
     default Table create(ReportPage reportPage,
                          Predicate<Object> tableNameFinder,
                          Predicate<Object> lastRowFinder,
-                         Class<? extends TableColumnDescription> headerDescription) {
+                         Class<? extends TableHeaderColumn> headerDescription) {
         return create(reportPage, tableNameFinder, lastRowFinder, headerDescription, 1);
     }
 
@@ -107,7 +107,7 @@ public interface TableFactory {
      */
     default Table create(ReportPage reportPage,
                          Predicate<Object> tableNameFinder,
-                         Class<? extends TableColumnDescription> headerDescription) {
+                         Class<? extends TableHeaderColumn> headerDescription) {
         return create(reportPage, tableNameFinder, headerDescription, 1);
     }
 
@@ -120,7 +120,7 @@ public interface TableFactory {
     default Table create(ReportPage reportPage,
                          Predicate<Object> tableNameFinder,
                          Predicate<Object> lastRowFinder,
-                         Class<? extends TableColumnDescription> headerDescription,
+                         Class<? extends TableHeaderColumn> headerDescription,
                          int headersRowCount) {
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder);
         String tableName = getTableName(reportPage, tableNameFinder, range);
@@ -135,7 +135,7 @@ public interface TableFactory {
      */
     default Table create(ReportPage reportPage,
                          Predicate<Object> tableNameFinder,
-                         Class<? extends TableColumnDescription> headerDescription,
+                         Class<? extends TableHeaderColumn> headerDescription,
                          int headersRowCount) {
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount);
         String tableName = getTableName(reportPage, tableNameFinder, range);
@@ -169,7 +169,7 @@ public interface TableFactory {
     default Table createNameless(ReportPage reportPage,
                                  String firstRowString,
                                  String lastRowString,
-                                 Class<? extends TableColumnDescription> headerDescription) {
+                                 Class<? extends TableHeaderColumn> headerDescription) {
         return createNameless(reportPage, "undefined", firstRowString, lastRowString, headerDescription, 1);
     }
 
@@ -180,7 +180,7 @@ public interface TableFactory {
      */
     default Table createNameless(ReportPage reportPage,
                                  String firstRowString,
-                                 Class<? extends TableColumnDescription> headerDescription) {
+                                 Class<? extends TableHeaderColumn> headerDescription) {
         return createNameless(reportPage, "undefined", firstRowString, headerDescription, 1);
     }
 
@@ -196,7 +196,7 @@ public interface TableFactory {
                                  String providedTableName,
                                  String firstRowString,
                                  String lastRowString,
-                                 Class<? extends TableColumnDescription> headerDescription,
+                                 Class<? extends TableHeaderColumn> headerDescription,
                                  int headersRowCount) {
         return create(reportPage,
                 providedTableName,
@@ -215,7 +215,7 @@ public interface TableFactory {
     default Table createNameless(ReportPage reportPage,
                                  String providedTableName,
                                  String firstRowString,
-                                 Class<? extends TableColumnDescription> headerDescription,
+                                 Class<? extends TableHeaderColumn> headerDescription,
                                  int headersRowCount) {
         return create(reportPage,
                 providedTableName,
@@ -234,7 +234,7 @@ public interface TableFactory {
     default Table createNameless(ReportPage reportPage,
                                  Predicate<Object> firstRowFinder,
                                  Predicate<Object> lastRowFinder,
-                                 Class<? extends TableColumnDescription> headerDescription) {
+                                 Class<? extends TableHeaderColumn> headerDescription) {
         return createNameless(reportPage, "undefined", firstRowFinder, lastRowFinder, headerDescription, 1);
     }
 
@@ -246,7 +246,7 @@ public interface TableFactory {
      */
     default Table createNameless(ReportPage reportPage,
                                  Predicate<Object> firstRowFinder,
-                                 Class<? extends TableColumnDescription> headerDescription) {
+                                 Class<? extends TableHeaderColumn> headerDescription) {
         return createNameless(reportPage, "undefined", firstRowFinder, headerDescription, 1);
     }
 
@@ -261,7 +261,7 @@ public interface TableFactory {
                                  String providedTableName,
                                  Predicate<Object> firstRowFinder,
                                  Predicate<Object> lastRowFinder,
-                                 Class<? extends TableColumnDescription> headerDescription,
+                                 Class<? extends TableHeaderColumn> headerDescription,
                                  int headersRowCount) {
         return create(reportPage,
                 providedTableName,
@@ -281,7 +281,7 @@ public interface TableFactory {
     default Table createNameless(ReportPage reportPage,
                                  String providedTableName,
                                  Predicate<Object> firstRowFinder,
-                                 Class<? extends TableColumnDescription> headerDescription,
+                                 Class<? extends TableHeaderColumn> headerDescription,
                                  int headersRowCount) {
         return create(reportPage,
                 providedTableName,
@@ -295,6 +295,6 @@ public interface TableFactory {
     Table create(ReportPage reportPage,
                  String tableName,
                  TableCellRange tableRange,
-                 Class<? extends TableColumnDescription> headerDescription,
+                 Class<? extends TableHeaderColumn> headerDescription,
                  int headersRowCount);
 }

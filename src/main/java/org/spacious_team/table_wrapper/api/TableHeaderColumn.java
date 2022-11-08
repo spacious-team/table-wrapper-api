@@ -18,6 +18,9 @@
 
 package org.spacious_team.table_wrapper.api;
 
-public interface TableColumnDescription {
+/**
+ * Use to create enum of table header columns
+ */
+public interface TableHeaderColumn {
     TableColumn getColumn();
 }

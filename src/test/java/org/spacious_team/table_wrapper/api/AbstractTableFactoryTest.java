@@ -69,7 +69,7 @@ class AbstractTableFactoryTest {
 
         @Override
         public Table create(ReportPage reportPage, String tableName, TableCellRange tableRange,
-                            Class<? extends TableColumnDescription> headerDescription, int headersRowCount) {
+                            Class<? extends TableHeaderColumn> headerDescription, int headersRowCount) {
             throw new UnsupportedOperationException();
         }
     }
