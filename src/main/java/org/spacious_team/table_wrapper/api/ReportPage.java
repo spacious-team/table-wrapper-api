@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 import static java.util.Objects.requireNonNull;
 import static org.spacious_team.table_wrapper.api.ReportPageHelper.getCellStringValueIgnoreCasePrefixPredicate;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface ReportPage {
 
     /**

@@ -19,7 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -40,6 +40,8 @@ import static org.spacious_team.table_wrapper.api.TableCellRange.EMPTY_RANGE;
 @ExtendWith(MockitoExtension.class)
 class ReportPageTest {
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
+    static TableFactory tableFactory;
     Object value = new Object();
     TableCellAddress address1 = TableCellAddress.of(1, 2);
     TableCellAddress address2 = TableCellAddress.of(3, 4);
@@ -47,6 +49,12 @@ class ReportPageTest {
     String prefix2 = "B";
     Predicate<Object> predicate1 = getCellStringValueIgnoreCasePrefixPredicate(prefix1);
     Predicate<Object> predicate2 = getCellStringValueIgnoreCasePrefixPredicate(prefix2);
+    String tableName = "table name";
+    String headerRow = "header row";
+    String tableFooterString = "footer";
+    Predicate<Object> tableNameFinder = cell -> true;
+    Predicate<Object> tableFooterFinder = cell -> true;
+    Class<TableHeader> tableHeader = TableHeader.class;
     @Mock
     ReportPageRow row1;
     @Mock
@@ -54,8 +62,11 @@ class ReportPageTest {
     @Spy
     ReportPage reportPage;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void beforeAll() {
+        tableFactory = mock(TableFactory.class);
+        when(tableFactory.canHandle(any())).thenReturn(true);
+        TableFactoryRegistry.add(tableFactory);
     }
 
     @Test
@@ -437,5 +448,112 @@ class ReportPageTest {
         when(reportPage.getLastRowNum()).thenReturn(1000);
 
         assertEquals(2, reportPage.findEmptyRow(1));
+    }
+
+
+    @Test
+    void create() {
+        reportPage.create(tableName, tableFooterString, tableHeader);
+        verify(tableFactory).create(reportPage, tableName, tableFooterString, tableHeader);
+    }
+
+    @Test
+    void testCreate() {
+        reportPage.create(tableName, tableHeader);
+        verify(tableFactory).create(reportPage, tableName, tableHeader);
+    }
+
+    @Test
+    void testCreate1() {
+        reportPage.create(tableName, tableFooterString, tableHeader, 2);
+        verify(tableFactory).create(reportPage, tableName, tableFooterString, tableHeader, 2);
+    }
+
+    @Test
+    void testCreate2() {
+        reportPage.create(tableName, tableHeader, 2);
+        verify(tableFactory).create(reportPage, tableName, tableHeader, 2);
+    }
+
+    @Test
+    void testCreate3() {
+        reportPage.create(tableNameFinder, tableFooterFinder, tableHeader);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableFooterFinder, tableHeader);
+    }
+
+    @Test
+    void testCreate4() {
+        reportPage.create(tableNameFinder, tableHeader);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableHeader);
+    }
+
+    @Test
+    void testCreate5() {
+        reportPage.create(tableNameFinder, tableFooterFinder, tableHeader, 2);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableFooterFinder, tableHeader, 2);
+    }
+
+    @Test
+    void testCreate6() {
+        reportPage.create(tableNameFinder, tableHeader, 2);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableHeader, 2);
+    }
+
+    @Test
+    void createNameless() {
+        reportPage.createNameless(headerRow, tableFooterString, tableHeader);
+        verify(tableFactory).createNameless(reportPage, headerRow, tableFooterString, tableHeader);
+    }
+
+    @Test
+    void testCreateNameless() {
+        reportPage.createNameless(headerRow, tableHeader);
+        verify(tableFactory).createNameless(reportPage, headerRow, tableHeader);
+    }
+
+    @Test
+    void testCreateNameless1() {
+        reportPage.createNameless(tableName, headerRow, tableFooterString, tableHeader, 2);
+        verify(tableFactory).createNameless(reportPage, tableName, headerRow, tableFooterString, tableHeader, 2);
+    }
+
+    @Test
+    void testCreateNameless2() {
+        reportPage.createNameless(tableName, headerRow, tableHeader, 2);
+        verify(tableFactory).createNameless(reportPage, tableName, headerRow, tableHeader, 2);
+    }
+
+    @Test
+    void testCreateNameless3() {
+        reportPage.createNameless(tableNameFinder, tableFooterFinder, tableHeader);
+        verify(tableFactory).createNameless(reportPage, tableNameFinder, tableFooterFinder, tableHeader);
+    }
+
+    @Test
+    void testCreateNameless4() {
+        reportPage.createNameless(tableNameFinder, tableHeader);
+        verify(tableFactory).createNameless(reportPage, tableNameFinder, tableHeader);
+    }
+
+    @Test
+    void testCreateNameless5() {
+        reportPage.createNameless(tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
+        verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
+    }
+
+    @Test
+    void testCreateNameless6() {
+        reportPage.createNameless(tableName, tableNameFinder, tableHeader, 2);
+        verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableHeader, 2);
+    }
+    
+
+    private enum TableHeader implements TableHeaderColumn {
+        ;
+
+        @Override
+        public TableColumn getColumn() {
+            throw new UnsupportedOperationException();
+        }
     }
 }

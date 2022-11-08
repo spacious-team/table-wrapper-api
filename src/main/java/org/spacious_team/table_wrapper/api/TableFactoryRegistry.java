@@ -19,12 +19,13 @@
 package org.spacious_team.table_wrapper.api;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import static java.util.Collections.unmodifiableCollection;
 
 public class TableFactoryRegistry {
 
-    private static final Collection<TableFactory> factories = new HashSet<>();
+    private static final Collection<TableFactory> factories = new CopyOnWriteArraySet<>();
 
     public static void add(TableFactory tableFactory) {
         factories.add(tableFactory);
@@ -32,7 +33,7 @@ public class TableFactoryRegistry {
 
     @SuppressWarnings("unused")
     public static Collection<TableFactory> getAll() {
-        return Collections.unmodifiableCollection(factories);
+        return unmodifiableCollection(factories);
     }
 
     public static TableFactory get(ReportPage reportPage) {
@@ -41,6 +42,7 @@ public class TableFactoryRegistry {
                 return factory;
             }
         }
-        throw new IllegalArgumentException("Нет парсера для отчета формата " + reportPage.getClass().getSimpleName());
+        throw new IllegalArgumentException(
+                "No factory registered for report page of type " + reportPage.getClass().getSimpleName());
     }
 }
