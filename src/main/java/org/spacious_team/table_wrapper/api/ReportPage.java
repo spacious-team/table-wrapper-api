@@ -302,7 +302,7 @@ public interface ReportPage {
         for (int n = getLastRowNum(); lastRowNum <= n; lastRowNum++) {
             @Nullable ReportPageRow row = getRow(lastRowNum);
             if (row == null || row.getLastCellNum() == -1) {
-                return lastRowNum; // all row cells blank
+                return lastRowNum; // all row's cells are blank
             }
             for (@SuppressWarnings("NullableProblems") @Nullable TableCell cell : row) {
                 @Nullable Object value;
@@ -313,7 +313,7 @@ public interface ReportPage {
                     continue LAST_ROW;
                 }
             }
-            return lastRowNum; // all row cells are blank
+            return lastRowNum; // all row's cells are blank
         }
         return -1;
     }

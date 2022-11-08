@@ -41,7 +41,7 @@ class PatternTableColumnTest {
 
     @Test
     void getColumnIndex() {
-        ReportPageRow row = TableColumnHelperTest.getRow();
+        ReportPageRow row = ReportPageRowHelperTest.getRow();
         assertEquals(0, PatternTableColumn.of().getColumnIndex(row));
         assertEquals(9, PatternTableColumn.of("test").getColumnIndex(row));
         assertEquals(9, PatternTableColumn.of("WORD").getColumnIndex(row));

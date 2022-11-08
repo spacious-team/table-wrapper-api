@@ -29,7 +29,7 @@ class OptionalTableColumnTest {
 
     @Test
     void getColumnIndex() {
-        ReportPageRow row = TableColumnHelperTest.getRow();
+        ReportPageRow row = ReportPageRowHelperTest.getRow();
         assertEquals(0, OptionalTableColumn.of(PatternTableColumn.of()).getColumnIndex(row));
         assertEquals(9, OptionalTableColumn.of(PatternTableColumn.of("test")).getColumnIndex(row));
         assertEquals(-1, OptionalTableColumn.of(PatternTableColumn.of("test")).getColumnIndex(10, row));

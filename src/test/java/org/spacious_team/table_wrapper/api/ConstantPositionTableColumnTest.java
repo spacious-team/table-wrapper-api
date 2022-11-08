@@ -31,7 +31,7 @@ class ConstantPositionTableColumnTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 10, 20, 1_000_000})
     void getColumnIndex(int columnNum) {
-        ReportPageRow row = TableColumnHelperTest.getRow();
+        ReportPageRow row = ReportPageRowHelperTest.getRow();
         ConstantPositionTableColumn column = ConstantPositionTableColumn.of(columnNum);
 
         assertEquals(columnNum, column.getColumnIndex(row));

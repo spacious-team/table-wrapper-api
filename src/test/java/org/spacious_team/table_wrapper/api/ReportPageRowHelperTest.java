@@ -24,15 +24,13 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-class TableColumnHelperTest {
+final class ReportPageRowHelperTest {
 
     @SuppressWarnings("ConstantConditions")
     static ReportPageRow getRow() {
-        ReportPageRow row = mock(ReportPageRow.class);
-        Collection<TableCell> cells = Arrays.asList(
+        return getRow(0,
                 null,
                 cell(null, 1),
                 cell(123, 2),
@@ -45,8 +43,6 @@ class TableColumnHelperTest {
                 cell("London\nis the\ncapital\nof Great Britain", 20),
                 cell("The Mac\rnew line", 21),
                 cell("The Windows\r\nnew line", 22));
-        when(row.iterator()).then($ -> cells.iterator());
-        return row;
     }
 
     /**
@@ -59,21 +55,15 @@ class TableColumnHelperTest {
      * Row 2:  | null | b1 | b2 | b1 | b2 | b1 | b2 | b1 | b2 | b1 | b2 | b1 | b2 |
      * <pre/>
      */
+    @SuppressWarnings("ConstantConditions")
     static ReportPageRow[] getThreeRowsHeader() {
         ReportPageRow[] rows = new ReportPageRow[3];
-
-        rows[0] = mock(ReportPageRow.class);
-        when(rows[0].getRowNum()).thenReturn(0);
-        Collection<TableCell> cells0 = Arrays.asList(
+        rows[0] = getRow(0,
                 null,
                 cell("One", 1),
                 cell("Two", 20),
                 cell("Three", 30));
-        when(rows[0].iterator()).then($ -> cells0.iterator());
-
-        rows[1] = mock(ReportPageRow.class);
-        when(rows[1].getRowNum()).thenReturn(1);
-        Collection<TableCell> cells1 = Arrays.asList(
+        rows[1] = getRow(1,
                 null,
                 cell("a1", 1),
                 cell("a2", 5),
@@ -81,11 +71,7 @@ class TableColumnHelperTest {
                 cell("a2", 15),
                 cell("a1", 21),
                 cell("a2", 25));
-        when(rows[1].iterator()).then($ -> cells1.iterator());
-
-        rows[2] = mock(ReportPageRow.class);
-        when(rows[2].getRowNum()).thenReturn(2);
-        Collection<TableCell> cells2 = Arrays.asList(
+        rows[2] = getRow(2,
                 null,
                 cell("b1", 1),
                 cell("b2", 2),
@@ -99,11 +85,18 @@ class TableColumnHelperTest {
                 cell("b2", 22),
                 cell("b1", 25),
                 cell("b2", 26));
-        when(rows[2].iterator()).then($ -> cells2.iterator());
         return rows;
     }
 
-    private static TableCellTestImpl cell(Object value, int columnIndex) {
+    static ReportPageRow getRow(int rowNum, TableCell... cells) {
+        ReportPageRow row = mock(ReportPageRow.class);
+        Collection<TableCell> cellsCollection = Arrays.asList(cells);
+        when(row.iterator()).then($ -> cellsCollection.iterator());
+        lenient().when(row.getRowNum()).thenReturn(rowNum);
+        return row;
+    }
+
+    static TableCell cell(Object value, int columnIndex) {
         return new TableCellTestImpl(value, columnIndex);
     }
 

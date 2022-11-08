@@ -32,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.spacious_team.table_wrapper.api.ReportPageHelper.getCellStringValueIgnoreCasePrefixPredicate;
+import static org.spacious_team.table_wrapper.api.ReportPageRowHelperTest.cell;
+import static org.spacious_team.table_wrapper.api.ReportPageRowHelperTest.getRow;
 import static org.spacious_team.table_wrapper.api.TableCellAddress.NOT_FOUND;
 import static org.spacious_team.table_wrapper.api.TableCellRange.EMPTY_RANGE;
 
@@ -145,7 +147,7 @@ class ReportPageTest {
     void getNextColumnValue() {
         String prefix = "test";
         doReturn(address1).when(reportPage).findByPrefix(prefix);
-        ReportPageRow row = TableColumnHelperTest.getRow();
+        ReportPageRow row = getRow();
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row);
 
@@ -368,5 +370,72 @@ class ReportPageTest {
                 TableCellRange.of(address1.getRow(), address1.getRow(), row1.getFirstCellNum(), row1.getLastCellNum()),
                 reportPage.getTableCellRange(predicate1, 2));
         verify(reportPage, times(1)).getRow(address1.getRow());
+    }
+
+    @Test
+    void findEmptyNotFound() {
+        ReportPageRow row = getRow(1, cell("abc", 0));
+        //noinspection ConstantConditions
+        when(reportPage.getRow(1)).thenReturn(row);
+        when(reportPage.getLastRowNum()).thenReturn(1);
+
+        assertEquals(-1, reportPage.findEmptyRow(1));
+    }
+
+    @Test
+    void findEmptyRowFoundFirst() {
+        //noinspection ConstantConditions
+        when(reportPage.getRow(1)).thenReturn(null);
+        when(reportPage.getLastRowNum()).thenReturn(1000);
+
+        assertEquals(1, reportPage.findEmptyRow(1));
+    }
+
+    @Test
+    void findEmptyRowFoundSecond() {
+        ReportPageRow row = getRow(1, cell("abc", 0));
+        //noinspection ConstantConditions
+        when(reportPage.getRow(1)).thenReturn(row);
+        //noinspection ConstantConditions
+        when(reportPage.getRow(2)).thenReturn(null);
+        when(reportPage.getLastRowNum()).thenReturn(1000);
+
+        assertEquals(2, reportPage.findEmptyRow(1));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    void findEmptyRowFoundSecondWithNull() {
+        ReportPageRow row1 = getRow(1, cell(null, 0), cell("abc", 1));
+        ReportPageRow row2 = getRow(2, cell(null, 0), cell(null, 1));
+        when(reportPage.getRow(1)).thenReturn(row1);
+        when(reportPage.getRow(2)).thenReturn(row2);
+        when(reportPage.getLastRowNum()).thenReturn(1000);
+
+        assertEquals(2, reportPage.findEmptyRow(1));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    void findEmptyRowFoundSecondWithNullCell() {
+        ReportPageRow row1 = getRow(1, cell(null, 0), cell("abc", 1));
+        ReportPageRow row2 = getRow(2, null, null);
+        when(reportPage.getRow(1)).thenReturn(row1);
+        when(reportPage.getRow(2)).thenReturn(row2);
+        when(reportPage.getLastRowNum()).thenReturn(1000);
+
+        assertEquals(2, reportPage.findEmptyRow(1));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    void findEmptyRowFoundSecondWithEmptyString() {
+        ReportPageRow row1 = getRow(1, cell(null, 0), cell("abc", 1));
+        ReportPageRow row2 = getRow(2, cell("", 0), cell("", 20));
+        when(reportPage.getRow(1)).thenReturn(row1);
+        when(reportPage.getRow(2)).thenReturn(row2);
+        when(reportPage.getLastRowNum()).thenReturn(1000);
+
+        assertEquals(2, reportPage.findEmptyRow(1));
     }
 }
