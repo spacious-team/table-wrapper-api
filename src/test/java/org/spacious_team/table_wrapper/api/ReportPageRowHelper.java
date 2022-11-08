@@ -19,16 +19,19 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static lombok.AccessLevel.PRIVATE;
 import static org.mockito.Mockito.*;
 
-final class ReportPageRowHelperTest {
+@RequiredArgsConstructor(access = PRIVATE)
+final class ReportPageRowHelper {
 
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings({"nullness", "ConstantConditions"})
     static ReportPageRow getRow() {
         return getRow(0,
                 null,
@@ -55,7 +58,7 @@ final class ReportPageRowHelperTest {
      * Row 2:  | null | b1 | b2 | b1 | b2 | b1 | b2 | b1 | b2 | b1 | b2 | b1 | b2 |
      * <pre/>
      */
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings({"nullness", "ConstantConditions"})
     static ReportPageRow[] getThreeRowsHeader() {
         ReportPageRow[] rows = new ReportPageRow[3];
         rows[0] = getRow(0,

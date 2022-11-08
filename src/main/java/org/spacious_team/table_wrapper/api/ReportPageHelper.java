@@ -35,7 +35,7 @@ final class ReportPageHelper {
 
     @ToString
     @EqualsAndHashCode
-    final static class StringIgnoreCasePrefixPredicate implements Predicate<Object> {
+    static final class StringIgnoreCasePrefixPredicate implements Predicate<Object> {
         private final String lowercasePrefix;
 
         private StringIgnoreCasePrefixPredicate(String prefix) {

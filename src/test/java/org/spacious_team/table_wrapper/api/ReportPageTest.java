@@ -32,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.spacious_team.table_wrapper.api.ReportPageHelper.getCellStringValueIgnoreCasePrefixPredicate;
-import static org.spacious_team.table_wrapper.api.ReportPageRowHelperTest.cell;
-import static org.spacious_team.table_wrapper.api.ReportPageRowHelperTest.getRow;
+import static org.spacious_team.table_wrapper.api.ReportPageRowHelper.cell;
+import static org.spacious_team.table_wrapper.api.ReportPageRowHelper.getRow;
 import static org.spacious_team.table_wrapper.api.TableCellAddress.NOT_FOUND;
 import static org.spacious_team.table_wrapper.api.TableCellRange.EMPTY_RANGE;
 

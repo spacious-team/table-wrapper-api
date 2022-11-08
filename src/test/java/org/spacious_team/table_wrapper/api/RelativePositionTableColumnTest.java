@@ -29,7 +29,7 @@ class RelativePositionTableColumnTest {
 
     @Test
     void getColumnIndex() {
-        ReportPageRow row = ReportPageRowHelperTest.getRow();
+        ReportPageRow row = ReportPageRowHelper.getRow();
         assertEquals(2, RelativePositionTableColumn.of(PatternTableColumn.of(), 2).getColumnIndex(row));
         assertEquals(7, RelativePositionTableColumn.of(PatternTableColumn.of("test"), -2).getColumnIndex(row));
 

@@ -29,7 +29,7 @@ class MultiLineTableColumnTest {
 
     @Test
     void getColumnIndex() {
-        ReportPageRow[] rows = ReportPageRowHelperTest.getThreeRowsHeader();
+        ReportPageRow[] rows = ReportPageRowHelper.getThreeRowsHeader();
         assertEquals(2, MultiLineTableColumn.of("one", "a1", "b2").getColumnIndex(rows));
         assertEquals(5, MultiLineTableColumn.of("one", "a2", "b1").getColumnIndex(rows));
         assertEquals(26, MultiLineTableColumn.of("TWO", "A2", "b2").getColumnIndex(rows));
