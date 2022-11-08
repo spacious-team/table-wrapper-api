@@ -310,10 +310,11 @@ class AbstractTableTest {
 
     class TableTestImpl extends AbstractTable<EmptyTableRow> {
 
-        protected TableTestImpl(AbstractReportPage<EmptyTableRow> reportPage,
+        protected <T extends Enum<T> & TableHeaderColumn>
+        TableTestImpl(AbstractReportPage<EmptyTableRow> reportPage,
                                 String tableName,
                                 TableCellRange tableRange,
-                                Class<? extends TableHeaderColumn> headerDescription,
+                                Class<T> headerDescription,
                                 int headersRowCount) {
             super(reportPage, tableName, tableRange, headerDescription, headersRowCount);
         }

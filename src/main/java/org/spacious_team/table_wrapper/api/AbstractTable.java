@@ -41,6 +41,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -66,11 +67,12 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
      * @param tableRange only first and last row numbers matters
      */
     @SuppressWarnings("unused")
-    protected AbstractTable(AbstractReportPage<R> reportPage,
-                            String tableName,
-                            TableCellRange tableRange,
-                            Class<? extends TableHeaderColumn> headerDescription,
-                            int headersRowCount) {
+    protected <T extends Enum<T> & TableHeaderColumn>
+    AbstractTable(AbstractReportPage<R> reportPage,
+                  String tableName,
+                  TableCellRange tableRange,
+                  Class<T> headerDescription,
+                  int headersRowCount) {
         this.reportPage = reportPage;
         this.tableName = tableName;
         this.dataRowOffset = 1 + headersRowCount; // table_name + headersRowCount
@@ -105,9 +107,10 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         return tableRange.getLastRow() - tableRange.getFirstRow() + 1;
     }
 
-    private static Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<?> reportPage, TableCellRange tableRange,
-                                                                  Class<? extends TableHeaderColumn> headerDescription,
-                                                                  int headersRowCount) {
+    private static <T extends Enum<T> & TableHeaderColumn>
+    Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<?> reportPage, TableCellRange tableRange,
+                                                   Class<T> headerDescription,
+                                                   int headersRowCount) {
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
         ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
         for (int i = 0; i < headersRowCount; i++) {
@@ -123,7 +126,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         for (TableColumn column : columns) {
             columnIndices.put(column, column.getColumnIndex(headerRows));
         }
-        return Collections.unmodifiableMap(columnIndices);
+        return unmodifiableMap(columnIndices);
     }
 
     private static IntStream getColumnIndices(Map<TableColumn, Integer> headerDescription) {

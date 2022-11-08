@@ -68,8 +68,9 @@ class AbstractTableFactoryTest {
         }
 
         @Override
-        public Table create(ReportPage reportPage, String tableName, TableCellRange tableRange,
-                            Class<? extends TableHeaderColumn> headerDescription, int headersRowCount) {
+        public <T extends Enum<T> & TableHeaderColumn>
+        Table create(ReportPage reportPage, String tableName, TableCellRange tableRange,
+                     Class<T> headerDescription, int headersRowCount) {
             throw new UnsupportedOperationException();
         }
     }
