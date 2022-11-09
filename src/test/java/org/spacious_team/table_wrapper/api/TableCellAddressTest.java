@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.spacious_team.table_wrapper.api.TableCellAddress.NOT_FOUND;
 
 class TableCellAddressTest {
 
@@ -30,6 +31,12 @@ class TableCellAddressTest {
     void testConstructor() {
         assertEquals(1, TableCellAddress.of(1, 2).getRow());
         assertEquals(2, TableCellAddress.of(1, 2).getColumn());
+    }
+
+    @Test
+    void testNotFoundCell() {
+        assertEquals(-1, NOT_FOUND.getRow());
+        assertEquals(-1, NOT_FOUND.getColumn());
     }
 
     @Test

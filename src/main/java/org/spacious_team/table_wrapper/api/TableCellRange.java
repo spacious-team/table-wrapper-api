@@ -38,12 +38,12 @@ public class TableCellRange {
     private final int firstColumn;
     private final int lastColumn;
 
-    public TableCellRange of(TableCellAddress leftUpperCellAddress, TableCellAddress rightBottomCellAddress) {
+    public static TableCellRange of(TableCellAddress upperLeft, TableCellAddress bottomRight) {
         return of(
-                leftUpperCellAddress.getRow(),
-                rightBottomCellAddress.getRow(),
-                leftUpperCellAddress.getColumn(),
-                rightBottomCellAddress.getColumn());
+                upperLeft.getRow(),
+                bottomRight.getRow(),
+                upperLeft.getColumn(),
+                bottomRight.getColumn());
     }
 
     public boolean contains(TableCellAddress address) {
@@ -51,7 +51,7 @@ public class TableCellRange {
     }
 
     public boolean containsRow(int row) {
-        return firstColumn <= row && row <= lastRow;
+        return firstRow <= row && row <= lastRow;
     }
 
     public boolean containsColumn(int column) {
@@ -95,7 +95,7 @@ public class TableCellRange {
     private static class EmptyTableCellRange extends TableCellRange {
 
         private EmptyTableCellRange() {
-            super(0, 0, 0, 0);
+            super(-1, -1, -1, -1);
         }
 
         @Override
