@@ -35,13 +35,13 @@ class MultiLineTableColumnTest {
         assertEquals(26, MultiLineTableColumn.of("TWO", "A2", "b2").getColumnIndex(rows));
 
         TableColumn column1 = MultiLineTableColumn.of("not", "fo", "und");
-        assertThrows(RuntimeException.class, () -> column1.getColumnIndex(rows));
+        assertThrows(TableColumnNotFound.class, () -> column1.getColumnIndex(rows));
         TableColumn column2 = MultiLineTableColumn.of("one");
-        assertThrows(RuntimeException.class, () -> column2.getColumnIndex(rows));
+        assertThrows(TableColumnNotFound.class, () -> column2.getColumnIndex(rows));
         TableColumn column3 = MultiLineTableColumn.of("Three", "a2");
-        assertThrows(RuntimeException.class, () -> column3.getColumnIndex(rows));
+        assertThrows(TableColumnNotFound.class, () -> column3.getColumnIndex(rows));
         TableColumn column4 = MultiLineTableColumn.of("one", "a1", "b2");
-        assertThrows(RuntimeException.class, () -> column4.getColumnIndex(3, rows));
+        assertThrows(TableColumnNotFound.class, () -> column4.getColumnIndex(3, rows));
     }
 
     @Test

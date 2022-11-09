@@ -42,8 +42,8 @@ class AnyOfTableColumnTest {
         assertEquals(10, column1.getColumnIndex(10));
         assertEquals(0, column2.getColumnIndex());
         assertEquals(10, column2.getColumnIndex(10));
-        assertThrows(RuntimeException.class, column3::getColumnIndex);
-        assertThrows(RuntimeException.class, () -> column3.getColumnIndex(10));
+        assertThrows(TableColumnNotFound.class, column3::getColumnIndex);
+        assertThrows(TableColumnNotFound.class, () -> column3.getColumnIndex(10));
     }
 
     @Test

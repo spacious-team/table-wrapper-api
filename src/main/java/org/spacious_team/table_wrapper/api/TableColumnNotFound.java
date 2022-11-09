@@ -18,9 +18,13 @@
 
 package org.spacious_team.table_wrapper.api;
 
-public class OptionalTableColumnNotFound extends TableColumnNotFound {
+public class TableColumnNotFound extends RuntimeException {
 
-    public OptionalTableColumnNotFound(Throwable t) {
+    public TableColumnNotFound(String message) {
+        super(message);
+    }
+
+    public TableColumnNotFound(Throwable t) {
         super(t);
     }
 }

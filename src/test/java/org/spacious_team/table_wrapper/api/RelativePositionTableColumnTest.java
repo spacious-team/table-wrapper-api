@@ -34,10 +34,10 @@ class RelativePositionTableColumnTest {
         assertEquals(7, RelativePositionTableColumn.of(PatternTableColumn.of("test"), -2).getColumnIndex(row));
 
         TableColumn column1 = RelativePositionTableColumn.of(PatternTableColumn.of("test"), 2);
-        assertThrows(RuntimeException.class, () -> column1.getColumnIndex(10, row));
+        assertThrows(TableColumnNotFound.class, () -> column1.getColumnIndex(10, row));
 
         TableColumn column2 = RelativePositionTableColumn.of(PatternTableColumn.of("not found"), 2);
-        assertThrows(RuntimeException.class, () -> column2.getColumnIndex(row));
+        assertThrows(TableColumnNotFound.class, () -> column2.getColumnIndex(row));
     }
 
     @Test

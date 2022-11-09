@@ -58,15 +58,15 @@ class PatternTableColumnTest {
         assertEquals(22, PatternTableColumn.of("windows").getColumnIndex(21, row));
 
         TableColumn column1 = PatternTableColumn.of("windows");
-        assertThrows(RuntimeException.class, () -> column1.getColumnIndex(23, row));
+        assertThrows(TableColumnNotFound.class, () -> column1.getColumnIndex(23, row));
         TableColumn column2 = PatternTableColumn.of("not found");
-        assertThrows(RuntimeException.class, () -> column2.getColumnIndex(row));
+        assertThrows(TableColumnNotFound.class, () -> column2.getColumnIndex(row));
         TableColumn column3 = PatternTableColumn.of("london is");
-        assertThrows(RuntimeException.class, () -> column3.getColumnIndex(row));
+        assertThrows(TableColumnNotFound.class, () -> column3.getColumnIndex(row));
         TableColumn column4 = PatternTableColumn.of("mac new");
-        assertThrows(RuntimeException.class, () -> column4.getColumnIndex(row));
+        assertThrows(TableColumnNotFound.class, () -> column4.getColumnIndex(row));
         TableColumn column5 = PatternTableColumn.of("windows new");
-        assertThrows(RuntimeException.class, () -> column5.getColumnIndex(row));
+        assertThrows(TableColumnNotFound.class, () -> column5.getColumnIndex(row));
     }
 
     @Test

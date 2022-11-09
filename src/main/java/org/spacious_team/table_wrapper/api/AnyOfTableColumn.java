@@ -49,6 +49,6 @@ public class AnyOfTableColumn implements TableColumn {
                 Arrays.stream(columns)
                         .map(TableColumn::toString)
                         .toArray(String[]::new));
-        throw new RuntimeException("Header including '" + expected + "' not found");
+        throw new TableColumnNotFound("Header including '" + expected + "' not found");
     }
 }

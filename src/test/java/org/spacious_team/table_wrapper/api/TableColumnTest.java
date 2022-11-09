@@ -43,9 +43,9 @@ class TableColumnTest {
 
     @Test
     void testConstants() {
-        assertThrows(RuntimeException.class, () -> TableColumn.NOCOLUMN.getColumnIndex(0));
-        assertThrows(RuntimeException.class, () -> TableColumn.NOCOLUMN.getColumnIndex(1));
-        assertThrows(RuntimeException.class, () -> TableColumn.NOCOLUMN.getColumnIndex(-2));
+        assertThrows(TableColumnNotFound.class, () -> TableColumn.NOCOLUMN.getColumnIndex(0));
+        assertThrows(TableColumnNotFound.class, () -> TableColumn.NOCOLUMN.getColumnIndex(1));
+        assertThrows(TableColumnNotFound.class, () -> TableColumn.NOCOLUMN.getColumnIndex(-2));
         assertEquals(0, TableColumn.LEFTMOST_COLUMN.getColumnIndex(0));
         assertEquals(1, TableColumn.LEFTMOST_COLUMN.getColumnIndex(1));
         assertEquals(-1, TableColumn.LEFTMOST_COLUMN.getColumnIndex(-1));
