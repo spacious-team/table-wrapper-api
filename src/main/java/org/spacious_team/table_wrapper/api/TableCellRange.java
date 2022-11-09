@@ -23,6 +23,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import static java.lang.Integer.MIN_VALUE;
+
 /**
  * Zero-based table cell range
  */
@@ -95,7 +97,7 @@ public class TableCellRange {
     private static class EmptyTableCellRange extends TableCellRange {
 
         private EmptyTableCellRange() {
-            super(-1, -1, -1, -1);
+            super(MIN_VALUE, MIN_VALUE, MIN_VALUE, MIN_VALUE);
         }
 
         @Override

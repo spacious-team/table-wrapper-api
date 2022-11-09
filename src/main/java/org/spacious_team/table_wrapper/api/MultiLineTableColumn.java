@@ -63,8 +63,7 @@ public class MultiLineTableColumn implements TableColumn {
     @Override
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         if (headerRows.length != rowDescriptors.length) {
-            throw new RuntimeException("Внутренняя ошибка, в таблице ожидается " + rowDescriptors.length +
-                    " строк в заголовке");
+            throw new RuntimeException("Internal error, " + rowDescriptors.length + " rows expected in table header");
         }
         int columnIndex = firstColumnForSearch;
         int i = 0;

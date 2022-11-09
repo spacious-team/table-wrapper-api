@@ -45,9 +45,10 @@ public class AnyOfTableColumn implements TableColumn {
             } catch (RuntimeException ignore) {
             }
         }
-        throw new RuntimeException("Не обнаружен заголовок таблицы, включающий: " + String.join(", ",
+        String expected = String.join(", ",
                 Arrays.stream(columns)
                         .map(TableColumn::toString)
-                        .toArray(String[]::new)));
+                        .toArray(String[]::new));
+        throw new RuntimeException("Header including '" + expected + "' not found");
     }
 }

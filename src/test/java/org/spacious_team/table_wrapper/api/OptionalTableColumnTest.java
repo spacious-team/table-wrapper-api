@@ -23,7 +23,8 @@ import org.junit.jupiter.api.Test;
 
 import static nl.jqno.equalsverifier.Warning.ALL_FIELDS_SHOULD_BE_USED;
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OptionalTableColumnTest {
 
@@ -32,8 +33,10 @@ class OptionalTableColumnTest {
         ReportPageRow row = ReportPageRowHelper.getRow();
         assertEquals(0, OptionalTableColumn.of(PatternTableColumn.of()).getColumnIndex(row));
         assertEquals(9, OptionalTableColumn.of(PatternTableColumn.of("test")).getColumnIndex(row));
-        assertEquals(-1, OptionalTableColumn.of(PatternTableColumn.of("test")).getColumnIndex(10, row));
-        assertEquals(-1, OptionalTableColumn.of(PatternTableColumn.of("not found")).getColumnIndex(row));
+        OptionalTableColumn column1 = OptionalTableColumn.of(PatternTableColumn.of("test"));
+        OptionalTableColumn column2 =  OptionalTableColumn.of(PatternTableColumn.of("not found"));
+        assertThrows(OptionalTableColumnNotFound.class, () -> column1.getColumnIndex(10, row));
+        assertThrows(OptionalTableColumnNotFound.class, () -> column2.getColumnIndex(row));
     }
 
     @Test

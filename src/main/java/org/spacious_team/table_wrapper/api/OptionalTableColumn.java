@@ -37,6 +37,10 @@ public class OptionalTableColumn implements TableColumn {
 
     @Override
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
-        return anyOfTableColumn.getColumnIndex(firstColumnForSearch, headerRows);
+        try {
+            return anyOfTableColumn.getColumnIndex(firstColumnForSearch, headerRows);
+        } catch (Exception e) {
+            throw new OptionalTableColumnNotFound(e);
+        }
     }
 }

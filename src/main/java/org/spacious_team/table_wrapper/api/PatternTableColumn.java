@@ -78,7 +78,7 @@ public class PatternTableColumn implements TableColumn {
                 }
             }
         }
-        throw new RuntimeException("Не обнаружен заголовок таблицы, включающий слова: " + String.join(", ", words));
+        throw new RuntimeException("Header including '" + String.join(", ", words) + "' not found");
     }
 
     private boolean matches(CharSequence cellText) {

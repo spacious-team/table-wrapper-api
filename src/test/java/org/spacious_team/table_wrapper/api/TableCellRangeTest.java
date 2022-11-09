@@ -21,6 +21,7 @@ package org.spacious_team.table_wrapper.api;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
+import static java.lang.Integer.MIN_VALUE;
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.spacious_team.table_wrapper.api.TableCellRange.EMPTY_RANGE;
@@ -139,10 +140,10 @@ class TableCellRangeTest {
 
     @Test
     void testEmptyRange() {
-        assertEquals(-1, EMPTY_RANGE.getFirstRow());
-        assertEquals(-1, EMPTY_RANGE.getLastRow());
-        assertEquals(-1, EMPTY_RANGE.getFirstColumn());
-        assertEquals(-1, EMPTY_RANGE.getLastColumn());
+        assertEquals(MIN_VALUE, EMPTY_RANGE.getFirstRow());
+        assertEquals(MIN_VALUE, EMPTY_RANGE.getLastRow());
+        assertEquals(MIN_VALUE, EMPTY_RANGE.getFirstColumn());
+        assertEquals(MIN_VALUE, EMPTY_RANGE.getLastColumn());
         assertFalse(EMPTY_RANGE.contains(TableCellAddress.NOT_FOUND));
         assertFalse(EMPTY_RANGE.contains(TableCellAddress.of(-1, -1)));
         assertFalse(EMPTY_RANGE.contains(TableCellAddress.of(0, 0)));

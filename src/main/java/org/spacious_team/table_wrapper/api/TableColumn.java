@@ -19,22 +19,25 @@
 package org.spacious_team.table_wrapper.api;
 
 public interface TableColumn {
-    int NOCOLUMN_INDEX = -1;
-    TableColumn NOCOLUMN = (i, j) -> NOCOLUMN_INDEX;
     TableColumn LEFTMOST_COLUMN = (firstColumnForSearch, $) -> firstColumnForSearch;
+    TableColumn NOCOLUMN = (i, j) -> {
+        throw new RuntimeException("No column impl");
+    };
 
     /**
      * @param headerRows header rows
      * @return column index of table
+     * @throws RuntimeException if column not found
      */
     default int getColumnIndex(ReportPageRow... headerRows) {
         return getColumnIndex(0, headerRows);
     }
 
     /**
-     * @param firstColumnForSearch start result column search from this index
-     * @param headerRows header rows
+     * @param firstColumnForSearch start column index for search from
+     * @param headerRows           header rows
      * @return column index of table
+     * @throws RuntimeException if column not found
      */
     int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows);
 }

@@ -21,6 +21,7 @@ package org.spacious_team.table_wrapper.api;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
+import static java.lang.Integer.MIN_VALUE;
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.spacious_team.table_wrapper.api.TableCellAddress.NOT_FOUND;
@@ -35,8 +36,8 @@ class TableCellAddressTest {
 
     @Test
     void testNotFoundCell() {
-        assertEquals(-1, NOT_FOUND.getRow());
-        assertEquals(-1, NOT_FOUND.getColumn());
+        assertEquals(MIN_VALUE, NOT_FOUND.getRow());
+        assertEquals(MIN_VALUE, NOT_FOUND.getColumn());
     }
 
     @Test

@@ -124,7 +124,11 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                 .map(TableHeaderColumn::getColumn)
                 .toArray(TableColumn[]::new);
         for (TableColumn column : columns) {
-            columnIndices.put(column, column.getColumnIndex(headerRows));
+            try {
+                int columnIndex = column.getColumnIndex(headerRows);
+                columnIndices.put(column, columnIndex);
+            } catch (OptionalTableColumnNotFound ignore) {
+            }
         }
         return unmodifiableMap(columnIndices);
     }
@@ -132,8 +136,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     private static IntStream getColumnIndices(Map<TableColumn, Integer> headerDescription) {
         return headerDescription.values()
                 .stream()
-                .mapToInt(i -> i)
-                .filter(i -> i != TableColumn.NOCOLUMN_INDEX);
+                .mapToInt(i -> i);
     }
 
     public <T> List<T> getData(Object report, Function<TableRow, @Nullable T> rowExtractor) {
