@@ -127,7 +127,8 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
             try {
                 int columnIndex = column.getColumnIndex(headerRows);
                 columnIndices.put(column, columnIndex);
-            } catch (OptionalTableColumnNotFound ignore) {
+            } catch (OptionalTableColumnNotFound e) {
+                log.debug("Optional header column is not found: {}", column, e);
             }
         }
         return unmodifiableMap(columnIndices);

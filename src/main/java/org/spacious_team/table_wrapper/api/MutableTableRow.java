@@ -125,7 +125,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
         @Nullable Integer cellIndex = table.getHeaderDescription()
                 .get(column.getColumn());
         @SuppressWarnings("nullness")
-        int cell = requireNonNull(cellIndex, "Cell not found");
+        int cell = requireNonNull(cellIndex, "Cell is not found");
         return cell;
     }
 

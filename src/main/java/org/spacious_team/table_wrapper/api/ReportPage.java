@@ -227,13 +227,13 @@ public interface ReportPage {
             return TableCellRange.EMPTY_RANGE;
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row not found");
+        ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row is not found");
         TableCellAddress endAddress = find(startAddress.getRow() + headersRowCount + 1, lastRowFinder);
         if (endAddress.equals(TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        ReportPageRow lastRow = requireNonNull(getRow(endAddress.getRow()), "Row not found");
+        ReportPageRow lastRow = requireNonNull(getRow(endAddress.getRow()), "Row is not found");
         return TableCellRange.of(
                 startAddress.getRow(),
                 endAddress.getRow(),
@@ -266,10 +266,10 @@ public interface ReportPage {
             return TableCellRange.EMPTY_RANGE;
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row not found");
+        ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row is not found");
         int emptyRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
         if (emptyRowNum == -1) {
-            emptyRowNum = getLastRowNum(); // empty row not found, use last row
+            emptyRowNum = getLastRowNum(); // empty row is not found, use last row
         } else if (emptyRowNum <= getLastRowNum()) {
             emptyRowNum--; // exclude empty row
         }
@@ -279,7 +279,7 @@ public interface ReportPage {
             lastRow = firstRow;
         } else {
             @SuppressWarnings({"nullness", "ConstantConditions"})
-            ReportPageRow row = requireNonNull(getRow(emptyRowNum), "Row not found");
+            ReportPageRow row = requireNonNull(getRow(emptyRowNum), "Row is not found");
             lastRow = row;
         }
         return TableCellRange.of(
@@ -294,7 +294,7 @@ public interface ReportPage {
      * This implementation generates a huge amount of garbage. May be overridden for improve performance.
      *
      * @param startRow first row for check
-     * @return index of first empty row or -1 if not found
+     * @return index of first empty row or -1 if empty row is not found
      */
     default int findEmptyRow(int startRow) {
         int lastRowNum = startRow;

@@ -78,7 +78,7 @@ public class PatternTableColumn implements TableColumn {
                 }
             }
         }
-        throw new TableColumnNotFound("Header including '" + String.join(", ", words) + "' not found");
+        throw new TableColumnNotFound("Header including '" + String.join(", ", words) + "' is not found");
     }
 
     private boolean matches(CharSequence cellText) {

@@ -74,13 +74,13 @@ public interface Table extends Iterable<TableRow> {
     ReportPageRow getRow(int i);
 
     /**
-     * @return row containing cell with exact value or null if not found
+     * @return row containing cell with exact value or null if row is not found
      */
     @Nullable
     TableRow findRow(Object value);
 
     /**
-     * @return row containing cell starting with prefix or null if not found
+     * @return row containing cell starting with prefix or null if row is not found
      */
     @SuppressWarnings("UnusedReturnValue")
     @Nullable TableRow findRowByPrefix(String prefix);

@@ -27,7 +27,7 @@ public interface TableColumn {
     /**
      * @param headerRows header rows
      * @return column index of table
-     * @throws TableColumnNotFound if column not found
+     * @throws TableColumnNotFound if column is not found
      */
     default int getColumnIndex(ReportPageRow... headerRows) {
         return getColumnIndex(0, headerRows);
@@ -37,7 +37,7 @@ public interface TableColumn {
      * @param firstColumnForSearch start column index for search from
      * @param headerRows           header rows
      * @return column index of table
-     * @throws TableColumnNotFound if column not found
+     * @throws TableColumnNotFound if column is not found
      */
     int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows);
 }

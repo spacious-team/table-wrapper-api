@@ -145,7 +145,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default int getIntValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getIntValue(cell);
     }
 
@@ -154,7 +154,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default long getLongValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getLongValue(cell);
     }
 
@@ -163,7 +163,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default double getDoubleValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getDoubleValue(cell);
     }
 
@@ -172,7 +172,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default BigDecimal getBigDecimalValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getBigDecimalValue(cell);
     }
 
@@ -181,7 +181,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default String getStringValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getStringValue(cell);
     }
 
@@ -190,7 +190,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default Instant getInstantValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getInstantValue(cell);
     }
 
@@ -201,7 +201,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getLocalDateTimeValue(cell);
     }
 
@@ -211,7 +211,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     @SuppressWarnings("UnusedReturnValue")
     default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex, ZoneId zoneId) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getLocalDateTimeValue(cell, zoneId);
     }
 }
