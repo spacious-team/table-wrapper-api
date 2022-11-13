@@ -20,8 +20,6 @@ package org.spacious_team.table_wrapper.api;
 
 import java.util.function.Predicate;
 
-import static java.util.Objects.requireNonNull;
-
 public interface TableFactory {
 
     boolean canHandle(ReportPage reportPage);
@@ -130,7 +128,7 @@ public interface TableFactory {
                  Class<T> headerDescription,
                  int headersRowCount) {
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder);
-        String tableName = getTableName(reportPage, tableNameFinder, range);
+        String tableName = TableFactoryHelper.getTableName(reportPage, tableNameFinder, range);
         return create(reportPage, tableName, range, headerDescription, headersRowCount);
     }
 
@@ -146,25 +144,8 @@ public interface TableFactory {
                  Class<T> headerDescription,
                  int headersRowCount) {
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount);
-        String tableName = getTableName(reportPage, tableNameFinder, range);
+        String tableName = TableFactoryHelper.getTableName(reportPage, tableNameFinder, range);
         return create(reportPage, tableName, range, headerDescription, headersRowCount);
-    }
-
-    private static String getTableName(ReportPage reportPage, Predicate<Object> tableNameFinder, TableCellRange range) {
-        if (!range.equals(TableCellRange.EMPTY_RANGE)) {
-            TableCellAddress tableNameCell =
-                    reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
-            if (!tableNameCell.equals(TableCellAddress.NOT_FOUND)) {
-                try {
-                    @SuppressWarnings({"nullness", "ConstantConditions"})
-                    TableCell cell = requireNonNull(reportPage.getCell(tableNameCell));
-                    return cell.getStringValue();
-                } catch (Exception ignore) {
-                    return "<not found>";
-                }
-            }
-        }
-        return "<not found>";
     }
 
     /**

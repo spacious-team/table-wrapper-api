@@ -548,7 +548,7 @@ class ReportPageTest {
     }
     
 
-    private enum TableHeader implements TableHeaderColumn {
+    enum TableHeader implements TableHeaderColumn {
         ;
 
         @Override
