@@ -58,6 +58,8 @@ class TableFactoryRegistryTest {
         lenient().when(factory2.canHandle(reportPage1)).thenReturn(false);
         lenient().when(factory2.canHandle(reportPage2)).thenReturn(true);
         lenient().when(factory2.canHandle(reportPageOfNotRegisteredFactory)).thenReturn(false);
+
+        TableFactoryRegistry.clear();
     }
 
     @AfterEach

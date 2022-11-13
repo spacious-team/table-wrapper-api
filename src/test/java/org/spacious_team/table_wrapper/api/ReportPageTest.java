@@ -19,6 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,6 +68,11 @@ class ReportPageTest {
         tableFactory = mock(TableFactory.class);
         when(tableFactory.canHandle(any())).thenReturn(true);
         TableFactoryRegistry.add(tableFactory);
+    }
+
+    @AfterAll
+    static void afterAll() {
+        TableFactoryRegistry.remove(tableFactory);
     }
 
     @Test
