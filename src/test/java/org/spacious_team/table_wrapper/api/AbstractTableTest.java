@@ -45,6 +45,7 @@ import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.spacious_team.table_wrapper.api.TableColumn.LEFTMOST_COLUMN;
+import static org.spacious_team.table_wrapper.api.TableColumn.NOCOLUMN;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractTableTest {
@@ -112,7 +113,7 @@ class AbstractTableTest {
     }
 
     @Test
-    void testEmptyRangeConstructor2() {
+    void testNotEmptyRangeConstructor2() {
         AbstractTable<EmptyTableRow> originalTable = getNotEmptyTable();
         AbstractTable<EmptyTableRow> table = new TableTestImpl(originalTable, -1, -1);
         TableCellRange range = TableCellRange.of(3, 5, 0, 1);
@@ -124,7 +125,7 @@ class AbstractTableTest {
     }
 
     @Test
-    void testNotEmptyRangeConstructor2() {
+    void testEmptyRangeConstructor2() {
         AbstractTable<EmptyTableRow> originalTable = getEmptyTable();
         AbstractTable<EmptyTableRow> table = new TableTestImpl(originalTable, 1, 2);
         TableCellRange range = TableCellRange.of(1, 5,
@@ -338,7 +339,8 @@ class AbstractTableTest {
     @RequiredArgsConstructor
     enum Columns implements TableHeaderColumn {
         FIRST(LEFTMOST_COLUMN),
-        SECOND(ConstantPositionTableColumn.of(1));
+        SECOND(ConstantPositionTableColumn.of(1)),
+        NOT_FOUND(OptionalTableColumn.of(NOCOLUMN));
         private final TableColumn column;
     }
 }

@@ -61,6 +61,11 @@ class AbstractTableFactoryTest {
                 .verify();
     }
 
+    @Test
+    void testToString() {
+        assertTrue(factory.toString().startsWith("AbstractTableFactory(reportPageType="));
+    }
+
     static class TableFactoryTestImpl extends AbstractTableFactory<AbstractReportPage<ReportPageRow>> {
 
         protected TableFactoryTestImpl(Class<AbstractReportPage<ReportPageRow>> reportPageType) {

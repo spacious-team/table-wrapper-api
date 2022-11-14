@@ -28,6 +28,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class MultiLineTableColumnTest {
 
     @Test
+    void testOf() {
+        assertEquals(
+                MultiLineTableColumn.of("a1", "b2"),
+                MultiLineTableColumn.of(
+                        PatternTableColumn.of("a1"),
+                        PatternTableColumn.of("b2")));
+    }
+
+    @Test
     void getColumnIndex() {
         ReportPageRow[] rows = ReportPageRowHelper.getThreeRowsHeader();
         assertEquals(2, MultiLineTableColumn.of("one", "a1", "b2").getColumnIndex(rows));

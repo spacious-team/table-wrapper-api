@@ -100,6 +100,7 @@ class CellDataAccessObjectTest {
         assertThrows(NumberFormatException.class, () -> dao.getDoubleValue("abc"));
         assertThrows(NumberFormatException.class, () -> dao.getDoubleValue("a.bc"));
         assertThrows(NumberFormatException.class, () -> dao.getDoubleValue("0xFF"));
+        assertThrows(NumberFormatException.class, () -> dao.getDoubleValue("1.2.3"));
     }
 
     @ParameterizedTest

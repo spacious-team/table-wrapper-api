@@ -23,6 +23,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -160,18 +162,46 @@ class ReportPageTest {
         verify(reportPage).getRow(address1.getRow());
     }
 
-    @Test
-    void getNextColumnValue() {
+    @ParameterizedTest
+    @MethodSource("nextColumnValueRows")
+    void getNextColumnValue(Object expected, ReportPageRow row) {
         String prefix = "test";
         doReturn(address1).when(reportPage).findByPrefix(prefix);
-        ReportPageRow row = getRow();
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row);
 
         @Nullable
         Object result = reportPage.getNextColumnValue(prefix);
 
-        assertEquals(1.23, result);
+        assertEquals(expected, result);
+        verify(reportPage).findByPrefix(prefix);
+        verify(reportPage).getRow(address1.getRow());
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    static Object[][] nextColumnValueRows() {
+        return new Object[][]{
+                {null, getRow(0, null, null)},
+                {"test", getRow(0, null, cell("test", 3))},
+                {123, getRow(0,
+                        cell("", 2),
+                        cell(" ", 3),
+                        cell(123, 4))}};
+    }
+
+    @Test
+    void getNextColumnValue2() {
+        String prefix = "test";
+        doReturn(address1).when(reportPage).findByPrefix(prefix);
+        ReportPageRow row = getRow(0,
+                cell(123, 3));
+        //noinspection ConstantConditions
+        when(reportPage.getRow(address1.getRow())).thenReturn(row);
+
+        @Nullable
+        Object result = reportPage.getNextColumnValue(prefix);
+
+        assertEquals(123, result);
         verify(reportPage).findByPrefix(prefix);
         verify(reportPage).getRow(address1.getRow());
     }
@@ -552,7 +582,7 @@ class ReportPageTest {
         reportPage.createNameless(tableName, tableNameFinder, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableHeader, 2);
     }
-    
+
 
     enum TableHeader implements TableHeaderColumn {
         ;

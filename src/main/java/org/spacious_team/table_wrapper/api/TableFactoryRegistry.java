@@ -18,14 +18,18 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static java.util.Collections.unmodifiableSet;
+import static lombok.AccessLevel.PRIVATE;
 
-public class TableFactoryRegistry {
+@RequiredArgsConstructor(access = PRIVATE)
+public final class TableFactoryRegistry {
 
     private static final Set<TableFactory> factories = new CopyOnWriteArraySet<>();
 

@@ -30,13 +30,13 @@ class RelativePositionTableColumnTest {
     @Test
     void getColumnIndex() {
         ReportPageRow row = ReportPageRowHelper.getRow();
-        assertEquals(2, RelativePositionTableColumn.of(PatternTableColumn.of(), 2).getColumnIndex(row));
+        assertEquals(4, RelativePositionTableColumn.of(PatternTableColumn.of(), 4).getColumnIndex(row));
         assertEquals(7, RelativePositionTableColumn.of(PatternTableColumn.of("test"), -2).getColumnIndex(row));
 
-        TableColumn column1 = RelativePositionTableColumn.of(PatternTableColumn.of("test"), 2);
+        TableColumn column1 = RelativePositionTableColumn.of(PatternTableColumn.of("test"), 4);
         assertThrows(TableColumnNotFound.class, () -> column1.getColumnIndex(10, row));
 
-        TableColumn column2 = RelativePositionTableColumn.of(PatternTableColumn.of("not found"), 2);
+        TableColumn column2 = RelativePositionTableColumn.of(PatternTableColumn.of("not found"), 4);
         assertThrows(TableColumnNotFound.class, () -> column2.getColumnIndex(row));
     }
 

@@ -77,8 +77,6 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
             } catch (NumberFormatException e) {
                 if (str.indexOf(',') != -1) {
                     return Double.parseDouble(str.replace(',', '.'));
-                } else if (str.indexOf('.') != -1) {
-                    return Double.parseDouble(str.replace('.', ','));
                 }
                 throw e;
             }
