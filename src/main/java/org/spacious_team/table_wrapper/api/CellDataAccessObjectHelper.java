@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
+ * Copyright (C) 2022  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,20 +18,17 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.NoArgsConstructor;
 
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import java.time.ZoneId;
+import java.util.regex.Pattern;
 
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(staticName = "of")
-public class RelativePositionTableColumn implements TableColumn {
-    private final TableColumn column;
-    private final int positionOffset;
+import static lombok.AccessLevel.PRIVATE;
 
-    @Override
-    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
-        return column.getColumnIndex(firstColumnForSearch, headerRows) + positionOffset;
-    }
+@NoArgsConstructor(access = PRIVATE)
+final class CellDataAccessObjectHelper {
+
+    static final ZoneId defaultZoneId = ZoneId.systemDefault();
+    static final Pattern spacePattern = Pattern.compile("\\s");
+    static final String NO_CELL_VALUE_EXCEPTION_MESSAGE = "Cell doesn't contains value";
 }

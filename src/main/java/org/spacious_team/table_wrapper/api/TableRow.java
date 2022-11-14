@@ -32,53 +32,53 @@ public interface TableRow extends ReportPageRow, Cloneable {
     Table getTable();
 
     @Nullable
-    TableCell getCell(TableColumnDescription column);
+    TableCell getCell(TableHeaderColumn column);
 
     /**
      * Returns cell's native value
      */
     @Nullable
-    Object getCellValue(TableColumnDescription column);
+    Object getCellValue(TableHeaderColumn column);
 
     /**
      * @throws RuntimeException if method can't extract int value
      */
-    int getIntCellValue(TableColumnDescription column);
+    int getIntCellValue(TableHeaderColumn column);
 
     /**
      * @throws RuntimeException if method can't extract long value
      */
-    long getLongCellValue(TableColumnDescription column);
+    long getLongCellValue(TableHeaderColumn column);
 
     /**
      * @throws RuntimeException if method can't extract Double value
      */
-    double getDoubleCellValue(TableColumnDescription column);
+    double getDoubleCellValue(TableHeaderColumn column);
 
     /**
      * @throws RuntimeException if method can't extract BigDecimal value
      */
-    BigDecimal getBigDecimalCellValue(TableColumnDescription column);
+    BigDecimal getBigDecimalCellValue(TableHeaderColumn column);
 
     /**
      * @throws RuntimeException if method can't extract string value
      */
-    String getStringCellValue(TableColumnDescription column);
+    String getStringCellValue(TableHeaderColumn column);
 
     /**
      * @throws RuntimeException if method can't extract instant value
      */
-    Instant getInstantCellValue(TableColumnDescription column);
+    Instant getInstantCellValue(TableHeaderColumn column);
 
     /**
      * @throws RuntimeException if method can't extract local date time value
      */
-    LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column);
+    LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column);
 
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default @Nullable Object getCellValueOrDefault(TableColumnDescription column, @Nullable Object defaultValue) {
+    default @Nullable Object getCellValueOrDefault(TableHeaderColumn column, @Nullable Object defaultValue) {
         try {
             return getCellValue(column);
         } catch (Exception e) {
@@ -89,7 +89,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default int getIntCellValueOrDefault(TableColumnDescription column, int defaultValue) {
+    default int getIntCellValueOrDefault(TableHeaderColumn column, int defaultValue) {
         try {
             return getIntCellValue(column);
         } catch (Exception e) {
@@ -100,7 +100,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default long getLongCellValueOrDefault(TableColumnDescription column, long defaultValue) {
+    default long getLongCellValueOrDefault(TableHeaderColumn column, long defaultValue) {
         try {
             return getLongCellValue(column);
         } catch (Exception e) {
@@ -111,7 +111,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default double getDoubleCellValue(TableColumnDescription column, double defaultValue) {
+    default double getDoubleCellValueOrDefault(TableHeaderColumn column, double defaultValue) {
         try {
             return getDoubleCellValue(column);
         } catch (Exception e) {
@@ -122,7 +122,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default BigDecimal getBigDecimalCellValueOrDefault(TableColumnDescription column, BigDecimal defaultValue) {
+    default BigDecimal getBigDecimalCellValueOrDefault(TableHeaderColumn column, BigDecimal defaultValue) {
         try {
             return getBigDecimalCellValue(column);
         } catch (Exception e) {
@@ -133,7 +133,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default String getStringCellValueOrDefault(TableColumnDescription column, String defaultValue) {
+    default String getStringCellValueOrDefault(TableHeaderColumn column, String defaultValue) {
         try {
             return getStringCellValue(column);
         } catch (Exception e) {
@@ -144,7 +144,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default Instant getInstantCellValueOrDefault(TableColumnDescription column, Instant defaultValue) {
+    default Instant getInstantCellValueOrDefault(TableHeaderColumn column, Instant defaultValue) {
         try {
             return getInstantCellValue(column);
         } catch (Exception e) {
@@ -155,7 +155,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default LocalDateTime getLocalDateTimeCellValueOrDefault(TableColumnDescription column, LocalDateTime defaultValue) {
+    default LocalDateTime getLocalDateTimeCellValueOrDefault(TableHeaderColumn column, LocalDateTime defaultValue) {
         try {
             return getLocalDateTimeCellValue(column);
         } catch (Exception e) {

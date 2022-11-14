@@ -18,6 +18,7 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +41,11 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
+@EqualsAndHashCode
 @ToString(of = {"tableName"})
 public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
@@ -64,11 +67,12 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
      * @param tableRange only first and last row numbers matters
      */
     @SuppressWarnings("unused")
-    protected AbstractTable(AbstractReportPage<R> reportPage,
-                            String tableName,
-                            TableCellRange tableRange,
-                            Class<? extends TableColumnDescription> headerDescription,
-                            int headersRowCount) {
+    protected <T extends Enum<T> & TableHeaderColumn>
+    AbstractTable(AbstractReportPage<R> reportPage,
+                  String tableName,
+                  TableCellRange tableRange,
+                  Class<T> headerDescription,
+                  int headersRowCount) {
         this.reportPage = reportPage;
         this.tableName = tableName;
         this.dataRowOffset = 1 + headersRowCount; // table_name + headersRowCount
@@ -78,7 +82,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                 getHeaderDescription(reportPage, tableRange, headerDescription, headersRowCount);
         this.tableRange = empty ?
                 tableRange :
-                new TableCellRange(
+                TableCellRange.of(
                         tableRange.getFirstRow(),
                         tableRange.getLastRow(),
                         getColumnIndices(this.headerDescription).min().orElse(tableRange.getFirstColumn()),
@@ -96,17 +100,17 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     }
 
     private static boolean isEmpty(TableCellRange tableRange, int dataRowOffset) {
-        return tableRange.equals(TableCellRange.EMPTY_RANGE) ||
-                (getNumberOfTableRows(tableRange) - dataRowOffset) <= 0;
+        return getNumberOfTableRows(tableRange) <= dataRowOffset;
     }
 
     private static int getNumberOfTableRows(TableCellRange tableRange) {
         return tableRange.getLastRow() - tableRange.getFirstRow() + 1;
     }
 
-    private static Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<?> reportPage, TableCellRange tableRange,
-                                                                  Class<? extends TableColumnDescription> headerDescription,
-                                                                  int headersRowCount) {
+    private static <T extends Enum<T> & TableHeaderColumn>
+    Map<TableColumn, Integer> getHeaderDescription(AbstractReportPage<?> reportPage, TableCellRange tableRange,
+                                                   Class<T> headerDescription,
+                                                   int headersRowCount) {
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
         ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
         for (int i = 0; i < headersRowCount; i++) {
@@ -117,19 +121,23 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         }
         @SuppressWarnings("nullness")
         TableColumn[] columns = Arrays.stream(headerDescription.getEnumConstants())
-                .map(TableColumnDescription::getColumn)
+                .map(TableHeaderColumn::getColumn)
                 .toArray(TableColumn[]::new);
         for (TableColumn column : columns) {
-            columnIndices.put(column, column.getColumnIndex(headerRows));
+            try {
+                int columnIndex = column.getColumnIndex(headerRows);
+                columnIndices.put(column, columnIndex);
+            } catch (OptionalTableColumnNotFound e) {
+                log.debug("Optional header column is not found: {}", column, e);
+            }
         }
-        return Collections.unmodifiableMap(columnIndices);
+        return unmodifiableMap(columnIndices);
     }
 
     private static IntStream getColumnIndices(Map<TableColumn, Integer> headerDescription) {
         return headerDescription.values()
                 .stream()
-                .mapToInt(i -> i)
-                .filter(i -> i != TableColumn.NOCOLUMN_INDEX);
+                .mapToInt(i -> i);
     }
 
     public <T> List<T> getData(Object report, Function<TableRow, @Nullable T> rowExtractor) {

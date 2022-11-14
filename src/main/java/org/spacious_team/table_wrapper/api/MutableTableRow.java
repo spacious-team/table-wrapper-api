@@ -47,7 +47,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     private volatile T row;
 
     @Override
-    public @Nullable TableCell getCell(TableColumnDescription column) {
+    public @Nullable TableCell getCell(TableHeaderColumn column) {
         return getCell(getCellIndex(column));
     }
 
@@ -82,50 +82,50 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     }
 
     @Override
-    public @Nullable Object getCellValue(TableColumnDescription column) {
+    public @Nullable Object getCellValue(TableHeaderColumn column) {
         return dao.getValue(row, getCellIndex(column));
     }
 
     @Override
-    public int getIntCellValue(TableColumnDescription column) {
+    public int getIntCellValue(TableHeaderColumn column) {
         return dao.getIntValue(row, getCellIndex(column));
     }
 
     @Override
-    public long getLongCellValue(TableColumnDescription column) {
+    public long getLongCellValue(TableHeaderColumn column) {
         return dao.getLongValue(row, getCellIndex(column));
     }
 
     @Override
-    public double getDoubleCellValue(TableColumnDescription column) {
+    public double getDoubleCellValue(TableHeaderColumn column) {
         return dao.getDoubleValue(row, getCellIndex(column));
     }
 
     @Override
-    public BigDecimal getBigDecimalCellValue(TableColumnDescription column) {
+    public BigDecimal getBigDecimalCellValue(TableHeaderColumn column) {
         return dao.getBigDecimalValue(row, getCellIndex(column));
     }
 
     @Override
-    public String getStringCellValue(TableColumnDescription column) {
+    public String getStringCellValue(TableHeaderColumn column) {
         return dao.getStringValue(row, getCellIndex(column));
     }
 
     @Override
-    public Instant getInstantCellValue(TableColumnDescription column) {
+    public Instant getInstantCellValue(TableHeaderColumn column) {
         return dao.getInstantValue(row, getCellIndex(column));
     }
 
     @Override
-    public LocalDateTime getLocalDateTimeCellValue(TableColumnDescription column) {
+    public LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column) {
         return dao.getLocalDateTimeValue(row, getCellIndex(column));
     }
 
-    private Integer getCellIndex(TableColumnDescription column) {
+    private int getCellIndex(TableHeaderColumn column) {
         @Nullable Integer cellIndex = table.getHeaderDescription()
                 .get(column.getColumn());
         @SuppressWarnings("nullness")
-        Integer cell = requireNonNull(cellIndex, "Cell not found");
+        int cell = requireNonNull(cellIndex, "Cell is not found");
         return cell;
     }
 

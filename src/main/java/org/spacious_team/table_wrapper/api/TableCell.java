@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface TableCell {
 
     /**
@@ -31,6 +31,9 @@ public interface TableCell {
      */
     int getColumnIndex();
 
+    /**
+     * @throws RuntimeException if can't extract value
+     */
     @Nullable
     Object getValue();
 
@@ -105,7 +108,7 @@ public interface TableCell {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default double getDoubleValue(double defaultValue) {
+    default double getDoubleValueOrDefault(double defaultValue) {
         try {
             return getDoubleValue();
         } catch (Exception e) {

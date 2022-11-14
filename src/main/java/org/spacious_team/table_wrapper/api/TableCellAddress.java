@@ -23,12 +23,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import static java.lang.Integer.MIN_VALUE;
+
 @Getter
-@EqualsAndHashCode
 @ToString
-@RequiredArgsConstructor
+@EqualsAndHashCode
+@RequiredArgsConstructor(staticName = "of")
 public class TableCellAddress {
-    public static final TableCellAddress NOT_FOUND = new TableCellAddress(-1, -1);
+    public static final TableCellAddress NOT_FOUND = new TableCellAddress(MIN_VALUE, MIN_VALUE);
 
     private final int row;
     private final int column;

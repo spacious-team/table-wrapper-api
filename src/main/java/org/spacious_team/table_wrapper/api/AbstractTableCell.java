@@ -19,14 +19,18 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
+import lombok.ToString;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+@ToString
+@EqualsAndHashCode
 @Getter(AccessLevel.PROTECTED)
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractTableCell<T> implements TableCell {

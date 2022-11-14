@@ -18,20 +18,9 @@
 
 package org.spacious_team.table_wrapper.api;
 
-
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(staticName = "of")
-public class RelativePositionTableColumn implements TableColumn {
-    private final TableColumn column;
-    private final int positionOffset;
-
-    @Override
-    public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
-        return column.getColumnIndex(firstColumnForSearch, headerRows) + positionOffset;
-    }
+/**
+ * Use to create enum of table header columns
+ */
+public interface TableHeaderColumn {
+    TableColumn getColumn();
 }

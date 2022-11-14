@@ -18,34 +18,31 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
+import static java.util.Objects.requireNonNull;
 import static lombok.AccessLevel.PRIVATE;
 
 @RequiredArgsConstructor(access = PRIVATE)
-final class ReportPageHelper {
+final class TableFactoryHelper {
 
-    static Predicate<Object> getCellStringValueIgnoreCasePrefixPredicate(String prefix) {
-        return new StringIgnoreCasePrefixPredicate(prefix);
-    }
-
-    @ToString
-    @EqualsAndHashCode
-    static final class StringIgnoreCasePrefixPredicate implements Predicate<Object> {
-        private final String lowercasePrefix;
-
-        private StringIgnoreCasePrefixPredicate(String prefix) {
-            this.lowercasePrefix = prefix.trim().toLowerCase();
+    static String getTableName(ReportPage reportPage, Predicate<Object> tableNameFinder, TableCellRange range) {
+        try {
+            if (!Objects.equals(range, TableCellRange.EMPTY_RANGE)) {
+                TableCellAddress tableNameCell =
+                        reportPage.find(range.getFirstRow(), range.getFirstRow() + 1, tableNameFinder);
+                if (!Objects.equals(tableNameCell, TableCellAddress.NOT_FOUND)) {
+                    @SuppressWarnings({"nullness", "ConstantConditions"})
+                    TableCell cell = requireNonNull(reportPage.getCell(tableNameCell));
+                    return cell.getStringValue();
+                }
+            }
+        } catch (Exception ignore) {
+            return "<not found>";
         }
-
-        @Override
-        public boolean test(Object cell) {
-            return (cell instanceof String) &&
-                    ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
-        }
+        return "<not found>";
     }
 }

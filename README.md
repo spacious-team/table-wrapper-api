@@ -57,7 +57,7 @@ enum ProductTableHeader implements TableColumnDescription {
     }
 
     ProductTableHeader(String... words) {
-        this.column = TableColumnImpl.of(words);
+        this.column = PatternTableColumn.of(words);
     }
 
     public TableColumn getColumn() {
@@ -65,7 +65,7 @@ enum ProductTableHeader implements TableColumnDescription {
     }   
 }
 
-enum CellTableHeader implements TableColumnDescription {
+enum SalesTableHeader implements TableColumnDescription {
     BUYER_COUNTRY(MultiLineTableColumn.of("покупатель", "страна")),
     BUYER_COMPANY(MultiLineTableColumn.of("покупатель", "компания")),
     TYPE(MultiLineTableColumn.of("категория", "покупателя")),
@@ -93,18 +93,18 @@ ReportPage reportPage = new ExcelSheet(book.getSheetAt(0));    // select first E
 Используем API для доступа к данным таблиц
 ```java
 // finding row with "таблица товаров" content, parsing next row as header and
-// counting next rows as table till empty line
-Table productTable = reportPage.create("таблица товаров", null, ProductTableHeader.class);
+// counting next rows as table data rows till empty line
+Table productTable = reportPage.create("таблица товаров", ProductTableHeader.class);
 // finding row with "таблица продаж" content, parsing next 2 rows as header and
-// counting next rows as table till row containing "итого" in any cell
-Table cellTable = reportPage.create("таблица продаж", "итого",  CellTableHeader.class, 2);
+// counting next rows as table data rows till row containing "итого" in any cell
+Table salesTable = reportPage.create("таблица продаж", "итого",  SalesTableHeader.class, 2);
 
 for (TableRow row : productTable) {
     String product = row.getStringCellValueOrDefault(PRICE_TRADE, "Неизвестный товар");
     BigDecimal price = row.getBigDecimalCellValue(PRICE_TRADE);
 }
 
-Set<String> countries = cellTable.stream()
+Set<String> countries = salesTable.stream()
     .map(row -> row.getStringCelValueOrDefault(BUYER_COUNTRY, "unknown"))
     .collect(toSet())
 ```

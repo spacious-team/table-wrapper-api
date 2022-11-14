@@ -18,29 +18,50 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
-public class TableFactoryRegistry {
+import static java.util.Collections.unmodifiableSet;
+import static lombok.AccessLevel.PRIVATE;
 
-    private static final Collection<TableFactory> factories = new HashSet<>();
+@RequiredArgsConstructor(access = PRIVATE)
+public final class TableFactoryRegistry {
+
+    private static final Set<TableFactory> factories = new CopyOnWriteArraySet<>();
 
     public static void add(TableFactory tableFactory) {
         factories.add(tableFactory);
     }
 
-    @SuppressWarnings("unused")
-    public static Collection<TableFactory> getAll() {
-        return Collections.unmodifiableCollection(factories);
+    /**
+     * @return {@code true} if factory was removed as a result of this call
+     */
+    public static boolean remove(TableFactory tableFactory) {
+        return factories.remove(tableFactory);
     }
 
+    @SuppressWarnings("unused")
+    public static Collection<TableFactory> getAll() {
+        return unmodifiableSet(factories);
+    }
+
+    public static void clear() {
+        factories.clear();
+    }
+
+
     public static TableFactory get(ReportPage reportPage) {
+        Objects.requireNonNull(reportPage, "Report page is null");
         for (TableFactory factory : factories) {
             if (factory.canHandle(reportPage)) {
                 return factory;
             }
         }
-        throw new IllegalArgumentException("Нет парсера для отчета формата " + reportPage.getClass().getSimpleName());
+        throw new IllegalArgumentException(
+                "No factory registered for report page of type " + reportPage.getClass().getSimpleName());
     }
 }

@@ -19,6 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface Table extends Iterable<TableRow> {
 
     /**
@@ -42,7 +43,7 @@ public interface Table extends Iterable<TableRow> {
         return getData("unknown", rowExtractor);
     }
 
-    <T> List<T> getData(Object report, Function<TableRow, T> rowExtractor);
+    <T> List<T> getData(Object report, Function<TableRow, @Nullable T> rowExtractor);
 
     /**
      * Extracts objects from table without duplicate objects handling (duplicated row are both will be returned)
@@ -51,14 +52,14 @@ public interface Table extends Iterable<TableRow> {
         return getDataCollection("unknown", rowExtractor);
     }
 
-    <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor);
+    <T> List<T> getDataCollection(Object report, Function<TableRow, @Nullable Collection<T>> rowExtractor);
 
     /**
      * Extracts objects from table with duplicate objects handling logic
      */
-    <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor,
+    <T> List<T> getDataCollection(Object report, Function<TableRow, @Nullable Collection<T>> rowExtractor,
                                   BiPredicate<T, T> equalityChecker,
-                                  BiFunction<T, T, Collection<T>> mergeDuplicates);
+                                  BiFunction<T, T, @Nullable Collection<T>> mergeDuplicates);
 
     boolean isEmpty();
 
@@ -73,16 +74,16 @@ public interface Table extends Iterable<TableRow> {
     ReportPageRow getRow(int i);
 
     /**
-     * @return row containing cell with exact value or null if not found
+     * @return row containing cell with exact value or null if row is not found
      */
     @Nullable
     TableRow findRow(Object value);
 
     /**
-     * @return row containing cell starting with prefix or null if not found
+     * @return row containing cell starting with prefix or null if row is not found
      */
-    @Nullable
-    TableRow findRowByPrefix(String prefix);
+    @SuppressWarnings("UnusedReturnValue")
+    @Nullable TableRow findRowByPrefix(String prefix);
 
     Map<TableColumn, Integer> getHeaderDescription();
 
@@ -99,7 +100,8 @@ public interface Table extends Iterable<TableRow> {
      *     subTable(0, -1)
      * </pre>
      * for exclude last "Total" row from iterator or stream.
-     * @param topRows positive value for inclusion, negative for exclusion
+     *
+     * @param topRows    positive value for inclusion, negative for exclusion
      * @param bottomRows positive value for inclusion, negative for exclusion
      */
     Table subTable(int topRows, int bottomRows);

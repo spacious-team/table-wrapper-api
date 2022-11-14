@@ -24,14 +24,16 @@ import lombok.ToString;
 
 import java.util.Arrays;
 
+import static lombok.AccessLevel.PRIVATE;
+
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = PRIVATE)
 public class AnyOfTableColumn implements TableColumn {
 
     private final TableColumn[] columns;
 
-    public static TableColumn of(TableColumn... columns) {
+    public static AnyOfTableColumn of(TableColumn... columns) {
         return new AnyOfTableColumn(columns);
     }
 
@@ -43,9 +45,10 @@ public class AnyOfTableColumn implements TableColumn {
             } catch (RuntimeException ignore) {
             }
         }
-        throw new RuntimeException("Не обнаружен заголовок таблицы, включающий: " + String.join(", ",
+        String expected = String.join(", ",
                 Arrays.stream(columns)
                         .map(TableColumn::toString)
-                        .toArray(String[]::new)));
+                        .toArray(String[]::new));
+        throw new TableColumnNotFound("Header including '" + expected + "' is not found");
     }
 }

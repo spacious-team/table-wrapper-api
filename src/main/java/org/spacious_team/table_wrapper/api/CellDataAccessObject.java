@@ -19,24 +19,21 @@
 package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
+import static org.spacious_team.table_wrapper.api.CellDataAccessObjectHelper.*;
 
 /**
  * @apiNote Impl may have parameters that affect how the value is parsed,
  * for example DataTimeFormat that changes behavior of date time value parser.
  */
 public interface CellDataAccessObject<C, R extends ReportPageRow> {
-
-    ZoneId defaultZoneId = ZoneId.systemDefault();
-    Pattern spacePattern = Pattern.compile("\\s");
-    String NO_CELL_VALUE_EXCEPTION_MESSAGE = "Cell doesn't contains value";
 
     @Nullable
     C getCell(R row, Integer cellIndex);
@@ -59,7 +56,8 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
         if (value instanceof Number) {
             return ((Number) value).longValue();
         } else if (value != null) {
-            return Long.parseLong(spacePattern.matcher((CharSequence) value).replaceAll(""));
+            String str = spacePattern.matcher(value.toString()).replaceAll("");
+            return Long.parseLong(str);
         } else {
             throw new NullPointerException(NO_CELL_VALUE_EXCEPTION_MESSAGE);
         }
@@ -73,14 +71,12 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
         } else if (value != null) {
-            String str = spacePattern.matcher((CharSequence) value).replaceAll("");
+            String str = spacePattern.matcher(value.toString()).replaceAll("");
             try {
                 return Double.parseDouble(str);
             } catch (NumberFormatException e) {
                 if (str.indexOf(',') != -1) {
                     return Double.parseDouble(str.replace(',', '.'));
-                } else if (str.indexOf('.') != -1) {
-                    return Double.parseDouble(str.replace('.', ','));
                 }
                 throw e;
             }
@@ -96,8 +92,9 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default BigDecimal getBigDecimalValue(C cell) {
         String number = getStringValue(cell);
+        number = spacePattern.matcher(number).replaceAll("");
         number = number.replace(',', '.');
-        return (Objects.equals(number, "0") || Objects.equals(number, "0.0")) ?
+        return (Objects.equals(number, "0") || Objects.equals(number, "0.0") || Objects.equals(number, "0.00")) ?
                 BigDecimal.ZERO : new BigDecimal(number);
     }
 
@@ -117,11 +114,22 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     Instant getInstantValue(C cell);
 
     /**
+     * Returns local date time at default time zone.
+     *
      * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(C cell) {
         return getInstantValue(cell)
                 .atZone(defaultZoneId)
+                .toLocalDateTime();
+    }
+
+    /**
+     * @throws RuntimeException if method can't extract local date time value
+     */
+    default LocalDateTime getLocalDateTimeValue(C cell, ZoneId zoneId) {
+        return getInstantValue(cell)
+                .atZone(zoneId)
                 .toLocalDateTime();
     }
 
@@ -135,7 +143,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default int getIntValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getIntValue(cell);
     }
 
@@ -144,7 +152,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default long getLongValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getLongValue(cell);
     }
 
@@ -153,7 +161,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default double getDoubleValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getDoubleValue(cell);
     }
 
@@ -162,7 +170,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default BigDecimal getBigDecimalValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getBigDecimalValue(cell);
     }
 
@@ -171,7 +179,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default String getStringValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getStringValue(cell);
     }
 
@@ -180,16 +188,28 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      */
     default Instant getInstantValue(R row, Integer cellIndex) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
         return getInstantValue(cell);
+    }
+
+    /**
+     * Returns local date time at default time zone.
+     *
+     * @throws RuntimeException if method can't extract local date time value
+     */
+    default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex) {
+        @SuppressWarnings({"nullness", "ConstantConditions"})
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
+        return getLocalDateTimeValue(cell);
     }
 
     /**
      * @throws RuntimeException if method can't extract local date time value
      */
-    default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex) {
+    @SuppressWarnings("UnusedReturnValue")
+    default LocalDateTime getLocalDateTimeValue(R row, Integer cellIndex, ZoneId zoneId) {
         @SuppressWarnings({"nullness", "ConstantConditions"})
-        C cell = requireNonNull(getCell(row, cellIndex), "Cell not found");
-        return getLocalDateTimeValue(cell);
+        C cell = requireNonNull(getCell(row, cellIndex), "Cell is not found");
+        return getLocalDateTimeValue(cell, zoneId);
     }
 }
