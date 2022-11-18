@@ -18,10 +18,12 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EmptyTableCellTest {
@@ -44,5 +46,18 @@ class EmptyTableCellTest {
         assertThrows(NullPointerException.class, () -> cell.getStringValue());
         assertThrows(NullPointerException.class, () -> cell.getInstantValue());
         assertThrows(NullPointerException.class, () -> cell.getLocalDateTimeValue());
+    }
+
+    @Test
+    void testEqualsAndHashCode() {
+        EqualsVerifier
+                .forClass(EmptyTableCell.class)
+                .suppress(STRICT_INHERITANCE) // no subclass for test
+                .verify();
+    }
+
+    @Test
+    void testToString() {
+        assertEquals("EmptyTableCell(columnIndex=1)", cell.toString());
     }
 }

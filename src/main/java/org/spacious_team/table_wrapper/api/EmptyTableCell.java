@@ -18,14 +18,18 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(staticName = "of")
 public class EmptyTableCell implements TableCell {
     @Getter
