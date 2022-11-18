@@ -67,7 +67,7 @@ public class PatternTableColumn implements TableColumn {
 
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         for (ReportPageRow header : headerRows) {
-            for (@SuppressWarnings("NullableProblems") @Nullable TableCell cell : header) {
+            for (@Nullable TableCell cell : header) {
                 @Nullable Object value;
                 if (cell != null &&
                         cell.getColumnIndex() >= firstColumnForSearch &&

@@ -173,7 +173,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
     private <T> List<T> getDataCollection(Object report, BiConsumer<TableRow, Collection<T>> rowHandler) {
         List<T> data = new ArrayList<>();
-        for (@SuppressWarnings("NullableProblems") @Nullable TableRow row : this) {
+        for (@Nullable TableRow row : this) {
             if (row != null) {
                 try {
                     rowHandler.accept(row, data);
@@ -214,13 +214,15 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
      * Call {@link TableRow#clone()} if you want to use row object outside stream() block.
      */
     @Override
-    public Stream<TableRow> stream() {
+    public Stream<@Nullable TableRow> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
 
     /**
-     * {@link TableRow} impl is mutable.
-     * For performance issue same object with changed state is provided in each loop cycle.
+     * Iterator which returns {@link MutableTableRow} or {@link EmptyTableRow}.
+     *
+     * @implSpec This iterator never returns null values. Null rows is wrapped by {@link EmptyTableRow}
+     * @implNote For performance issue same object with changed state is provided in each loop cycle.
      * Call {@link TableRow#clone()} if you want to use row object outside iterator() block.
      */
     @Override
@@ -239,18 +241,17 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
             return i < numberOfRows;
         }
 
+        /**
+         * Returns mutable {@link TableRow} impl. Never returns null value.
+         */
         @Override
         public TableRow next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            int rowNum;
-            @Nullable R row;
-            do {
-                rowNum = tableRange.getFirstRow() + (i++);
-                row = getRow(rowNum);
-            } while (row == null && hasNext());
-            if (row == null) { // Last row is empty
+            int rowNum = tableRange.getFirstRow() + (i++);
+            @Nullable R row = getRow(rowNum);
+            if (row == null) {
                 return new EmptyTableRow(AbstractTable.this, rowNum);
             }
             tableRow.setRow(row);

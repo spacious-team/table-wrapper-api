@@ -77,7 +77,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     }
 
     @Override
-    public Iterator<TableCell> iterator() {
+    public Iterator<@Nullable TableCell> iterator() {
         return row.iterator();
     }
 

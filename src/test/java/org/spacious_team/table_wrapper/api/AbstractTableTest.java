@@ -100,8 +100,8 @@ class AbstractTableTest {
     }
 
     /**
-     * Builds not empty table of 2 columns, row #2 contains table name, row #3 and #4 - header, row #5 - data,
-     * row #6 - data with is equals to null
+     * Builds not empty table of 2 columns, row #2 contains table name, row #3 and #4 - header, row #5 and
+     * row #6 - data with row equals to null
      */
     @SuppressWarnings("ConstantConditions")
     private AbstractTable<EmptyTableRow> getNotEmptyTable() {
@@ -249,6 +249,29 @@ class AbstractTableTest {
         assertThrows(NoSuchElementException.class, iterator::next);
         assertEquals(5, rowA.getRowNum());
         assertEquals(6, rowB.getRowNum());
+    }
+
+    @Test
+    void testIterationCount() {
+        table = getNotEmptyTable();
+        int cnt = 0;
+        for (TableRow ignored : table) {
+            cnt++;
+        }
+        assertEquals(2, cnt);
+    }
+
+    @Test
+    void testIteratorWithNullRows() {
+        TableCellRange tableRange = TableCellRange.of(2, 6, 0, 100);
+        //noinspection ConstantConditions
+        when(report.getRow(3)).thenReturn(new EmptyTableRow(table, 3)); // not empty header required
+        table = new TableTestImpl(report, "table name", tableRange, headerDescription, 1);
+        int i = tableRange.getFirstRow() + 2; // 2 - table name and header
+        for (TableRow row : table) {
+            assertNull(report.getRow(i++));
+            assertEquals(EmptyTableRow.class, row.getClass());
+        }
     }
 
     @Test

@@ -20,7 +20,7 @@ package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface ReportPageRow extends Iterable<TableCell> {
+public interface ReportPageRow extends Iterable<@Nullable TableCell> {
 
     /**
      * @param i zero-based cell number

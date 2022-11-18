@@ -167,7 +167,7 @@ public interface ReportPage {
         TableCellAddress address = findByPrefix(firstColumnValuePrefix);
         @Nullable ReportPageRow row = getRow(address.getRow());
         if (row != null) {
-            for (@SuppressWarnings("NullableProblems") @Nullable TableCell cell : row) {
+            for (@Nullable TableCell cell : row) {
                 if (cell != null && cell.getColumnIndex() > address.getColumn()) {
                     @Nullable Object value = cell.getValue();
                     if (value != null && (!(value instanceof String) || !((String) value).isBlank())) {
@@ -304,7 +304,7 @@ public interface ReportPage {
             if (row == null || row.getLastCellNum() == -1) {
                 return lastRowNum; // all row's cells are blank
             }
-            for (@SuppressWarnings("NullableProblems") @Nullable TableCell cell : row) {
+            for (@Nullable TableCell cell : row) {
                 @Nullable Object value;
                 if (!(cell == null
                         || ((value = cell.getValue()) == null)

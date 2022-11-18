@@ -29,7 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public interface Table extends Iterable<TableRow> {
+public interface Table extends Iterable<@Nullable TableRow> {
 
     /**
      * Report page this table belongs to
@@ -63,7 +63,7 @@ public interface Table extends Iterable<TableRow> {
 
     boolean isEmpty();
 
-    Stream<TableRow> stream();
+    Stream<@Nullable TableRow> stream();
 
     /**
      * @param i zero-based index
