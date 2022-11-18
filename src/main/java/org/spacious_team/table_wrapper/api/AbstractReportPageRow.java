@@ -19,6 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Function;
@@ -26,10 +27,10 @@ import java.util.function.Function;
 public abstract class AbstractReportPageRow implements ReportPageRow {
 
     @RequiredArgsConstructor
-    protected static class ReportPageRowIterator<T> implements Iterator<TableCell> {
+    protected static class ReportPageRowIterator<T> implements Iterator<@Nullable TableCell> {
 
-        private final Iterator<T> innerIterator;
-        private final Function<T, TableCell> converter;
+        private final Iterator<@Nullable T> innerIterator;
+        private final Function<@Nullable T, @Nullable TableCell> converter;
 
 
         @Override
@@ -38,7 +39,7 @@ public abstract class AbstractReportPageRow implements ReportPageRow {
         }
 
         @Override
-        public TableCell next() {
+        public @Nullable TableCell next() {
             return converter.apply(innerIterator.next());
         }
     }
