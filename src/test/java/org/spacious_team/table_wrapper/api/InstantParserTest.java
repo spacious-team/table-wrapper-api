@@ -68,7 +68,7 @@ class InstantParserTest {
 
     @ParameterizedTest
     @MethodSource("getInstantExamples")
-    void getInstantWithSpecifiedZone(String actual, Temporal expected) {
+    void parseInstantWithSpecifiedZone(String actual, Temporal expected) {
         ZoneId zoneId = ZoneId.of("Europe/Paris");
         InstantParser parser = InstantParser.builder()
                 .defaultZoneId(zoneId)
@@ -80,7 +80,7 @@ class InstantParserTest {
 
     @ParameterizedTest
     @MethodSource("getInstantExamples")
-    void getInstantWithSpecifiedLocalTime(String actual, Temporal expected) {
+    void parseInstantWithSpecifiedLocalTime(String actual, Temporal expected) {
         LocalTime time = LocalTime.of(1, 45);
         InstantParser parser = InstantParser.builder()
                 .defaultTime(time)
@@ -92,7 +92,7 @@ class InstantParserTest {
 
     @ParameterizedTest
     @MethodSource("getInstantExamples")
-    void getInstantWithSpecifiedLocalDate(String actual, Temporal expected) {
+    void parseInstantWithSpecifiedLocalDate(String actual, Temporal expected) {
         LocalDate date = LocalDate.of(2000, 2, 1);
         InstantParser parser = InstantParser.builder()
                 .defaultDate(date)
@@ -124,7 +124,7 @@ class InstantParserTest {
     }
 
     @Test
-    void getInstantWithSpecifiedDateTimePatternOnlyDate() {
+    void parseInstantWithSpecifiedDateTimePatternOnlyDate() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM / yyyy");
         InstantParser parser = InstantParser.builder()
                 .dateTimeFormatter(dtf)
@@ -140,15 +140,16 @@ class InstantParserTest {
     }
 
     @Test
-    void getInstantWithSpecifiedDateTimePatternOnlyTime() {
+    void parseInstantWithSpecifiedDateTimePatternTime() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("+HH-mm.ss");
         InstantParser parser = InstantParser.builder()
                 .dateTimeFormatter(dtf)
+                .defaultZoneId(UTC)
                 .build();
         String data = "+01-30.45";
         Instant expected = LocalTime.of(1, 30, 45)
                 .atDate(LocalDate.now())
-                .atZone(ZoneId.systemDefault())
+                .atZone(UTC)
                 .toInstant();
 
         assertEquals(expected, parser.parseInstant(data));

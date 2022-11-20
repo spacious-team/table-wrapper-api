@@ -59,7 +59,7 @@ class DateTimeFormatParserTest {
             assertEquals(expected, LocalTime.parse(actual, dtf));
         } else if (length == 10) {
             assertEquals(expected, LocalDate.parse(actual, dtf));
-        } else if (length == 19 || length == 23) {
+        } else if (length == 19 || length == 23) { // without and with millis
             assertEquals(expected, LocalDateTime.parse(actual, dtf));
         } else {
             assertEquals(Instant.from(expected), ZonedDateTime.parse(actual, dtf).toInstant());
@@ -69,7 +69,7 @@ class DateTimeFormatParserTest {
     static Object[][] getInstantExamples() {
         LocalDate date = LocalDate.of(2000, 2, 1);
         LocalTime time = LocalTime.of(20, 10, 2);
-        ZoneId zoneID = ZoneId.of("Europe/Moscow");
+        ZoneId zoneId = ZoneId.of("Europe/Moscow");
         ZoneOffset zoneOffset = ZoneOffset.ofHours(3);
         return new Object[][]{
                 {"2000-02-01", date},
@@ -90,9 +90,11 @@ class DateTimeFormatParserTest {
                 {"20:10:02 2000/02/01Z", date.atTime(time).atZone(UTC)},
                 {"01.02.2000 20:10:02UTC", date.atTime(time).atZone(UTC)},
                 {"01.02.2000 20:10:02GMT", date.atTime(time).atZone(UTC)},
-                {"01.02.2000 20:10:02Europe/Moscow", date.atTime(time).atZone(zoneID)},
-                {"01.02.2000 20:10:02.000Europe/Moscow", date.atTime(time).atZone(zoneID)},
-                {"01.02.2000 20:10:02MSK", date.atTime(time).atZone(zoneID)},
+                {"01.02.2000 20:10:02Europe/Moscow", date.atTime(time).atZone(zoneId)},
+                {"01.02.2000 20:10:02+01:00[Europe/Paris]", date.atTime(time).atZone(ZoneId.of("Europe/Paris"))},
+                {"01.02.2000 20:10:02.000Europe/Moscow", date.atTime(time).atZone(zoneId)},
+                {"01.02.2000 20:10:02MSK", date.atTime(time).atZone(zoneId)},
+                {"2000-02-01T20:10:02-0300", date.atTime(time).atZone(ZoneOffset.ofHours(-3))},
                 {"2000-02-01T20:10:02+0300", date.atTime(time).atZone(zoneOffset)},
                 {"01.02.2000 20:10:02+0300", date.atTime(time).atZone(zoneOffset)},
                 {"2000-02-01T20:10:02+03:00", date.atTime(time).atZone(zoneOffset)},
