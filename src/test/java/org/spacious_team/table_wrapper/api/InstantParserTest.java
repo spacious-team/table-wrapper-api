@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.Temporal;
@@ -140,16 +141,15 @@ class InstantParserTest {
     }
 
     @Test
-    void parseInstantWithSpecifiedDateTimePatternTime() {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("+HH-mm.ss");
+    void parseInstantWithSpecifiedDateTimePatternTimeAndZone() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("+HH-mm.ssx");
         InstantParser parser = InstantParser.builder()
                 .dateTimeFormatter(dtf)
-                .defaultZoneId(UTC)
                 .build();
-        String data = "+01-30.45";
+        String data = "+01-30.45+01";
         Instant expected = LocalTime.of(1, 30, 45)
                 .atDate(LocalDate.now())
-                .atZone(UTC)
+                .atZone(ZoneOffset.ofHours(1))
                 .toInstant();
 
         assertEquals(expected, parser.parseInstant(data));
