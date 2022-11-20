@@ -112,7 +112,7 @@ final class DateTimeFormatParser {
             // MSK, UTC, GMT
             zonePattern = "z";
         } else if (char19 == 'G') {
-            if (length >= 23 && dateTimeOffset.charAt(23) == '0') {
+            if (length > 23 && dateTimeOffset.charAt(23) == '0') {
                 // GMT+03:00 / GMT+03:00:00
                 zonePattern = "OOOO";
             } else {
@@ -120,7 +120,7 @@ final class DateTimeFormatParser {
                 zonePattern = "O";
             }
         } else if (char19 == '+' || char19 == '-') {
-            if (length > 23 && dateTimeOffset.indexOf('[', 23) != -1) {
+            if (dateTimeOffset.indexOf('[', 23) != -1) {
                 // +01:00[Europe/Paris]'
                 zonePattern = "xxxxx'['VV']'";
             } else if (length > 22 && dateTimeOffset.charAt(22) == ':') {
