@@ -114,7 +114,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
     Instant getInstantValue(C cell);
 
     /**
-     * Returns local date time at default time zone.
+     * Returns local date time at system default time zone.
      *
      * @throws RuntimeException if method can't extract local date time value
      */
