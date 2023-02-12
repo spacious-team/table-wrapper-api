@@ -29,8 +29,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.util.regex.Pattern.CASE_INSENSITIVE;
-import static java.util.regex.Pattern.UNICODE_CASE;
+import static java.util.regex.Pattern.*;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -92,6 +91,6 @@ public class PatternTableColumn implements TableColumn {
 
 
     private static Pattern toPattern(String pattern) {
-        return Pattern.compile(pattern, CASE_INSENSITIVE | UNICODE_CASE);
+        return Pattern.compile(pattern, CASE_INSENSITIVE | UNICODE_CASE | UNICODE_CHARACTER_CLASS);
     }
 }

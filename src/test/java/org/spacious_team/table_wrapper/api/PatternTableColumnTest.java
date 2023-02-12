@@ -56,6 +56,8 @@ class PatternTableColumnTest {
         assertEquals(21, PatternTableColumn.of("mac").getColumnIndex(row));
         assertEquals(22, PatternTableColumn.of("windows").getColumnIndex(row));
         assertEquals(22, PatternTableColumn.of("windows").getColumnIndex(21, row));
+        assertEquals(23, PatternTableColumn.of("\\bмягких\\b").getColumnIndex(row));
+        assertEquals(23, PatternTableColumn.of("\\bбулочек\\b").getColumnIndex(row));
 
         TableColumn column1 = PatternTableColumn.of("windows");
         assertThrows(TableColumnNotFound.class, () -> column1.getColumnIndex(23, row));

@@ -45,7 +45,8 @@ final class ReportPageRowHelper {
                 cell("This Is Sparta", 10),
                 cell("London\nis the\ncapital\nof Great Britain", 20),
                 cell("The Mac\rnew line", 21),
-                cell("The Windows\r\nnew line", 22));
+                cell("The Windows\r\nnew line", 22),
+                cell("Съешь еще этих\nмягких французских булочек.", 23));
     }
 
     /**
