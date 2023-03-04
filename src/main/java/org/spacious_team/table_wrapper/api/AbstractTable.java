@@ -115,7 +115,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
         for (int i = 0; i < headersRowCount; i++) {
             @Nullable ReportPageRow row = reportPage.getRow(tableRange.getFirstRow() + 1 + i);
-            @SuppressWarnings({"nullness"})
+            @SuppressWarnings("nullness")
             ReportPageRow notNullRow = requireNonNull(row, "Header row is absent");
             headerRows[i] = notNullRow;
         }

@@ -128,7 +128,7 @@ class CellDataAccessObjectTest {
     }
 
     @Test
-    @SuppressWarnings({"ConstantConditions"})
+    @SuppressWarnings("ConstantConditions")
     void getBigDecimalValueSpecialCases() {
         assertThrows(NullPointerException.class, () -> dao.getDoubleValue(null));
         assertThrows(NumberFormatException.class, () -> dao.getDoubleValue("abc"));
