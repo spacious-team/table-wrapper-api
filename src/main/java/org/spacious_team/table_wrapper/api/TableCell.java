@@ -50,7 +50,7 @@ public interface TableCell {
     /**
      * @throws RuntimeException if can't extract Double value
      */
-    Double getDoubleValue();
+    double getDoubleValue();
 
     /**
      * @throws RuntimeException if can't extract BigDecimal value

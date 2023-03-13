@@ -51,7 +51,7 @@ public class EmptyTableCell implements TableCell {
     }
 
     @Override
-    public Double getDoubleValue() {
+    public double getDoubleValue() {
         throw new NullPointerException("Can't get double value");
     }
 

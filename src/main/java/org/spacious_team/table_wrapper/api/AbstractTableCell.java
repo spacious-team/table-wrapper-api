@@ -54,7 +54,7 @@ public abstract class AbstractTableCell<T> implements TableCell {
     }
 
     @Override
-    public Double getDoubleValue() {
+    public double getDoubleValue() {
         return dao.getDoubleValue(cell);
     }
 
