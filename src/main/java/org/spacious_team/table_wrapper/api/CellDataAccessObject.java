@@ -119,9 +119,7 @@ public interface CellDataAccessObject<C, R extends ReportPageRow> {
      * @throws RuntimeException if method can't extract local date time value
      */
     default LocalDateTime getLocalDateTimeValue(C cell) {
-        return getInstantValue(cell)
-                .atZone(defaultZoneId)
-                .toLocalDateTime();
+        return getLocalDateTimeValue(cell, defaultZoneId);
     }
 
     /**

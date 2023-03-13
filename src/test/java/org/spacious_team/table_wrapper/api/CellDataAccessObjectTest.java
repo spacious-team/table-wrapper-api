@@ -180,11 +180,13 @@ class CellDataAccessObjectTest {
     @Test
     void getLocalDateTimeValue() {
         LocalDateTime expected = LocalDateTime.of(2000, 1, 2, 3, 4, 5);
+        ZoneId zoneId = ZoneId.systemDefault();
         Instant instant = expected
-                .atZone(ZoneId.systemDefault())
+                .atZone(zoneId)
                 .toInstant();
         when(dao.getInstantValue(any())).thenReturn(instant);
         assertEquals(expected, dao.getLocalDateTimeValue(instant));
+        verify(dao).getLocalDateTimeValue(instant, zoneId);
     }
 
     @Test
