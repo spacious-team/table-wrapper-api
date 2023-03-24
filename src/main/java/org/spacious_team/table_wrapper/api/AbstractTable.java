@@ -250,7 +250,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
                 throw new NoSuchElementException();
             }
             int rowNum = tableRange.getFirstRow() + (i++);
-            @Nullable R row = getRow(rowNum);
+            @Nullable R row = reportPage.getRow(rowNum);
             if (row == null) {
                 return new EmptyTableRow(AbstractTable.this, rowNum);
             }
@@ -260,8 +260,8 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     }
 
     @Override
-    public @Nullable R getRow(int i) {
-        return reportPage.getRow(i);
+    public @Nullable TableRow getRow(int i) {
+        return getMutableTableRow(i);
     }
 
     @Override
@@ -278,13 +278,23 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
 
     private @Nullable MutableTableRow<R> getMutableTableRow(TableCellAddress address) {
         if (tableRange.contains(address)) {
-            MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
-            @SuppressWarnings({"nullness", "ConstantConditions"})
-            R row = requireNonNull(getRow(address.getRow()), "Row is empty");
-            tableRow.setRow(row);
+            int rowNum = address.getRow();
+            @Nullable MutableTableRow<R> row = getMutableTableRow(rowNum);
+            @SuppressWarnings("nullness")
+            MutableTableRow<R> tableRow = requireNonNull(row, "Row is empty");
             return tableRow;
         }
         return null;
+    }
+
+    private @Nullable MutableTableRow<R> getMutableTableRow(int i) {
+        @Nullable R row = reportPage.getRow(i);
+        if (row == null) {
+            return null;
+        }
+        MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
+        tableRow.setRow(row);
+        return tableRow;
     }
 
     protected abstract CellDataAccessObject<?, R> getCellDataAccessObject();

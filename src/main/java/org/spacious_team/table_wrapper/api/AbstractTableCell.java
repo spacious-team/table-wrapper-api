@@ -18,7 +18,6 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +28,12 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @ToString
 @EqualsAndHashCode
-@Getter(AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter(PROTECTED)
+@RequiredArgsConstructor(access = PROTECTED)
 public abstract class AbstractTableCell<T> implements TableCell {
 
     private final T cell;
@@ -76,5 +77,19 @@ public abstract class AbstractTableCell<T> implements TableCell {
     @Override
     public LocalDateTime getLocalDateTimeValue() {
         return dao.getLocalDateTimeValue(cell);
+    }
+
+    /**
+     * Creates new object with required {@link CellDataAccessObject}
+     *
+     * @apiNote Subclasses should override method if any of {@code this} methods is overridden
+     */
+    public AbstractTableCell<T> withCellDataAccessObject(CellDataAccessObject<T, ?> dao) {
+        return new AbstractTableCell<>(cell, dao) {
+            @Override
+            public int getColumnIndex() {
+                return AbstractTableCell.this.getColumnIndex();
+            }
+        };
     }
 }

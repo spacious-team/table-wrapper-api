@@ -33,9 +33,11 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Mutable implementation. Used by {@link AbstractTable#iterator()} and {@link AbstractTable#stream()} to eliminate
- * heap pollution. On each iteration {@link #row} field is updated. Call {@link #clone()} instead of using this object
- * outside iterator or stream, that safer in outside code, because {@link #row} field holds value even if iterator
- * will continue to work.
+ * heap pollution. On each iteration {@link #row} field is updated.
+ * <br/>
+ * When {@code MutableTableRow} should be passed to outside iterator or stream, call {@link #clone()} and
+ * use cloned object. Cloned object is safe when used outside iterator or stream, because cloned {@link #row} field
+ * holds its original value when {@link AbstractTable#iterator()} continues to loop.
  */
 @Data
 class MutableTableRow<T extends ReportPageRow> implements TableRow {
@@ -53,7 +55,17 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
 
     @Override
     public @Nullable TableCell getCell(int i) {
-        return row.getCell(i);
+        @Nullable TableCell cell = row.getCell(i);
+        return updateCellDataAccessObject(cell);
+    }
+
+    private @Nullable TableCell updateCellDataAccessObject(@Nullable TableCell cell) {
+        if (cell instanceof AbstractTableCell) {
+            // hopes dao is compatible with cell
+            //noinspection unchecked,rawtypes
+            cell = ((AbstractTableCell) cell).withCellDataAccessObject(dao);
+        }
+        return cell;
     }
 
     @Override
@@ -78,7 +90,19 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
 
     @Override
     public Iterator<@Nullable TableCell> iterator() {
-        return row.iterator();
+        Iterator<@Nullable TableCell> it = row.iterator();
+        return new Iterator<@Nullable TableCell>() {
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override
+            public @Nullable TableCell next() {
+                @Nullable TableCell cell = it.next();
+                return updateCellDataAccessObject(cell);
+            }
+        };
     }
 
     @Override
