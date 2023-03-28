@@ -27,7 +27,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractTableCellTest {
@@ -102,6 +103,23 @@ class AbstractTableCellTest {
     }
 
     @Test
+    void withCellAccessDataObject_sameDao() {
+        assertSame(cell, cell.withCellDataAccessObject(cell.getDao()));
+    }
+
+    @Test
+    void withCellAccessDataObject_differentDao() {
+        //noinspection unchecked
+        CellDataAccessObject<Object, ?> otherDao = mock(CellDataAccessObject.class);
+
+        AbstractTableCell<Object> actual = cell.withCellDataAccessObject(otherDao);
+
+        assertNotSame(cell, actual);
+        assertSame(cell.getCell(), actual.getCell());
+        assertSame(otherDao, actual.getDao());
+    }
+
+    @Test
     void testEqualsAndHashCode() {
         EqualsVerifier
                 .forClass(AbstractTableCell.class)
@@ -123,6 +141,12 @@ class AbstractTableCellTest {
         @Override
         public int getColumnIndex() {
             throw new UnsupportedOperationException();
+        }
+
+
+        @Override
+        protected AbstractTableCell<Object> createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+            return new TableCellTestImpl(getCell(), dao);
         }
     }
 }

@@ -56,8 +56,8 @@ class AbstractTableTest {
     TableCellRange tableRange;
     Class<Columns> headerDescription = Columns.class;
     @Mock
-    CellDataAccessObject<?, EmptyTableRow> dao;
-    AbstractTable<EmptyTableRow> table;
+    CellDataAccessObject<Object, EmptyTableRow> dao;
+    AbstractTable<?, EmptyTableRow> table;
 
     @BeforeEach
     void beforeEach() {
@@ -66,7 +66,7 @@ class AbstractTableTest {
 
     @Test
     void testEmptyRangeConstructor() {
-        AbstractTable<EmptyTableRow> table = getEmptyTable();
+        AbstractTable<?, EmptyTableRow> table = getEmptyTable();
 
         assertEquals(report, table.getReportPage());
         assertEquals(TableCellRange.of(2, 3, 0, 100), table.getTableRange());
@@ -77,14 +77,14 @@ class AbstractTableTest {
     /**
      * Builds not empty table of 2 columns, row #2 contains table name, row #3 - header, no data rows
      */
-    private AbstractTable<EmptyTableRow> getEmptyTable() {
+    private AbstractTable<Object, EmptyTableRow> getEmptyTable() {
         TableCellRange tableRange = TableCellRange.of(2, 3, 0, 100);
         return new TableTestImpl(report, "table name", tableRange, headerDescription, 1);
     }
 
     @Test
     void testNotEmptyRangeConstructor() {
-        AbstractTable<EmptyTableRow> table = getNotEmptyTable();
+        AbstractTable<?, EmptyTableRow> table = getNotEmptyTable();
         TableCellRange range = TableCellRange.of(2, 6, 0, 1);
         ReportPageRow[] headerRows = new EmptyTableRow[0]; // mock
         Map<TableColumn, Integer> headerDescriptionMap = Map.of(
@@ -104,7 +104,7 @@ class AbstractTableTest {
      * row #6 - data with row equals to null
      */
     @SuppressWarnings("ConstantConditions")
-    private AbstractTable<EmptyTableRow> getNotEmptyTable() {
+    private AbstractTable<Object, EmptyTableRow> getNotEmptyTable() {
         // 2-th row - table name, 3-st and 4-nd rows - table header
         TableCellRange tableRange = TableCellRange.of(2, 6, 0, 100);
         when(report.getRow(3)).thenReturn(new EmptyTableRow(table, 3));
@@ -114,8 +114,8 @@ class AbstractTableTest {
 
     @Test
     void testNotEmptyRangeConstructor2() {
-        AbstractTable<EmptyTableRow> originalTable = getNotEmptyTable();
-        AbstractTable<EmptyTableRow> table = new TableTestImpl(originalTable, -1, -1);
+        AbstractTable<Object, EmptyTableRow> originalTable = getNotEmptyTable();
+        AbstractTable<Object, EmptyTableRow> table = new TableTestImpl(originalTable, -1, -1);
         TableCellRange range = TableCellRange.of(3, 5, 0, 1);
 
         assertEquals(report, table.getReportPage());
@@ -126,8 +126,8 @@ class AbstractTableTest {
 
     @Test
     void testEmptyRangeConstructor2() {
-        AbstractTable<EmptyTableRow> originalTable = getEmptyTable();
-        AbstractTable<EmptyTableRow> table = new TableTestImpl(originalTable, 1, 2);
+        AbstractTable<Object, EmptyTableRow> originalTable = getEmptyTable();
+        AbstractTable<Object, EmptyTableRow> table = new TableTestImpl(originalTable, 1, 2);
         TableCellRange range = TableCellRange.of(1, 5,
                 table.getTableRange().getFirstColumn(), table.getTableRange().getLastColumn());
 
@@ -293,20 +293,20 @@ class AbstractTableTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
     void findRow() {
         TableCellAddress address = TableCellAddress.of(1, 0);
         EmptyTableRow row = new EmptyTableRow(table, address.getRow());
-        MutableTableRow<EmptyTableRow> mutableRow = new MutableTableRow<>(table, dao);
+        MutableTableRow<Object, EmptyTableRow> mutableRow = new MutableTableRow<>(table, dao);
         mutableRow.setRow(row);
         when(report.find("row value")).thenReturn(address);
         when(tableRange.contains(address)).thenReturn(true);
-        when(table.getRow(address.getRow())).thenReturn(row);
+        //noinspection ConstantConditions
+        when(report.getRow(address.getRow())).thenReturn(row);
 
         assertEquals(mutableRow, table.findRow("row value"));
         verify(report).find("row value");
         verify(tableRange).contains(address);
-        verify(table).getRow(address.getRow());
+        verify(report).getRow(address.getRow());
     }
 
     @Test
@@ -332,23 +332,23 @@ class AbstractTableTest {
         assertEquals("AbstractTable(tableName=table name)", table.toString());
     }
 
-    class TableTestImpl extends AbstractTable<EmptyTableRow> {
+    class TableTestImpl extends AbstractTable<Object, EmptyTableRow> {
 
         protected <T extends Enum<T> & TableHeaderColumn>
         TableTestImpl(AbstractReportPage<EmptyTableRow> reportPage,
-                                String tableName,
-                                TableCellRange tableRange,
-                                Class<T> headerDescription,
-                                int headersRowCount) {
+                      String tableName,
+                      TableCellRange tableRange,
+                      Class<T> headerDescription,
+                      int headersRowCount) {
             super(reportPage, tableName, tableRange, headerDescription, headersRowCount);
         }
 
-        public TableTestImpl(AbstractTable<EmptyTableRow> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
+        public TableTestImpl(AbstractTable<Object, EmptyTableRow> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
             super(table, appendDataRowsToTop, appendDataRowsToBottom);
         }
 
         @Override
-        protected CellDataAccessObject<?, EmptyTableRow> getCellDataAccessObject() {
+        protected CellDataAccessObject<Object, EmptyTableRow> getCellDataAccessObject() {
             return dao;
         }
 

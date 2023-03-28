@@ -114,5 +114,10 @@ final class ReportPageRowHelper {
             this.value = value;
             this.columnIndex = columnIndex;
         }
+
+        @Override
+        protected AbstractTableCell<Object> createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

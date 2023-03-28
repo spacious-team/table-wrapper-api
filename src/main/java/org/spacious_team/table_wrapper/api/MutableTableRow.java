@@ -40,13 +40,13 @@ import static java.util.Objects.requireNonNull;
  * holds its original value when {@link AbstractTable#iterator()} continues to loop.
  */
 @Data
-class MutableTableRow<T extends ReportPageRow> implements TableRow {
+class MutableTableRow<C, R extends ReportPageRow> implements TableRow {
 
     private final Table table;
-    private final CellDataAccessObject<?, T> dao;
+    private final CellDataAccessObject<C, R> dao;
 
     @Setter(AccessLevel.PACKAGE)
-    private volatile T row;
+    private volatile R row;
 
     @Override
     public @Nullable TableCell getCell(TableHeaderColumn column) {
@@ -61,9 +61,8 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
 
     private @Nullable TableCell updateCellDataAccessObject(@Nullable TableCell cell) {
         if (cell instanceof AbstractTableCell) {
-            // hopes dao is compatible with cell
-            //noinspection unchecked,rawtypes
-            cell = ((AbstractTableCell) cell).withCellDataAccessObject(dao);
+            //noinspection unchecked
+            cell = ((AbstractTableCell<C>) cell).withCellDataAccessObject(dao);
         }
         return cell;
     }
@@ -162,7 +161,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     @Override
     @SneakyThrows
     @SuppressWarnings("unchecked")
-    public MutableTableRow<T> clone() {
-        return (MutableTableRow<T>) super.clone();
+    public MutableTableRow<C, R> clone() {
+        return (MutableTableRow<C, R>) super.clone();
     }
 }

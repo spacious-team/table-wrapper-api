@@ -27,6 +27,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -80,16 +81,12 @@ public abstract class AbstractTableCell<T> implements TableCell {
     }
 
     /**
-     * Creates new object with required {@link CellDataAccessObject}
-     *
-     * @apiNote Subclasses should override method if any of {@code this} methods is overridden
+     * Creates new cell object if provided {@link CellDataAccessObject}
+     * is different from this class CellDataAccessObject.
      */
     public AbstractTableCell<T> withCellDataAccessObject(CellDataAccessObject<T, ?> dao) {
-        return new AbstractTableCell<>(cell, dao) {
-            @Override
-            public int getColumnIndex() {
-                return AbstractTableCell.this.getColumnIndex();
-            }
-        };
+        return Objects.equals(this.dao, dao) ? this : createWithCellDataAccessObject(dao);
     }
+
+    protected abstract AbstractTableCell<T> createWithCellDataAccessObject(CellDataAccessObject<T, ?> dao);
 }

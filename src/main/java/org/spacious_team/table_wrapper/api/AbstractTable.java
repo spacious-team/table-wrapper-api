@@ -47,7 +47,7 @@ import static java.util.Objects.requireNonNull;
 @Slf4j
 @EqualsAndHashCode
 @ToString(of = {"tableName"})
-public abstract class AbstractTable<R extends ReportPageRow> implements Table {
+public abstract class AbstractTable<C, R extends ReportPageRow> implements Table {
 
     @Getter
     protected final AbstractReportPage<R> reportPage;
@@ -90,7 +90,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     }
 
     @SuppressWarnings("unused")
-    protected AbstractTable(AbstractTable<R> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
+    protected AbstractTable(AbstractTable<C, R> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
         this.reportPage = table.reportPage;
         this.tableName = table.tableName;
         this.tableRange = table.tableRange.addRowsToTop(appendDataRowsToTop).addRowsToBottom(appendDataRowsToBottom);
@@ -231,7 +231,7 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
     }
 
     protected class TableIterator implements Iterator<TableRow> {
-        private final MutableTableRow<R> tableRow =
+        private final MutableTableRow<C, R> tableRow =
                 new MutableTableRow<>(AbstractTable.this, getCellDataAccessObject());
         private final int numberOfRows = getNumberOfTableRows(tableRange);
         private int i = dataRowOffset;
@@ -276,26 +276,26 @@ public abstract class AbstractTable<R extends ReportPageRow> implements Table {
         return getMutableTableRow(address);
     }
 
-    private @Nullable MutableTableRow<R> getMutableTableRow(TableCellAddress address) {
+    private @Nullable MutableTableRow<C, R> getMutableTableRow(TableCellAddress address) {
         if (tableRange.contains(address)) {
             int rowNum = address.getRow();
-            @Nullable MutableTableRow<R> row = getMutableTableRow(rowNum);
+            @Nullable MutableTableRow<C, R> row = getMutableTableRow(rowNum);
             @SuppressWarnings("nullness")
-            MutableTableRow<R> tableRow = requireNonNull(row, "Row is empty");
+            MutableTableRow<C, R> tableRow = requireNonNull(row, "Row is empty");
             return tableRow;
         }
         return null;
     }
 
-    private @Nullable MutableTableRow<R> getMutableTableRow(int i) {
+    private @Nullable MutableTableRow<C, R> getMutableTableRow(int i) {
         @Nullable R row = reportPage.getRow(i);
         if (row == null) {
             return null;
         }
-        MutableTableRow<R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
+        MutableTableRow<C, R> tableRow = new MutableTableRow<>(this, getCellDataAccessObject());
         tableRow.setRow(row);
         return tableRow;
     }
 
-    protected abstract CellDataAccessObject<?, R> getCellDataAccessObject();
+    protected abstract CellDataAccessObject<C, R> getCellDataAccessObject();
 }
