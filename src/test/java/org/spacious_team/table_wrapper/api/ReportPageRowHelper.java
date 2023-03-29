@@ -105,18 +105,20 @@ final class ReportPageRowHelper {
     }
 
     @Getter
-    private static class TableCellTestImpl extends AbstractTableCell<Object> {
+    private static class TableCellTestImpl extends AbstractTableCell<Object, CellDataAccessObject<Object, ?>> {
         private final Object value;
         private final int columnIndex;
 
         TableCellTestImpl(Object value, int columnIndex) {
+            //noinspection ConstantConditions
             super(value, null);
             this.value = value;
             this.columnIndex = columnIndex;
         }
 
         @Override
-        protected AbstractTableCell<Object> createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+        protected AbstractTableCell<Object, CellDataAccessObject<Object, ?>>
+        createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
             throw new UnsupportedOperationException();
         }
     }

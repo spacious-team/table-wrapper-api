@@ -75,10 +75,11 @@ class MutableTableRowTest {
     @SuppressWarnings("unchecked")
     void getCellByIndex_differentDao() {
         CellDataAccessObject<Object, ?> dao = mock(CellDataAccessObject.class);
-        AbstractTableCell<Object> expectedCell = mock(AbstractTableCell.class);
-        AbstractTableCell<Object> cell = new AbstractTableCell<>(new Object(), dao) {
+        AbstractTableCell<Object, CellDataAccessObject<Object, ?>> expectedCell = mock(AbstractTableCell.class);
+        TableCell cell = new AbstractTableCell<Object, CellDataAccessObject<Object, ?>>(new Object(), dao) {
             @Override
-            protected AbstractTableCell<Object> createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+            protected AbstractTableCell<Object, CellDataAccessObject<Object, ?>>
+            createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
                 return expectedCell;
             }
 
@@ -131,10 +132,11 @@ class MutableTableRowTest {
     @SuppressWarnings("unchecked")
     void iterator_differentDao() {
         CellDataAccessObject<Object, ?> dao = mock(CellDataAccessObject.class);
-        AbstractTableCell<Object> expectedCell = mock(AbstractTableCell.class);
-        TableCell cell = new AbstractTableCell<>(new Object(), dao) {
+        AbstractTableCell<Object, CellDataAccessObject<Object, ?>> expectedCell = mock(AbstractTableCell.class);
+        TableCell cell = new AbstractTableCell<Object, CellDataAccessObject<Object, ?>>(new Object(), dao) {
             @Override
-            protected AbstractTableCell<Object> createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+            protected AbstractTableCell<Object, CellDataAccessObject<Object, ?>>
+            createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
                 return expectedCell;
             }
 

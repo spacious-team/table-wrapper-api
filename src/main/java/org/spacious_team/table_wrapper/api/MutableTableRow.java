@@ -61,8 +61,9 @@ class MutableTableRow<C, R extends ReportPageRow> implements TableRow {
 
     private @Nullable TableCell updateCellDataAccessObject(@Nullable TableCell cell) {
         if (cell instanceof AbstractTableCell) {
+            // hopes, dao is compatible
             //noinspection unchecked
-            cell = ((AbstractTableCell<C>) cell).withCellDataAccessObject(dao);
+            cell = ((AbstractTableCell<C, CellDataAccessObject<C, R>>) cell).withCellDataAccessObject(dao);
         }
         return cell;
     }

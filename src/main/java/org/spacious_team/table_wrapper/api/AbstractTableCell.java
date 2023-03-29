@@ -35,10 +35,10 @@ import static lombok.AccessLevel.PROTECTED;
 @EqualsAndHashCode
 @Getter(PROTECTED)
 @RequiredArgsConstructor(access = PROTECTED)
-public abstract class AbstractTableCell<T> implements TableCell {
+public abstract class AbstractTableCell<T, D extends CellDataAccessObject<T, ?>> implements TableCell {
 
     private final T cell;
-    private final CellDataAccessObject<T, ?> dao;
+    private final D dao;
 
     @Override
     public @Nullable Object getValue() {
@@ -84,9 +84,9 @@ public abstract class AbstractTableCell<T> implements TableCell {
      * Creates new cell object if provided {@link CellDataAccessObject}
      * is different from this class CellDataAccessObject.
      */
-    public AbstractTableCell<T> withCellDataAccessObject(CellDataAccessObject<T, ?> dao) {
+    public AbstractTableCell<T, D> withCellDataAccessObject(D dao) {
         return Objects.equals(this.dao, dao) ? this : createWithCellDataAccessObject(dao);
     }
 
-    protected abstract AbstractTableCell<T> createWithCellDataAccessObject(CellDataAccessObject<T, ?> dao);
+    protected abstract AbstractTableCell<T, D> createWithCellDataAccessObject(D dao);
 }

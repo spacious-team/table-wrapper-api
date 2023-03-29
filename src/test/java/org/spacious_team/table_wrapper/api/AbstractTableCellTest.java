@@ -112,7 +112,7 @@ class AbstractTableCellTest {
         //noinspection unchecked
         CellDataAccessObject<Object, ?> otherDao = mock(CellDataAccessObject.class);
 
-        AbstractTableCell<Object> actual = cell.withCellDataAccessObject(otherDao);
+        AbstractTableCell<Object, CellDataAccessObject<Object, ?>> actual = cell.withCellDataAccessObject(otherDao);
 
         assertNotSame(cell, actual);
         assertSame(cell.getCell(), actual.getCell());
@@ -132,7 +132,7 @@ class AbstractTableCellTest {
         assertEquals("AbstractTableCell(cell=cellValue, dao=dao)", cell.toString());
     }
 
-    static class TableCellTestImpl extends AbstractTableCell<Object> {
+    static class TableCellTestImpl extends AbstractTableCell<Object, CellDataAccessObject<Object, ?>> {
 
         protected TableCellTestImpl(Object cell, CellDataAccessObject<Object, ?> dao) {
             super(cell, dao);
@@ -145,7 +145,8 @@ class AbstractTableCellTest {
 
 
         @Override
-        protected AbstractTableCell<Object> createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+        protected AbstractTableCell<Object, CellDataAccessObject<Object, ?>>
+        createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
             return new TableCellTestImpl(getCell(), dao);
         }
     }
