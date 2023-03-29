@@ -47,7 +47,7 @@ import static java.util.Objects.requireNonNull;
 @Slf4j
 @EqualsAndHashCode
 @ToString(of = {"tableName"})
-public abstract class AbstractTable<C, R extends ReportPageRow> implements Table {
+public abstract class AbstractTable<R extends ReportPageRow, C> implements Table {
 
     @Getter
     protected final AbstractReportPage<R> reportPage;
@@ -90,7 +90,7 @@ public abstract class AbstractTable<C, R extends ReportPageRow> implements Table
     }
 
     @SuppressWarnings("unused")
-    protected AbstractTable(AbstractTable<C, R> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
+    protected AbstractTable(AbstractTable<R, C> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
         this.reportPage = table.reportPage;
         this.tableName = table.tableName;
         this.tableRange = table.tableRange.addRowsToTop(appendDataRowsToTop).addRowsToBottom(appendDataRowsToBottom);
@@ -297,5 +297,5 @@ public abstract class AbstractTable<C, R extends ReportPageRow> implements Table
         return tableRow;
     }
 
-    protected abstract CellDataAccessObject<C, R> getCellDataAccessObject();
+    public abstract CellDataAccessObject<C, R> getCellDataAccessObject();
 }

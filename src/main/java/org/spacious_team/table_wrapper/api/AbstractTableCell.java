@@ -33,10 +33,10 @@ import static lombok.AccessLevel.PROTECTED;
 
 @ToString
 @EqualsAndHashCode
-@Getter(PROTECTED)
 @RequiredArgsConstructor(access = PROTECTED)
 public abstract class AbstractTableCell<T, D extends CellDataAccessObject<T, ?>> implements TableCell {
 
+    @Getter(PROTECTED)
     private final T cell;
     private final D dao;
 
@@ -78,6 +78,10 @@ public abstract class AbstractTableCell<T, D extends CellDataAccessObject<T, ?>>
     @Override
     public LocalDateTime getLocalDateTimeValue() {
         return dao.getLocalDateTimeValue(cell);
+    }
+
+    public D getCellDataAccessObject() {
+        return dao;
     }
 
     /**

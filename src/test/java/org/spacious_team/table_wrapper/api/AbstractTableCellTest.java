@@ -99,12 +99,12 @@ class AbstractTableCellTest {
 
     @Test
     void getDao() {
-        assertEquals(dao, cell.getDao());
+        assertEquals(dao, cell.getCellDataAccessObject());
     }
 
     @Test
     void withCellAccessDataObject_sameDao() {
-        assertSame(cell, cell.withCellDataAccessObject(cell.getDao()));
+        assertSame(cell, cell.withCellDataAccessObject(cell.getCellDataAccessObject()));
     }
 
     @Test
@@ -116,7 +116,7 @@ class AbstractTableCellTest {
 
         assertNotSame(cell, actual);
         assertSame(cell.getCell(), actual.getCell());
-        assertSame(otherDao, actual.getDao());
+        assertSame(otherDao, actual.getCellDataAccessObject());
     }
 
     @Test

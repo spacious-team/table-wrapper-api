@@ -57,7 +57,7 @@ class AbstractTableTest {
     Class<Columns> headerDescription = Columns.class;
     @Mock
     CellDataAccessObject<Object, EmptyTableRow> dao;
-    AbstractTable<?, EmptyTableRow> table;
+    AbstractTable<EmptyTableRow, ?> table;
 
     @BeforeEach
     void beforeEach() {
@@ -66,7 +66,7 @@ class AbstractTableTest {
 
     @Test
     void testEmptyRangeConstructor() {
-        AbstractTable<?, EmptyTableRow> table = getEmptyTable();
+        AbstractTable<EmptyTableRow, ?> table = getEmptyTable();
 
         assertEquals(report, table.getReportPage());
         assertEquals(TableCellRange.of(2, 3, 0, 100), table.getTableRange());
@@ -77,14 +77,14 @@ class AbstractTableTest {
     /**
      * Builds not empty table of 2 columns, row #2 contains table name, row #3 - header, no data rows
      */
-    private AbstractTable<Object, EmptyTableRow> getEmptyTable() {
+    private AbstractTable<EmptyTableRow, Object> getEmptyTable() {
         TableCellRange tableRange = TableCellRange.of(2, 3, 0, 100);
         return new TableTestImpl(report, "table name", tableRange, headerDescription, 1);
     }
 
     @Test
     void testNotEmptyRangeConstructor() {
-        AbstractTable<?, EmptyTableRow> table = getNotEmptyTable();
+        AbstractTable<EmptyTableRow, ?> table = getNotEmptyTable();
         TableCellRange range = TableCellRange.of(2, 6, 0, 1);
         ReportPageRow[] headerRows = new EmptyTableRow[0]; // mock
         Map<TableColumn, Integer> headerDescriptionMap = Map.of(
@@ -104,7 +104,7 @@ class AbstractTableTest {
      * row #6 - data with row equals to null
      */
     @SuppressWarnings("ConstantConditions")
-    private AbstractTable<Object, EmptyTableRow> getNotEmptyTable() {
+    private AbstractTable<EmptyTableRow, Object> getNotEmptyTable() {
         // 2-th row - table name, 3-st and 4-nd rows - table header
         TableCellRange tableRange = TableCellRange.of(2, 6, 0, 100);
         when(report.getRow(3)).thenReturn(new EmptyTableRow(table, 3));
@@ -114,8 +114,8 @@ class AbstractTableTest {
 
     @Test
     void testNotEmptyRangeConstructor2() {
-        AbstractTable<Object, EmptyTableRow> originalTable = getNotEmptyTable();
-        AbstractTable<Object, EmptyTableRow> table = new TableTestImpl(originalTable, -1, -1);
+        AbstractTable<EmptyTableRow, Object> originalTable = getNotEmptyTable();
+        AbstractTable<EmptyTableRow, Object> table = new TableTestImpl(originalTable, -1, -1);
         TableCellRange range = TableCellRange.of(3, 5, 0, 1);
 
         assertEquals(report, table.getReportPage());
@@ -126,8 +126,8 @@ class AbstractTableTest {
 
     @Test
     void testEmptyRangeConstructor2() {
-        AbstractTable<Object, EmptyTableRow> originalTable = getEmptyTable();
-        AbstractTable<Object, EmptyTableRow> table = new TableTestImpl(originalTable, 1, 2);
+        AbstractTable<EmptyTableRow, Object> originalTable = getEmptyTable();
+        AbstractTable<EmptyTableRow, Object> table = new TableTestImpl(originalTable, 1, 2);
         TableCellRange range = TableCellRange.of(1, 5,
                 table.getTableRange().getFirstColumn(), table.getTableRange().getLastColumn());
 
@@ -332,7 +332,7 @@ class AbstractTableTest {
         assertEquals("AbstractTable(tableName=table name)", table.toString());
     }
 
-    class TableTestImpl extends AbstractTable<Object, EmptyTableRow> {
+    class TableTestImpl extends AbstractTable<EmptyTableRow, Object> {
 
         protected <T extends Enum<T> & TableHeaderColumn>
         TableTestImpl(AbstractReportPage<EmptyTableRow> reportPage,
@@ -343,12 +343,12 @@ class AbstractTableTest {
             super(reportPage, tableName, tableRange, headerDescription, headersRowCount);
         }
 
-        public TableTestImpl(AbstractTable<Object, EmptyTableRow> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
+        public TableTestImpl(AbstractTable<EmptyTableRow, Object> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
             super(table, appendDataRowsToTop, appendDataRowsToBottom);
         }
 
         @Override
-        protected CellDataAccessObject<Object, EmptyTableRow> getCellDataAccessObject() {
+        public CellDataAccessObject<Object, EmptyTableRow> getCellDataAccessObject() {
             return dao;
         }
 
