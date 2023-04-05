@@ -27,7 +27,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class AbstractTableCellTest {
@@ -98,7 +99,24 @@ class AbstractTableCellTest {
 
     @Test
     void getDao() {
-        assertEquals(dao, cell.getDao());
+        assertEquals(dao, cell.getCellDataAccessObject());
+    }
+
+    @Test
+    void withCellAccessDataObject_sameDao() {
+        assertSame(cell, cell.withCellDataAccessObject(cell.getCellDataAccessObject()));
+    }
+
+    @Test
+    void withCellAccessDataObject_differentDao() {
+        //noinspection unchecked
+        CellDataAccessObject<Object, ?> otherDao = mock(CellDataAccessObject.class);
+
+        AbstractTableCell<Object, CellDataAccessObject<Object, ?>> actual = cell.withCellDataAccessObject(otherDao);
+
+        assertNotSame(cell, actual);
+        assertSame(cell.getCell(), actual.getCell());
+        assertSame(otherDao, actual.getCellDataAccessObject());
     }
 
     @Test
@@ -114,7 +132,7 @@ class AbstractTableCellTest {
         assertEquals("AbstractTableCell(cell=cellValue, dao=dao)", cell.toString());
     }
 
-    static class TableCellTestImpl extends AbstractTableCell<Object> {
+    static class TableCellTestImpl extends AbstractTableCell<Object, CellDataAccessObject<Object, ?>> {
 
         protected TableCellTestImpl(Object cell, CellDataAccessObject<Object, ?> dao) {
             super(cell, dao);
@@ -123,6 +141,13 @@ class AbstractTableCellTest {
         @Override
         public int getColumnIndex() {
             throw new UnsupportedOperationException();
+        }
+
+
+        @Override
+        protected AbstractTableCell<Object, CellDataAccessObject<Object, ?>>
+        createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+            return new TableCellTestImpl(getCell(), dao);
         }
     }
 }

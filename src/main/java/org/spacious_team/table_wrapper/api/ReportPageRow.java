@@ -24,7 +24,7 @@ public interface ReportPageRow extends Iterable<@Nullable TableCell> {
 
     /**
      * @param i zero-based cell number
-     * @return cell ot null if cell does not exist
+     * @return cell or null if cell does not exist
      */
     @Nullable
     TableCell getCell(int i);
@@ -48,5 +48,5 @@ public interface ReportPageRow extends Iterable<@Nullable TableCell> {
      * @param expected searching value
      * @return true if any cell of this row has exact value, false otherwise
      */
-    boolean rowContains(Object expected);
+    boolean rowContains(@Nullable Object expected);
 }

@@ -19,12 +19,15 @@
 package org.spacious_team.table_wrapper.api;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static nl.jqno.equalsverifier.Warning.*;
@@ -46,7 +49,7 @@ class MutableTableRowTest {
     final int COLUMN_INDEX = 10;
     @Mock
     ReportPageRow wrappedRow;
-    MutableTableRow<ReportPageRow> row;
+    MutableTableRow<?, ReportPageRow> row;
 
     @BeforeEach
     void setUp() {
@@ -57,14 +60,40 @@ class MutableTableRowTest {
     }
 
     @Test
-    void getCell() {
+    void getCellByTableHeaderColumn() {
         row.getCell(headerColumn);
         verify(row).getCell(COLUMN_INDEX);
     }
 
     @Test
-    void testGetCell() {
+    void getCellByIndex_sameDao() {
         row.getCell(COLUMN_INDEX);
+        verify(wrappedRow).getCell(COLUMN_INDEX);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void getCellByIndex_differentDao() {
+        CellDataAccessObject<Object, ?> dao = mock(CellDataAccessObject.class);
+        AbstractTableCell<Object, CellDataAccessObject<Object, ?>> expectedCell = mock(AbstractTableCell.class);
+        TableCell cell = new AbstractTableCell<Object, CellDataAccessObject<Object, ?>>(new Object(), dao) {
+            @Override
+            protected AbstractTableCell<Object, CellDataAccessObject<Object, ?>>
+            createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+                return expectedCell;
+            }
+
+            @Override
+            public int getColumnIndex() {
+                return 0;
+            }
+        };
+        //noinspection ConstantConditions
+        when(wrappedRow.getCell(COLUMN_INDEX)).thenReturn(cell);
+
+        @Nullable TableCell actualCell = row.getCell(COLUMN_INDEX);
+
+        assertSame(expectedCell, actualCell);
         verify(wrappedRow).getCell(COLUMN_INDEX);
     }
 
@@ -96,6 +125,34 @@ class MutableTableRowTest {
     @Test
     void iterator() {
         row.iterator();
+        verify(wrappedRow).iterator();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void iterator_differentDao() {
+        CellDataAccessObject<Object, ?> dao = mock(CellDataAccessObject.class);
+        AbstractTableCell<Object, CellDataAccessObject<Object, ?>> expectedCell = mock(AbstractTableCell.class);
+        TableCell cell = new AbstractTableCell<Object, CellDataAccessObject<Object, ?>>(new Object(), dao) {
+            @Override
+            protected AbstractTableCell<Object, CellDataAccessObject<Object, ?>>
+            createWithCellDataAccessObject(CellDataAccessObject<Object, ?> dao) {
+                return expectedCell;
+            }
+
+            @Override
+            public int getColumnIndex() {
+                return 0;
+            }
+        };
+        Iterator<@Nullable TableCell> iterator = List.of(cell).iterator();
+        when(wrappedRow.iterator()).thenReturn(iterator);
+
+        Iterator<@Nullable TableCell> actualIterator = row.iterator();
+        //noinspection ConstantConditions
+        TableCell actualCell = actualIterator.next();
+
+        assertSame(expectedCell, actualCell);
         verify(wrappedRow).iterator();
     }
 
@@ -149,7 +206,7 @@ class MutableTableRowTest {
 
     @Test
     void testClone() {
-        MutableTableRow<ReportPageRow> row = new MutableTableRow<>(table, dao);
+        MutableTableRow<?, ReportPageRow> row = new MutableTableRow<>(table, dao);
         row.setRow(wrappedRow);
         assertEquals(row, row.clone());
     }

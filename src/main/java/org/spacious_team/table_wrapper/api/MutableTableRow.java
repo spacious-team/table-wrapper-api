@@ -33,18 +33,20 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Mutable implementation. Used by {@link AbstractTable#iterator()} and {@link AbstractTable#stream()} to eliminate
- * heap pollution. On each iteration {@link #row} field is updated. Call {@link #clone()} instead of using this object
- * outside iterator or stream, that safer in outside code, because {@link #row} field holds value even if iterator
- * will continue to work.
+ * heap pollution. On each iteration {@link #row} field is updated.
+ * <br/>
+ * When {@code MutableTableRow} should be passed to outside iterator or stream, call {@link #clone()} and
+ * use cloned object. Cloned object is safe when used outside iterator or stream, because cloned {@link #row} field
+ * holds its original value when {@link AbstractTable#iterator()} continues to loop.
  */
 @Data
-class MutableTableRow<T extends ReportPageRow> implements TableRow {
+class MutableTableRow<C, R extends ReportPageRow> implements TableRow {
 
     private final Table table;
-    private final CellDataAccessObject<?, T> dao;
+    private final CellDataAccessObject<C, R> dao;
 
     @Setter(AccessLevel.PACKAGE)
-    private volatile T row;
+    private volatile R row;
 
     @Override
     public @Nullable TableCell getCell(TableHeaderColumn column) {
@@ -53,7 +55,17 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
 
     @Override
     public @Nullable TableCell getCell(int i) {
-        return row.getCell(i);
+        @Nullable TableCell cell = row.getCell(i);
+        return updateCellDataAccessObject(cell);
+    }
+
+    private @Nullable TableCell updateCellDataAccessObject(@Nullable TableCell cell) {
+        if (cell instanceof AbstractTableCell) {
+            // hopes, dao is compatible
+            //noinspection unchecked
+            cell = ((AbstractTableCell<C, CellDataAccessObject<C, R>>) cell).withCellDataAccessObject(dao);
+        }
+        return cell;
     }
 
     @Override
@@ -72,13 +84,25 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     }
 
     @Override
-    public boolean rowContains(Object expected) {
+    public boolean rowContains(@Nullable Object expected) {
         return row.rowContains(expected);
     }
 
     @Override
     public Iterator<@Nullable TableCell> iterator() {
-        return row.iterator();
+        Iterator<@Nullable TableCell> it = row.iterator();
+        return new Iterator<@Nullable TableCell>() {
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override
+            public @Nullable TableCell next() {
+                @Nullable TableCell cell = it.next();
+                return updateCellDataAccessObject(cell);
+            }
+        };
     }
 
     @Override
@@ -138,7 +162,7 @@ class MutableTableRow<T extends ReportPageRow> implements TableRow {
     @Override
     @SneakyThrows
     @SuppressWarnings("unchecked")
-    public MutableTableRow<T> clone() {
-        return (MutableTableRow<T>) super.clone();
+    public MutableTableRow<C, R> clone() {
+        return (MutableTableRow<C, R>) super.clone();
     }
 }

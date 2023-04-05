@@ -18,7 +18,6 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -28,15 +27,18 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Objects;
+
+import static lombok.AccessLevel.PROTECTED;
 
 @ToString
 @EqualsAndHashCode
-@Getter(AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractTableCell<T> implements TableCell {
+@RequiredArgsConstructor(access = PROTECTED)
+public abstract class AbstractTableCell<T, D extends CellDataAccessObject<T, ?>> implements TableCell {
 
+    @Getter(PROTECTED)
     private final T cell;
-    private final CellDataAccessObject<T, ?> dao;
+    private final D dao;
 
     @Override
     public @Nullable Object getValue() {
@@ -77,4 +79,18 @@ public abstract class AbstractTableCell<T> implements TableCell {
     public LocalDateTime getLocalDateTimeValue() {
         return dao.getLocalDateTimeValue(cell);
     }
+
+    public D getCellDataAccessObject() {
+        return dao;
+    }
+
+    /**
+     * Creates new cell object if provided {@link CellDataAccessObject}
+     * is different from this class CellDataAccessObject.
+     */
+    public AbstractTableCell<T, D> withCellDataAccessObject(D dao) {
+        return Objects.equals(this.dao, dao) ? this : createWithCellDataAccessObject(dao);
+    }
+
+    protected abstract AbstractTableCell<T, D> createWithCellDataAccessObject(D dao);
 }
