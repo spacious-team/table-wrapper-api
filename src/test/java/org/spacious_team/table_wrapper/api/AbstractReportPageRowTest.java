@@ -87,7 +87,7 @@ class AbstractReportPageRowTest {
         }
 
         @Override
-        public boolean rowContains(Object expected) {
+        public boolean rowContains(@Nullable Object expected) {
             throw new UnsupportedOperationException();
         }
 

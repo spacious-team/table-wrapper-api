@@ -48,5 +48,5 @@ public interface ReportPageRow extends Iterable<@Nullable TableCell> {
      * @param expected searching value
      * @return true if any cell of this row has exact value, false otherwise
      */
-    boolean rowContains(Object expected);
+    boolean rowContains(@Nullable Object expected);
 }

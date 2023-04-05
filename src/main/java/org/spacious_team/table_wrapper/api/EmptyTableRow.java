@@ -56,7 +56,7 @@ class EmptyTableRow implements TableRow {
     }
 
     @Override
-    public boolean rowContains(Object expected) {
+    public boolean rowContains(@Nullable Object expected) {
         return false;
     }
 

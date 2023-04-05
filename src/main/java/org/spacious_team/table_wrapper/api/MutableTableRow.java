@@ -84,7 +84,7 @@ class MutableTableRow<C, R extends ReportPageRow> implements TableRow {
     }
 
     @Override
-    public boolean rowContains(Object expected) {
+    public boolean rowContains(@Nullable Object expected) {
         return row.rowContains(expected);
     }
 
