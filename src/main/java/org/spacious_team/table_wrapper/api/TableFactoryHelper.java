@@ -19,6 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -29,7 +30,7 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 final class TableFactoryHelper {
 
-    static String getTableName(ReportPage reportPage, Predicate<Object> tableNameFinder, TableCellRange range) {
+    static String getTableName(ReportPage reportPage, Predicate<@Nullable Object> tableNameFinder, TableCellRange range) {
         try {
             if (!Objects.equals(range, TableCellRange.EMPTY_RANGE)) {
                 TableCellAddress tableNameCell =

@@ -21,6 +21,7 @@ package org.spacious_team.table_wrapper.api;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Predicate;
 
@@ -29,13 +30,13 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 final class ReportPageHelper {
 
-    static Predicate<Object> getCellStringValueIgnoreCasePrefixPredicate(String prefix) {
+    static Predicate<@Nullable Object> getCellStringValueIgnoreCasePrefixPredicate(String prefix) {
         return new StringIgnoreCasePrefixPredicate(prefix);
     }
 
     @ToString
     @EqualsAndHashCode
-    static final class StringIgnoreCasePrefixPredicate implements Predicate<Object> {
+    static final class StringIgnoreCasePrefixPredicate implements Predicate<@Nullable Object> {
         private final String lowercasePrefix;
 
         private StringIgnoreCasePrefixPredicate(String prefix) {
@@ -43,7 +44,7 @@ final class ReportPageHelper {
         }
 
         @Override
-        public boolean test(Object cell) {
+        public boolean test(@Nullable Object cell) {
             return (cell instanceof String) &&
                     ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
         }

@@ -18,6 +18,8 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.function.Predicate;
 
 public interface TableFactory {
@@ -96,8 +98,8 @@ public interface TableFactory {
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
-                 Predicate<Object> tableNameFinder,
-                 Predicate<Object> lastRowFinder,
+                 Predicate<@Nullable Object> tableNameFinder,
+                 Predicate<@Nullable Object> lastRowFinder,
                  Class<T> headerDescription) {
         return create(reportPage, tableNameFinder, lastRowFinder, headerDescription, 1);
     }
@@ -110,7 +112,7 @@ public interface TableFactory {
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
-                 Predicate<Object> tableNameFinder,
+                 Predicate<@Nullable Object> tableNameFinder,
                  Class<T> headerDescription) {
         return create(reportPage, tableNameFinder, headerDescription, 1);
     }
@@ -123,8 +125,8 @@ public interface TableFactory {
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
-                 Predicate<Object> tableNameFinder,
-                 Predicate<Object> lastRowFinder,
+                 Predicate<@Nullable Object> tableNameFinder,
+                 Predicate<@Nullable Object> lastRowFinder,
                  Class<T> headerDescription,
                  int headersRowCount) {
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount, lastRowFinder);
@@ -140,7 +142,7 @@ public interface TableFactory {
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
-                 Predicate<Object> tableNameFinder,
+                 Predicate<@Nullable Object> tableNameFinder,
                  Class<T> headerDescription,
                  int headersRowCount) {
         TableCellRange range = reportPage.getTableCellRange(tableNameFinder, headersRowCount);
@@ -226,8 +228,8 @@ public interface TableFactory {
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
-                         Predicate<Object> firstRowFinder,
-                         Predicate<Object> lastRowFinder,
+                         Predicate<@Nullable Object> firstRowFinder,
+                         Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription) {
         return createNameless(reportPage, "undefined", firstRowFinder, lastRowFinder, headerDescription, 1);
     }
@@ -240,7 +242,7 @@ public interface TableFactory {
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
-                         Predicate<Object> firstRowFinder,
+                         Predicate<@Nullable Object> firstRowFinder,
                          Class<T> headerDescription) {
         return createNameless(reportPage, "undefined", firstRowFinder, headerDescription, 1);
     }
@@ -255,8 +257,8 @@ public interface TableFactory {
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
                          String providedTableName,
-                         Predicate<Object> firstRowFinder,
-                         Predicate<Object> lastRowFinder,
+                         Predicate<@Nullable Object> firstRowFinder,
+                         Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription,
                          int headersRowCount) {
         return create(reportPage,
@@ -277,7 +279,7 @@ public interface TableFactory {
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
                          String providedTableName,
-                         Predicate<Object> firstRowFinder,
+                         Predicate<@Nullable Object> firstRowFinder,
                          Class<T> headerDescription,
                          int headersRowCount) {
         return create(reportPage,

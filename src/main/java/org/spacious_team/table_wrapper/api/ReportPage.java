@@ -76,7 +76,7 @@ public interface ReportPage {
      * @param cellValuePredicate predicate for testing cell value
      * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
-    default TableCellAddress find(Predicate<Object> cellValuePredicate) {
+    default TableCellAddress find(Predicate<@Nullable Object> cellValuePredicate) {
         return find(0, cellValuePredicate);
     }
 
@@ -86,7 +86,7 @@ public interface ReportPage {
      * @param startRow search rows start from this
      * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
-    default TableCellAddress find(int startRow, Predicate<Object> cellValuePredicate) {
+    default TableCellAddress find(int startRow, Predicate<@Nullable Object> cellValuePredicate) {
         return find(startRow, Integer.MAX_VALUE, cellValuePredicate);
     }
 
@@ -97,7 +97,7 @@ public interface ReportPage {
      * @param endRow   search rows excluding this, can handle values greater than real rows count
      * @return cell address or {@link TableCellAddress#NOT_FOUND}
      */
-    default TableCellAddress find(int startRow, int endRow, Predicate<Object> cellValuePredicate) {
+    default TableCellAddress find(int startRow, int endRow, Predicate<@Nullable Object> cellValuePredicate) {
         return find(startRow, endRow, 0, Integer.MAX_VALUE, cellValuePredicate);
     }
 
@@ -113,7 +113,7 @@ public interface ReportPage {
      */
     TableCellAddress find(int startRow, int endRow,
                           int startColumn, int endColumn,
-                          Predicate<Object> cellValuePredicate);
+                          Predicate<@Nullable Object> cellValuePredicate);
 
     /**
      * Finds cell address staring with value (ignore case, trims leading spaces).
@@ -216,9 +216,9 @@ public interface ReportPage {
     /**
      * Returns table range. First and last row will be found by predicate.
      */
-    default TableCellRange getTableCellRange(@Nullable Predicate<Object> firstRowFinder,
+    default TableCellRange getTableCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
                                              int headersRowCount,
-                                             @Nullable Predicate<Object> lastRowFinder) {
+                                             @Nullable Predicate<@Nullable Object> lastRowFinder) {
         if (firstRowFinder == null || lastRowFinder == null) {
             return TableCellRange.EMPTY_RANGE;
         }
@@ -257,7 +257,7 @@ public interface ReportPage {
     /**
      * Returns table range. First row will be found by predicate, range ends with empty row or last row of report page.
      */
-    default TableCellRange getTableCellRange(@Nullable Predicate<Object> firstRowFinder, int headersRowCount) {
+    default TableCellRange getTableCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder, int headersRowCount) {
         if (firstRowFinder == null) {
             return TableCellRange.EMPTY_RANGE;
         }
@@ -351,23 +351,23 @@ public interface ReportPage {
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
-    Table create(Predicate<Object> tableNameFinder,
-                 Predicate<Object> tableFooterFinder,
+    Table create(Predicate<@Nullable Object> tableNameFinder,
+                 Predicate<@Nullable Object> tableFooterFinder,
                  Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableNameFinder, tableFooterFinder, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
-    Table create(Predicate<Object> tableNameFinder,
+    Table create(Predicate<@Nullable Object> tableNameFinder,
                  Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableNameFinder, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
-    Table create(Predicate<Object> tableNameFinder,
-                 Predicate<Object> tableFooterFinder,
+    Table create(Predicate<@Nullable Object> tableNameFinder,
+                 Predicate<@Nullable Object> tableFooterFinder,
                  Class<T> headerDescription,
                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
@@ -375,7 +375,7 @@ public interface ReportPage {
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
-    Table create(Predicate<Object> tableNameFinder,
+    Table create(Predicate<@Nullable Object> tableNameFinder,
                  Class<T> headerDescription,
                  int headersRowCount) {
         return TableFactoryRegistry.get(this)
@@ -417,15 +417,15 @@ public interface ReportPage {
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
-    Table createNameless(Predicate<Object> firstLineFinder,
-                         Predicate<Object> lastRowFinder,
+    Table createNameless(Predicate<@Nullable Object> firstLineFinder,
+                         Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, firstLineFinder, lastRowFinder, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
-    Table createNameless(Predicate<Object> firstLineFinder,
+    Table createNameless(Predicate<@Nullable Object> firstLineFinder,
                          Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, firstLineFinder, headerDescription);
@@ -433,8 +433,8 @@ public interface ReportPage {
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         Predicate<Object> firstLineFinder,
-                         Predicate<Object> lastRowFinder,
+                         Predicate<@Nullable Object> firstLineFinder,
+                         Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription,
                          int headersRowCount) {
         return TableFactoryRegistry.get(this)
@@ -443,7 +443,7 @@ public interface ReportPage {
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         Predicate<Object> firstLineFinder,
+                         Predicate<@Nullable Object> firstLineFinder,
                          Class<T> headerDescription,
                          int headersRowCount) {
         return TableFactoryRegistry.get(this)
