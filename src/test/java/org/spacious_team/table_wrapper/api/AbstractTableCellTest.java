@@ -26,6 +26,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZoneOffset;
+
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -90,6 +92,12 @@ class AbstractTableCellTest {
     void getLocalDateTimeValue() {
         cell.getLocalDateTimeValue();
         Mockito.verify(dao).getLocalDateTimeValue(cellValue);
+    }
+
+    @Test
+    void getLocalDateTimeValue_withZoneId() {
+        cell.getLocalDateTimeValue(ZoneOffset.UTC);
+        Mockito.verify(dao).getLocalDateTimeValue(cellValue, ZoneOffset.UTC);
     }
 
     @Test

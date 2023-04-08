@@ -22,6 +22,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface TableCell {
@@ -71,6 +72,11 @@ public interface TableCell {
      * @throws RuntimeException if can't extract local date time value
      */
     LocalDateTime getLocalDateTimeValue();
+
+    /**
+     * @throws RuntimeException if can't extract local date time value
+     */
+    LocalDateTime getLocalDateTimeValue(ZoneId zoneId);
 
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
@@ -155,6 +161,17 @@ public interface TableCell {
     default LocalDateTime getLocalDateTimeValueOrDefault(LocalDateTime defaultValue) {
         try {
             return getLocalDateTimeValue();
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default LocalDateTime getLocalDateTimeValueOrDefault(ZoneId zoneId, LocalDateTime defaultValue) {
+        try {
+            return getLocalDateTimeValue(zoneId);
         } catch (Exception e) {
             return defaultValue;
         }

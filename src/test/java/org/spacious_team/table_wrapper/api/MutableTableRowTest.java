@@ -26,11 +26,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZoneOffset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static nl.jqno.equalsverifier.Warning.*;
+import static nl.jqno.equalsverifier.Warning.NONFINAL_FIELDS;
+import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
@@ -202,6 +204,12 @@ class MutableTableRowTest {
     void getLocalDateTimeCellValue() {
         row.getLocalDateTimeCellValue(headerColumn);
         verify(dao).getLocalDateTimeValue(wrappedRow, COLUMN_INDEX);
+    }
+
+    @Test
+    void getLocalDateTimeCellValue_withZoneId() {
+        row.getLocalDateTimeCellValue(headerColumn, ZoneOffset.UTC);
+        verify(dao).getLocalDateTimeValue(wrappedRow, COLUMN_INDEX, ZoneOffset.UTC);
     }
 
     @Test

@@ -25,6 +25,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Iterator;
 
 import static java.util.Collections.emptyIterator;
@@ -102,6 +103,11 @@ class EmptyTableRow implements TableRow {
 
     @Override
     public LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column) {
+        throw new NullPointerException(CELL_NOT_FOUND);
+    }
+
+    @Override
+    public LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column, ZoneId zoneId) {
         throw new NullPointerException(CELL_NOT_FOUND);
     }
 

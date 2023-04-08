@@ -27,6 +27,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Iterator;
 
 import static java.util.Objects.requireNonNull;
@@ -143,6 +144,11 @@ class MutableTableRow<C, R extends ReportPageRow> implements TableRow {
     @Override
     public LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column) {
         return dao.getLocalDateTimeValue(row, getCellIndex(column));
+    }
+
+    @Override
+    public LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column, ZoneId zoneId) {
+        return dao.getLocalDateTimeValue(row, getCellIndex(column), zoneId);
     }
 
     private int getCellIndex(TableHeaderColumn column) {

@@ -27,6 +27,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZoneOffset;
+
 import static nl.jqno.equalsverifier.Warning.STRICT_INHERITANCE;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -121,6 +123,12 @@ class EmptyTableRowTest {
     void getLocalDateTimeCellValue() {
         assertThrows(NullPointerException.class,
                 () -> row.getLocalDateTimeCellValue(column));
+    }
+
+    @Test
+    void getLocalDateTimeCellValue_withZoneId() {
+        assertThrows(NullPointerException.class,
+                () -> row.getLocalDateTimeCellValue(column, ZoneOffset.UTC));
     }
 
     @Test

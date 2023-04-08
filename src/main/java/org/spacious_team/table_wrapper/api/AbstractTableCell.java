@@ -27,6 +27,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -78,6 +79,11 @@ public abstract class AbstractTableCell<T, D extends CellDataAccessObject<T, ?>>
     @Override
     public LocalDateTime getLocalDateTimeValue() {
         return dao.getLocalDateTimeValue(cell);
+    }
+
+    @Override
+    public LocalDateTime getLocalDateTimeValue(ZoneId zoneId) {
+        return dao.getLocalDateTimeValue(cell, zoneId);
     }
 
     public D getCellDataAccessObject() {

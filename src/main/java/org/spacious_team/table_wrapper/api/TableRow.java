@@ -22,6 +22,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * {@link TableRow} subclass can be mutable. Use {@link #clone()} to make copy.
@@ -74,6 +75,11 @@ public interface TableRow extends ReportPageRow, Cloneable {
      * @throws RuntimeException if method can't extract local date time value
      */
     LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column);
+
+    /**
+     * @throws RuntimeException if method can't extract local date time value
+     */
+    LocalDateTime getLocalDateTimeCellValue(TableHeaderColumn column, ZoneId zoneId);
 
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
@@ -158,6 +164,17 @@ public interface TableRow extends ReportPageRow, Cloneable {
     default LocalDateTime getLocalDateTimeCellValueOrDefault(TableHeaderColumn column, LocalDateTime defaultValue) {
         try {
             return getLocalDateTimeCellValue(column);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default LocalDateTime getLocalDateTimeCellValueOrDefault(TableHeaderColumn column, ZoneId zoneId, LocalDateTime defaultValue) {
+        try {
+            return getLocalDateTimeCellValue(column, zoneId);
         } catch (Exception e) {
             return defaultValue;
         }

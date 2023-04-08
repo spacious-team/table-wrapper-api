@@ -27,6 +27,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @ToString
 @EqualsAndHashCode
@@ -72,6 +73,11 @@ public class EmptyTableCell implements TableCell {
 
     @Override
     public LocalDateTime getLocalDateTimeValue() {
+        throw new NullPointerException("Can't get LocalDateTime value");
+    }
+
+    @Override
+    public LocalDateTime getLocalDateTimeValue(ZoneId zoneId) {
         throw new NullPointerException("Can't get LocalDateTime value");
     }
 }
