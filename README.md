@@ -12,8 +12,9 @@ https://codecov.io/gh/spacious-team/table-wrapper-api)
 - [Зависимости](#зависимости)
 
 ### Назначение
-Предоставляет удобный API для доступа к табличным данным из файлов в форматах excel, xml и др.
-Пусть на листе excel имеется несколько таблиц.
+Предоставляет единый удобный API для доступа к табличным данным из файлов в форматах excel, xml, csv и др.
+
+Разберем доступ к данным на примере. Пусть на листе excel (xml или csv) имеется несколько таблиц.
 
 - Таблица с ценой товаров:
 
@@ -22,7 +23,7 @@ https://codecov.io/gh/spacious-team/table-wrapper-api)
 | Товар  | Цена (опт), руб/кг | Цена розничная, руб/кг |
 |--------|--------------------|------------------------|
 | Яблоко | 50                 | 90.5                   |
-|  Груша | 120                | 180.0                  |
+| Груша  | 120                | 180.0                  |
 
 - Таблица с заголовком из 2-х строк:
 
@@ -43,7 +44,7 @@ https://codecov.io/gh/spacious-team/table-wrapper-api)
 | Страна     | Компания | покупателя | кг   |
 
 ### Пример использования
-Для представленного выше примера объявляются описания столбцов:
+Для представленного выше примера объявляются описания столбцов вне зависимости от формата файла (excel, xml, csv и др.):
 ```java
 enum ProductTableHeader implements TableColumnDescription {
     PRODUCT(0),
@@ -84,28 +85,36 @@ enum SalesTableHeader implements TableColumnDescription {
     }  
 }
 ```
-В зависимости от формата исходных данных подготавливаются объекты. Например, для excel файла потребуются
+В зависимости от формата исходных данных подготавливаются объекты `ReportPage`. Например, для excel файла потребуются
+зависимость [table-wrapper-excel-impl](https://github.com/spacious-team/table-wrapper-excel-impl) или Spring Boot Starter
+и код:
 ```java
-// table wrapper excel impl dependency required 
-Workbook book = new XSSFWorkbook(xlsFileinputStream);          // open Excel file
-ReportPage reportPage = new ExcelSheet(book.getSheetAt(0));    // select first Excel sheet
+TableFactoryRegistry.add(new ExcelTableFactory());             // регистрируем фабрику
+Workbook book = new XSSFWorkbook(xlsFileinputStream);          // открываем Excel файл
+ReportPage reportPage = new ExcelSheet(book.getSheetAt(0));    // используем 1-ый лист Excel файла для поиска таблиц
 ```
 Используем API для доступа к данным таблиц
 ```java
-// finding row with "таблица товаров" content, parsing next row as header and
-// counting next rows as table data rows till empty line
+// Регистронезависимо найдет ячейку с текстом "Таблица товаров",
+// парсит следующую за ней строку как заголовок таблицы,
+// оставшиеся строки парсятся как данные до пустой строки или конца файла
 Table productTable = reportPage.create("таблица товаров", ProductTableHeader.class);
-// finding row with "таблица продаж" content, parsing next 2 rows as header and
-// counting next rows as table data rows till row containing "итого" in any cell
+
+// Регистронезависимо найдет ячейку с текстом "Таблица продаж",
+// парсит следующие за ней 2 строки заголовка таблицы,
+// оставшиеся строки парсятся как данные таблицы до строки, содержащей ячейку с текстом "Итого"
 Table salesTable = reportPage.create("таблица продаж", "итого",  SalesTableHeader.class, 2);
 
 for (TableRow row : productTable) {
-    String product = row.getStringCellValueOrDefault(PRICE_TRADE, "Неизвестный товар");
+    // Извлечет наименования товаров "Яблоко", "Груша" из "Таблицы товаров"
+    String product = row.getStringCellValueOrDefault(PRODUCT, "Неизвестный товар");
+    // Извлечет оптовые цены 50 и 120 из "Таблицы товаров"
     BigDecimal price = row.getBigDecimalCellValue(PRICE_TRADE);
 }
 
+// Список будет содержать ["Россия", "Беларусь"] из "Таблицы продаж"
 Set<String> countries = salesTable.stream()
-    .map(row -> row.getStringCelValueOrDefault(BUYER_COUNTRY, "unknown"))
+    .map(row -> row.getStringCellValue(BUYER_COUNTRY))
     .collect(toSet())
 ```
 API предоставляет и другие удобные интерфейсы для работы с таблицами.
@@ -142,8 +151,8 @@ API предоставляет и другие удобные интерфейс
 - паттерн `<branch>-SNAPSHOT` для сборки зависимости с последнего коммита выбранной ветки;
 - короткий десяти значный номер коммита для сборки зависимости с указанного коммита.
  
-Вам также потребуется реализация парсера, например
-[table-wrapper-excel-impl](https://github.com/spacious-team/table-wrapper-excel-impl) для работы с excel файлами
+Для извлечения данных Вам также потребуется одна или несколько реализаций:
+1. [table-wrapper-excel-impl](https://github.com/spacious-team/table-wrapper-excel-impl) для работы с excel файлами
 ```xml
 <dependency>
     <groupId>com.github.spacious-team</groupId>
@@ -151,3 +160,20 @@ API предоставляет и другие удобные интерфейс
     <version>master-SNAPSHOT</version>
 </dependency>
 ```
+2. [table-wrapper-xml-impl](https://github.com/spacious-team/table-wrapper-xml-impl) для работы с xml файлами
+```xml
+<dependency>
+    <groupId>com.github.spacious-team</groupId>
+    <artifactId>table-wrapper-xml-impl</artifactId>
+    <version>master-SNAPSHOT</version>
+</dependency>
+```
+3. [table-wrapper-csv-impl](https://github.com/spacious-team/table-wrapper-csv-impl) для работы с csv (tsv) файлами
+```xml
+<dependency>
+    <groupId>com.github.spacious-team</groupId>
+    <artifactId>table-wrapper-csv-impl</artifactId>
+    <version>master-SNAPSHOT</version>
+</dependency>
+```
+Или напишите реализацию для своего формата представления таблицы по аналогии с существующими.
