@@ -176,4 +176,6 @@ API предоставляет и другие удобные интерфейс
     <version>master-SNAPSHOT</version>
 </dependency>
 ```
-Или напишите реализацию для своего формата представления таблицы по аналогии с существующими.
+Или напишите реализацию для своего формата представления таблицы по
+[аналогии](https://github.com/spacious-team/table-wrapper-csv-impl/tree/develop/src/main/java/org/spacious_team/table_wrapper/csv)
+с существующими.
