@@ -46,7 +46,7 @@ https://codecov.io/gh/spacious-team/table-wrapper-api)
 ### Пример использования
 Для представленного выше примера объявляются описания столбцов вне зависимости от формата файла (excel, xml, csv и др.):
 ```java
-enum ProductTableHeader implements TableColumnDescription {
+enum ProductTableHeader implements TableHeaderColumn {
     PRODUCT(0),
     PRICE_TRADE("цена", "опт"),
     PRICE("цена", "розничная");
@@ -66,7 +66,7 @@ enum ProductTableHeader implements TableColumnDescription {
     }   
 }
 
-enum SalesTableHeader implements TableColumnDescription {
+enum SalesTableHeader implements TableHeaderColumn {
     BUYER_COUNTRY(MultiLineTableColumn.of("покупатель", "страна")),
     BUYER_COMPANY(MultiLineTableColumn.of("покупатель", "компания")),
     TYPE(MultiLineTableColumn.of("категория", "покупателя")),
