@@ -298,22 +298,24 @@ public interface ReportPage {
      */
     default int findEmptyRow(int startRow) {
         int lastRowNum = startRow;
-        LAST_ROW:
         for (int n = getLastRowNum(); lastRowNum <= n; lastRowNum++) {
             @Nullable ReportPageRow row = getRow(lastRowNum);
             if (row == null || row.getLastCellNum() == -1) {
                 return lastRowNum; // all row's cells are blank
             }
+            boolean isEmptyRow = true;
             for (@Nullable TableCell cell : row) {
                 @Nullable Object value;
                 if (!(cell == null
                         || ((value = cell.getValue()) == null)
                         || (value instanceof String) && (value.toString().isEmpty()))) {
-                    // not empty
-                    continue LAST_ROW;
+                    isEmptyRow = false;
+                    break;
                 }
             }
-            return lastRowNum; // all row's cells are blank
+            if (isEmptyRow) {
+                return lastRowNum; // all row's cells are blank
+            }
         }
         return -1;
     }

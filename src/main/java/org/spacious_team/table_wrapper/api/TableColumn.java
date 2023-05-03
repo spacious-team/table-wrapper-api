@@ -19,7 +19,7 @@
 package org.spacious_team.table_wrapper.api;
 
 public interface TableColumn {
-    TableColumn LEFTMOST_COLUMN = (firstColumnForSearch, $) -> firstColumnForSearch;
+    TableColumn LEFTMOST_COLUMN = (firstColumnForSearch, headerRows) -> firstColumnForSearch;
     TableColumn NOCOLUMN = (i, j) -> {
         throw new TableColumnNotFound("No column impl");
     };
