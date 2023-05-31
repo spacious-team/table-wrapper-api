@@ -183,3 +183,4 @@ API предоставляет и другие удобные интерфейс
 Существует также [Spring Boot Starter](https://github.com/spacious-team/table-wrapper-spring-boot-starter)
 для работы со Spring Boot проектами, который поставляет нужные зависимости и создает бины фабрик
 `ExcelTableFactory`, `XmlTableFactory`, `CsvTableFactory`.
+
