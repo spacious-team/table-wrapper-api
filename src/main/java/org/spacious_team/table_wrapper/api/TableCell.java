@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,10 +18,13 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface TableCell {
 
     /**
@@ -29,6 +32,10 @@ public interface TableCell {
      */
     int getColumnIndex();
 
+    /**
+     * @throws RuntimeException if can't extract value
+     */
+    @Nullable
     Object getValue();
 
     /**
@@ -44,7 +51,7 @@ public interface TableCell {
     /**
      * @throws RuntimeException if can't extract Double value
      */
-    Double getDoubleValue();
+    double getDoubleValue();
 
     /**
      * @throws RuntimeException if can't extract BigDecimal value
@@ -67,9 +74,14 @@ public interface TableCell {
     LocalDateTime getLocalDateTimeValue();
 
     /**
+     * @throws RuntimeException if can't extract local date time value
+     */
+    LocalDateTime getLocalDateTimeValue(ZoneId zoneId);
+
+    /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default Object getValueOrDefault(Object defaultValue) {
+    default @Nullable Object getValueOrDefault(@Nullable Object defaultValue) {
         try {
             return getValue();
         } catch (Exception e) {
@@ -102,7 +114,7 @@ public interface TableCell {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default double getDoubleValue(double defaultValue) {
+    default double getDoubleValueOrDefault(double defaultValue) {
         try {
             return getDoubleValue();
         } catch (Exception e) {
@@ -149,6 +161,17 @@ public interface TableCell {
     default LocalDateTime getLocalDateTimeValueOrDefault(LocalDateTime defaultValue) {
         try {
             return getLocalDateTimeValue();
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
+     */
+    default LocalDateTime getLocalDateTimeValueOrDefault(ZoneId zoneId, LocalDateTime defaultValue) {
+        try {
+            return getLocalDateTimeValue(zoneId);
         } catch (Exception e) {
             return defaultValue;
         }

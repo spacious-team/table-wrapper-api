@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2021  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2021  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -19,12 +19,16 @@
 package org.spacious_team.table_wrapper.api;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * {@link TableFactory} factory with specified {@link ReportPage}
  * @param <T> the factory supported {@link ReportPage} type and subtypes
  */
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractTableFactory<T extends ReportPage> implements TableFactory {
 
@@ -38,7 +42,7 @@ public abstract class AbstractTableFactory<T extends ReportPage> implements Tabl
     /**
      * Safe cast operation if {@link #canHandle(ReportPage)} is true
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unused"})
     protected T cast(ReportPage reportPage) {
         return (T) reportPage;
     }

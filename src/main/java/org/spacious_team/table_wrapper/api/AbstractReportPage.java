@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2021  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2021  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,12 +18,14 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * {@link ReportPage} with specified {@link ReportPageRow}
  */
 public abstract class AbstractReportPage<T extends ReportPageRow> implements ReportPage {
 
     @Override
-    public abstract T getRow(int i);
+    public abstract @Nullable T getRow(int i);
 
 }

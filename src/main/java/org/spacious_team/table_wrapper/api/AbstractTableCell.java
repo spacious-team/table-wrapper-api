@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2021  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2021  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,23 +18,31 @@
 
 package org.spacious_team.table_wrapper.api;
 
-import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Objects;
 
-@Getter(AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractTableCell<T> implements TableCell {
+import static lombok.AccessLevel.PROTECTED;
 
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = PROTECTED)
+public abstract class AbstractTableCell<T, D extends CellDataAccessObject<T, ?>> implements TableCell {
+
+    @Getter(PROTECTED)
     private final T cell;
-    private final CellDataAccessObject<T, ?> dao;
+    private final D dao;
 
     @Override
-    public Object getValue() {
+    public @Nullable Object getValue() {
         return dao.getValue(cell);
     }
 
@@ -49,7 +57,7 @@ public abstract class AbstractTableCell<T> implements TableCell {
     }
 
     @Override
-    public Double getDoubleValue() {
+    public double getDoubleValue() {
         return dao.getDoubleValue(cell);
     }
 
@@ -72,4 +80,23 @@ public abstract class AbstractTableCell<T> implements TableCell {
     public LocalDateTime getLocalDateTimeValue() {
         return dao.getLocalDateTimeValue(cell);
     }
+
+    @Override
+    public LocalDateTime getLocalDateTimeValue(ZoneId zoneId) {
+        return dao.getLocalDateTimeValue(cell, zoneId);
+    }
+
+    public D getCellDataAccessObject() {
+        return dao;
+    }
+
+    /**
+     * Creates new cell object if provided {@link CellDataAccessObject}
+     * is different from this class CellDataAccessObject.
+     */
+    public AbstractTableCell<T, D> withCellDataAccessObject(D dao) {
+        return Objects.equals(this.dao, dao) ? this : createWithCellDataAccessObject(dao);
+    }
+
+    protected abstract AbstractTableCell<T, D> createWithCellDataAccessObject(D dao);
 }

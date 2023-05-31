@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,12 +23,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import static java.lang.Integer.MIN_VALUE;
+
 @Getter
-@EqualsAndHashCode
 @ToString
-@RequiredArgsConstructor
+@EqualsAndHashCode
+@RequiredArgsConstructor(staticName = "of")
 public class TableCellAddress {
-    public static final TableCellAddress NOT_FOUND = new TableCellAddress(-1, -1);
+    public static final TableCellAddress NOT_FOUND = new TableCellAddress(MIN_VALUE, MIN_VALUE);
 
     private final int row;
     private final int column;

@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,10 +18,14 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.Arrays;
+import java.util.Objects;
+
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * Implements table header kind of
@@ -33,7 +37,8 @@ import java.util.Arrays;
  * Can find index for (Two -> a3 -> b1) column
  */
 @ToString
-@RequiredArgsConstructor
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = PRIVATE)
 public class MultiLineTableColumn implements TableColumn {
     private final TableColumn[] rowDescriptors;
 
@@ -45,9 +50,11 @@ public class MultiLineTableColumn implements TableColumn {
     }
 
     public static MultiLineTableColumn of(String... rowDescriptors) {
-        return new MultiLineTableColumn(Arrays.stream(rowDescriptors)
-                .map(TableColumnImpl::of)
-                .toArray(TableColumn[]::new));
+        TableColumn[] descriptors = Arrays.stream(rowDescriptors)
+                .map(Objects::requireNonNull)
+                .map(PatternTableColumn::of)
+                .toArray(TableColumn[]::new);
+        return new MultiLineTableColumn(descriptors);
     }
 
     /**
@@ -56,8 +63,7 @@ public class MultiLineTableColumn implements TableColumn {
     @Override
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
         if (headerRows.length != rowDescriptors.length) {
-            throw new RuntimeException("Внутренняя ошибка, в таблице ожидается " + rowDescriptors.length +
-                    " строк в заголовке");
+            throw new TableColumnNotFound("Internal error, " + rowDescriptors.length + " rows expected in table header");
         }
         int columnIndex = firstColumnForSearch;
         int i = 0;

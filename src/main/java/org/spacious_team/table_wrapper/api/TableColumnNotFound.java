@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2022  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,6 +18,13 @@
 
 package org.spacious_team.table_wrapper.api;
 
-public interface TableColumnDescription {
-    TableColumn getColumn();
+public class TableColumnNotFound extends RuntimeException {
+
+    public TableColumnNotFound(String message) {
+        super(message);
+    }
+
+    public TableColumnNotFound(Throwable t) {
+        super(t);
+    }
 }

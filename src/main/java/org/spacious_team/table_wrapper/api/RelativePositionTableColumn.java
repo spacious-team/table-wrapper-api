@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -19,17 +19,19 @@
 package org.spacious_team.table_wrapper.api;
 
 
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(staticName = "of")
 public class RelativePositionTableColumn implements TableColumn {
-    private final TableColumn relatedTableColumn;
-    private final int relatedOffset;
+    private final TableColumn column;
+    private final int positionOffset;
 
     @Override
     public int getColumnIndex(int firstColumnForSearch, ReportPageRow... headerRows) {
-        return relatedTableColumn.getColumnIndex(firstColumnForSearch, headerRows) + relatedOffset;
+        return column.getColumnIndex(firstColumnForSearch, headerRows) + positionOffset;
     }
 }

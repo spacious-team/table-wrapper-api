@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,12 +18,15 @@
 
 package org.spacious_team.table_wrapper.api;
 
-public interface ReportPageRow extends Iterable<TableCell> {
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+public interface ReportPageRow extends Iterable<@Nullable TableCell> {
 
     /**
      * @param i zero-based cell number
-     * @return cell ot null if cell does not exists
+     * @return cell or null if cell does not exist
      */
+    @Nullable
     TableCell getCell(int i);
 
     /**
@@ -32,7 +35,7 @@ public interface ReportPageRow extends Iterable<TableCell> {
     int getRowNum();
 
     /**
-     * Zero-based cell number
+     * Zero-based cell number or -1 if row doesn't contain cells
      */
     int getFirstCellNum();
 
@@ -45,5 +48,5 @@ public interface ReportPageRow extends Iterable<TableCell> {
      * @param expected searching value
      * @return true if any cell of this row has exact value, false otherwise
      */
-    boolean rowContains(Object expected);
+    boolean rowContains(@Nullable Object expected);
 }

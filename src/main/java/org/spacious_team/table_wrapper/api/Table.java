@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,6 +18,8 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +28,13 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public interface Table extends Iterable<TableRow> {
+@SuppressWarnings({"unused", "UnusedReturnValue"})
+public interface Table extends Iterable<@Nullable TableRow> {
+
+    /**
+     * Report page this table belongs to
+     */
+    ReportPage getReportPage();
 
     /**
      * Extracts exactly one object from excel row
@@ -35,7 +43,7 @@ public interface Table extends Iterable<TableRow> {
         return getData("unknown", rowExtractor);
     }
 
-    <T> List<T> getData(Object report, Function<TableRow, T> rowExtractor);
+    <T> List<T> getData(Object report, Function<TableRow, @Nullable T> rowExtractor);
 
     /**
      * Extracts objects from table without duplicate objects handling (duplicated row are both will be returned)
@@ -44,33 +52,43 @@ public interface Table extends Iterable<TableRow> {
         return getDataCollection("unknown", rowExtractor);
     }
 
-    <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor);
+    <T> List<T> getDataCollection(Object report, Function<TableRow, @Nullable Collection<T>> rowExtractor);
 
     /**
      * Extracts objects from table with duplicate objects handling logic
      */
-    <T> List<T> getDataCollection(Object report, Function<TableRow, Collection<T>> rowExtractor,
+    <T> List<T> getDataCollection(Object report, Function<TableRow, @Nullable Collection<T>> rowExtractor,
                                   BiPredicate<T, T> equalityChecker,
-                                  BiFunction<T, T, Collection<T>> mergeDuplicates);
+                                  BiFunction<T, T, @Nullable Collection<T>> mergeDuplicates);
 
     boolean isEmpty();
 
-    Stream<TableRow> stream();
+    Stream<@Nullable TableRow> stream();
 
     /**
-     * @return row containing cell with exact value or null if not found
+     * @param i zero-based index
+     * @return row object or null is row does not exist
+     * @apiNote Method impl should return {@link CellDataAccessObject} aware {@link ReportPageRow} impl
      */
+    @Nullable
+    ReportPageRow getRow(int i);
+
+    /**
+     * @return row containing cell with exact value or null if row is not found
+     */
+    @Nullable
     TableRow findRow(Object value);
 
     /**
-     * @return row containing cell starting with prefix or null if not found
+     * @return row containing cell starting with prefix or null if row is not found
      */
-    TableRow findRowByPrefix(String prefix);
+    @SuppressWarnings("UnusedReturnValue")
+    @Nullable TableRow findRowByPrefix(String prefix);
 
     Map<TableColumn, Integer> getHeaderDescription();
 
     /**
-     * By default table iterates throw all rows, call method if last row is "total" row and it should be excluded
+     * By default, table iterates throw all rows, call method if last row is "total" row, and it should be excluded
      */
     default Table excludeTotalRow() {
         return subTable(0, -1);
@@ -82,7 +100,8 @@ public interface Table extends Iterable<TableRow> {
      *     subTable(0, -1)
      * </pre>
      * for exclude last "Total" row from iterator or stream.
-     * @param topRows positive value for inclusion, negative for exclusion
+     *
+     * @param topRows    positive value for inclusion, negative for exclusion
      * @param bottomRows positive value for inclusion, negative for exclusion
      */
     Table subTable(int topRows, int bottomRows);

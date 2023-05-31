@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2022  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2022  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,13 +18,35 @@
 
 package org.spacious_team.table_wrapper.api;
 
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.function.Predicate;
 
-class ReportPageHelper {
+import static lombok.AccessLevel.PRIVATE;
 
-    static Predicate<Object> getCellStringValueIgnoreCasePrefixPredicate(String prefix) {
-        String lowercasePrefix = prefix.trim().toLowerCase();
-        return (cell) -> (cell instanceof String) &&
-                ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
+@RequiredArgsConstructor(access = PRIVATE)
+final class ReportPageHelper {
+
+    static Predicate<@Nullable Object> getCellStringValueIgnoreCasePrefixPredicate(String prefix) {
+        return new StringIgnoreCasePrefixPredicate(prefix);
+    }
+
+    @ToString
+    @EqualsAndHashCode
+    static final class StringIgnoreCasePrefixPredicate implements Predicate<@Nullable Object> {
+        private final String lowercasePrefix;
+
+        private StringIgnoreCasePrefixPredicate(String prefix) {
+            this.lowercasePrefix = prefix.trim().toLowerCase();
+        }
+
+        @Override
+        public boolean test(@Nullable Object cell) {
+            return (cell instanceof String) &&
+                    ((String) cell).trim().toLowerCase().startsWith(lowercasePrefix);
+        }
     }
 }

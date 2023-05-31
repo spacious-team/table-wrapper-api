@@ -1,6 +1,6 @@
 /*
  * Table Wrapper API
- * Copyright (C) 2020  Vitalii Ananev <spacious-team@ya.ru>
+ * Copyright (C) 2020  Spacious Team <spacious-team@ya.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,13 +23,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import static java.lang.Integer.MIN_VALUE;
+
 /**
  * Zero-based table cell range
  */
 @Getter
-@EqualsAndHashCode
 @ToString
-@RequiredArgsConstructor
+@EqualsAndHashCode
+@RequiredArgsConstructor(staticName = "of")
 public class TableCellRange {
     public static final TableCellRange EMPTY_RANGE = new EmptyTableCellRange();
 
@@ -38,12 +40,20 @@ public class TableCellRange {
     private final int firstColumn;
     private final int lastColumn;
 
+    public static TableCellRange of(TableCellAddress upperLeft, TableCellAddress bottomRight) {
+        return of(
+                upperLeft.getRow(),
+                bottomRight.getRow(),
+                upperLeft.getColumn(),
+                bottomRight.getColumn());
+    }
+
     public boolean contains(TableCellAddress address) {
         return containsRow(address.getRow()) && containsColumn(address.getColumn());
     }
 
     public boolean containsRow(int row) {
-        return firstColumn <= row && row <= lastRow;
+        return firstRow <= row && row <= lastRow;
     }
 
     public boolean containsColumn(int column) {
@@ -52,38 +62,42 @@ public class TableCellRange {
 
     /**
      * Adds rows without range check. First rows index of range may become negative.
+     *
      * @param number positive or negative values
      */
     public TableCellRange addRowsToTop(int number) {
-        return new TableCellRange(firstRow - number, lastRow, firstColumn, lastColumn);
+        return TableCellRange.of(firstRow - number, lastRow, firstColumn, lastColumn);
     }
 
     /**
      * @param number positive or negative values
      */
     public TableCellRange addRowsToBottom(int number) {
-        return new TableCellRange(firstRow, lastRow + number, firstColumn, lastColumn);
+        return TableCellRange.of(firstRow, lastRow + number, firstColumn, lastColumn);
     }
 
     /**
      * Adds columns without range check. First column index of range may become negative.
+     *
      * @param number positive or negative values
      */
+    @SuppressWarnings("unused")
     public TableCellRange addColumnsToLeft(int number) {
-        return new TableCellRange(firstRow, lastRow, firstColumn - number, lastColumn);
+        return TableCellRange.of(firstRow, lastRow, firstColumn - number, lastColumn);
     }
 
     /**
      * @param number positive or negative values
      */
+    @SuppressWarnings("unused")
     public TableCellRange addColumnsToRight(int number) {
-        return new TableCellRange(firstRow, lastRow, firstColumn, lastColumn + number);
+        return TableCellRange.of(firstRow, lastRow, firstColumn, lastColumn + number);
     }
 
     private static class EmptyTableCellRange extends TableCellRange {
 
         private EmptyTableCellRange() {
-            super(0, 0, 0, 0);
+            super(MIN_VALUE, MIN_VALUE, MIN_VALUE, MIN_VALUE);
         }
 
         @Override
