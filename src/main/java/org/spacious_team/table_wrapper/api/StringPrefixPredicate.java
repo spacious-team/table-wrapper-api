@@ -37,8 +37,8 @@ public final class StringPrefixPredicate {
         return PredicateOnObjectWrapper.of(predicate);
     }
 
-    public static Predicate<CharSequence> ignoreCaseStringPrefixPredicate(CharSequence prefix) {
-        return new IgnoreCaseStringPrefixPredicate(prefix);
+    public static <T extends CharSequence> Predicate<T> ignoreCaseStringPrefixPredicate(CharSequence prefix) {
+        return new IgnoreCaseStringPrefixPredicate<>(prefix);
     }
 
 
@@ -57,7 +57,7 @@ public final class StringPrefixPredicate {
 
     @ToString
     @EqualsAndHashCode
-    static final class IgnoreCaseStringPrefixPredicate implements Predicate<CharSequence> {
+    static final class IgnoreCaseStringPrefixPredicate<T extends CharSequence> implements Predicate<T> {
         private final String prefix;
 
         private IgnoreCaseStringPrefixPredicate(CharSequence prefix) {
@@ -65,7 +65,7 @@ public final class StringPrefixPredicate {
         }
 
         @Override
-        public boolean test(CharSequence cs) {
+        public boolean test(T cs) {
             int nonWhitespaceIndex = getIndexOfNonWhitespace(cs);
             if (nonWhitespaceIndex == -1) {
                 return false;

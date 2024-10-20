@@ -104,7 +104,6 @@ class StringPrefixPredicateTest {
     }
 
     @Test
-    @SuppressWarnings("DataFlowIssue")
     void ignoreCaseStringPrefixPredicate_null() {
         assertThrows(NullPointerException.class, () -> ignoreCaseStringPrefixPredicate("any").test(null));
     }
