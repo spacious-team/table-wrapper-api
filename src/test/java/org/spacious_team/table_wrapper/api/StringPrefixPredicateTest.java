@@ -48,6 +48,7 @@ class StringPrefixPredicateTest {
 
     static Object[][] prefixAndNotMatchingSting() {
         return new Object[][]{
+                {"First", "  \n\r\n\t"},
                 {"First", "One two"},
                 {"first", "fir st two"},
                 {"first", "zero first"},

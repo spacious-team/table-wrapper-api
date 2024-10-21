@@ -27,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -49,7 +50,8 @@ class TableCellTest {
         Object expectedDefault = new Object();
         doThrow(RuntimeException.class).when(cell).getValue();
 
-        @Nullable Object result = cell.getValueOrDefault(expectedDefault);
+        @SuppressWarnings("DataFlowIssue") @Nullable
+        Object result = cell.getValueOrDefault(expectedDefault);
 
         assertSame(expectedDefault, result);
         verify(cell).getValue();
@@ -202,5 +204,29 @@ class TableCellTest {
 
         assertSame(expectedDefault, result);
         verify(cell).getLocalDateTimeValue();
+    }
+
+    @Test
+    void getLocalDateTimeValueOnZoneIdOrDefault() {
+        ZoneOffset expectedZone = ZoneOffset.UTC;
+        LocalDateTime expected = LocalDateTime.now();
+        doReturn(expected).when(cell).getLocalDateTimeValue(any());
+
+        LocalDateTime result = cell.getLocalDateTimeValueOrDefault(expectedZone, LocalDateTime.MIN);
+
+        assertEquals(expected, result);
+        verify(cell).getLocalDateTimeValue(expectedZone);
+    }
+
+    @Test
+    void getZoneIdLocalDateTimeValueOnZoneIdOrDefaultExceptionally() {
+        ZoneOffset expectedZone = ZoneOffset.UTC;
+        LocalDateTime expectedDefault = LocalDateTime.now();
+        doThrow(RuntimeException.class).when(cell).getLocalDateTimeValue(any());
+
+        LocalDateTime result = cell.getLocalDateTimeValueOrDefault(expectedZone, expectedDefault);
+
+        assertSame(expectedDefault, result);
+        verify(cell).getLocalDateTimeValue(expectedZone);
     }
 }
