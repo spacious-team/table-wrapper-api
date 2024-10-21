@@ -27,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -124,28 +125,42 @@ class TableRowTest {
     @Test
     void getInstantCellValueOrDefault() {
         Instant expectedInstant = Instant.now();
-        when(row.getInstantCellValue(any())).thenThrow(RuntimeException.class);
-        assertSame(expectedInstant, row.getInstantCellValueOrDefault(column, expectedInstant));
-    }
-
-    @Test
-    void getInstantCellValueOrDefaultThrowable() {
-        Instant expectedInstant = Instant.now();
         when(row.getInstantCellValue(any())).thenReturn(expectedInstant);
         assertSame(expectedInstant, row.getInstantCellValueOrDefault(column, Instant.MIN));
     }
 
     @Test
+    void getInstantCellValueOrDefaultThrowable() {
+        Instant expectedInstant = Instant.now();
+        when(row.getInstantCellValue(any())).thenThrow(RuntimeException.class);
+        assertSame(expectedInstant, row.getInstantCellValueOrDefault(column, expectedInstant));
+    }
+
+    @Test
     void getLocalDateTimeCellValueOrDefault() {
+        LocalDateTime expectedLocalDateTime = LocalDateTime.now();
+        when(row.getLocalDateTimeCellValue(any())).thenReturn(expectedLocalDateTime);
+        assertSame(expectedLocalDateTime, row.getLocalDateTimeCellValueOrDefault(column, LocalDateTime.MIN));
+    }
+
+    @Test
+    void getLocalDateTimeCellValueOrDefaultThrowable() {
         LocalDateTime expectedLocalDateTime = LocalDateTime.now();
         when(row.getLocalDateTimeCellValue(any())).thenThrow(RuntimeException.class);
         assertSame(expectedLocalDateTime, row.getLocalDateTimeCellValueOrDefault(column, expectedLocalDateTime));
     }
 
     @Test
-    void getLocalDateTimeCellValueOrDefaultThrowable() {
+    void getLocalDateTimeCellValueOnZoneIdOrDefault() {
         LocalDateTime expectedLocalDateTime = LocalDateTime.now();
-        when(row.getLocalDateTimeCellValue(any())).thenReturn(expectedLocalDateTime);
-        assertSame(expectedLocalDateTime, row.getLocalDateTimeCellValueOrDefault(column, LocalDateTime.MIN));
+        when(row.getLocalDateTimeCellValue(any(), any())).thenReturn(expectedLocalDateTime);
+        assertSame(expectedLocalDateTime, row.getLocalDateTimeCellValueOrDefault(column, ZoneOffset.UTC, LocalDateTime.MIN));
+    }
+
+    @Test
+    void getLocalDateTimeCellValueOnZoneIdOrDefaultThrowable() {
+        LocalDateTime expectedLocalDateTime = LocalDateTime.now();
+        when(row.getLocalDateTimeCellValue(any(), any())).thenThrow(RuntimeException.class);
+        assertSame(expectedLocalDateTime, row.getLocalDateTimeCellValueOrDefault(column, ZoneOffset.UTC, expectedLocalDateTime));
     }
 }

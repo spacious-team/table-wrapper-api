@@ -19,6 +19,8 @@
 package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -125,7 +127,7 @@ public interface TableCell {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default BigDecimal getBigDecimalValueOrDefault(BigDecimal defaultValue) {
+    default @PolyNull BigDecimal getBigDecimalValueOrDefault(@PolyNull BigDecimal defaultValue) {
         try {
             return getBigDecimalValue();
         } catch (Exception e) {
@@ -136,7 +138,7 @@ public interface TableCell {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default String getStringValueOrDefault(String defaultValue) {
+    default @PolyNull String getStringValueOrDefault(@PolyNull String defaultValue) {
         try {
             return getStringValue();
         } catch (Exception e) {
@@ -147,7 +149,7 @@ public interface TableCell {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default Instant getInstantValueOrDefault(Instant defaultValue) {
+    default @PolyNull Instant getInstantValueOrDefault(@PolyNull Instant defaultValue) {
         try {
             return getInstantValue();
         } catch (Exception e) {
@@ -158,7 +160,7 @@ public interface TableCell {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default LocalDateTime getLocalDateTimeValueOrDefault(LocalDateTime defaultValue) {
+    default @PolyNull LocalDateTime getLocalDateTimeValueOrDefault(@PolyNull LocalDateTime defaultValue) {
         try {
             return getLocalDateTimeValue();
         } catch (Exception e) {
@@ -169,7 +171,7 @@ public interface TableCell {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default LocalDateTime getLocalDateTimeValueOrDefault(ZoneId zoneId, LocalDateTime defaultValue) {
+    default @PolyNull LocalDateTime getLocalDateTimeValueOrDefault(ZoneId zoneId, @PolyNull LocalDateTime defaultValue) {
         try {
             return getLocalDateTimeValue(zoneId);
         } catch (Exception e) {

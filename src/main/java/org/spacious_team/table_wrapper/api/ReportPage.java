@@ -23,7 +23,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
-import static org.spacious_team.table_wrapper.api.ReportPageHelper.getCellStringValueIgnoreCasePrefixPredicate;
+import static org.spacious_team.table_wrapper.api.StringPrefixPredicate.ignoreCaseStringPrefixPredicateOnObject;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface ReportPage {
@@ -157,7 +157,7 @@ public interface ReportPage {
     default TableCellAddress findByPrefix(@Nullable String prefix, int startRow, int endRow, int startColumn, int endColumn) {
         return (prefix == null || prefix.isEmpty()) ?
                 TableCellAddress.NOT_FOUND :
-                find(startRow, endRow, startColumn, endColumn, getCellStringValueIgnoreCasePrefixPredicate(prefix));
+                find(startRow, endRow, startColumn, endColumn, ignoreCaseStringPrefixPredicateOnObject(prefix));
     }
 
     /**
@@ -208,9 +208,9 @@ public interface ReportPage {
             return TableCellRange.EMPTY_RANGE;
         }
         return getTableCellRange(
-                getCellStringValueIgnoreCasePrefixPredicate(firstRowPrefix),
+                ignoreCaseStringPrefixPredicateOnObject(firstRowPrefix),
                 headersRowCount,
-                getCellStringValueIgnoreCasePrefixPredicate(lastRowPrefix));
+                ignoreCaseStringPrefixPredicateOnObject(lastRowPrefix));
     }
 
     /**
@@ -250,7 +250,7 @@ public interface ReportPage {
             return TableCellRange.EMPTY_RANGE;
         }
         return getTableCellRange(
-                getCellStringValueIgnoreCasePrefixPredicate(firstRowPrefix),
+                ignoreCaseStringPrefixPredicateOnObject(firstRowPrefix),
                 headersRowCount);
     }
 
