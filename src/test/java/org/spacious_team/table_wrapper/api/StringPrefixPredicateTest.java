@@ -25,6 +25,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.spacious_team.table_wrapper.api.StringPrefixPredicate.IgnoreCaseStringPrefixPredicate;
 import org.spacious_team.table_wrapper.api.StringPrefixPredicate.PredicateOnObjectWrapper;
 
+import java.util.function.Predicate;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.spacious_team.table_wrapper.api.StringPrefixPredicate.ignoreCaseStringPrefixPredicate;
 import static org.spacious_team.table_wrapper.api.StringPrefixPredicate.ignoreCaseStringPrefixPredicateOnObject;
@@ -105,8 +107,10 @@ class StringPrefixPredicateTest {
     }
 
     @Test
+    @SuppressWarnings("DataFlowIssue")
     void ignoreCaseStringPrefixPredicate_null() {
-        assertThrows(NullPointerException.class, () -> ignoreCaseStringPrefixPredicate("any").test(null));
+        Predicate<String> predicate = ignoreCaseStringPrefixPredicate("any");
+        assertThrows(NullPointerException.class, () -> predicate.test(null));
     }
 
     @Test

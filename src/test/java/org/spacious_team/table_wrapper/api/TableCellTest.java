@@ -50,8 +50,8 @@ class TableCellTest {
         Object expectedDefault = new Object();
         doThrow(RuntimeException.class).when(cell).getValue();
 
-        @SuppressWarnings("DataFlowIssue") @Nullable
-        Object result = cell.getValueOrDefault(expectedDefault);
+        @SuppressWarnings("DataFlowIssue")
+        @Nullable Object result = cell.getValueOrDefault(expectedDefault);
 
         assertSame(expectedDefault, result);
         verify(cell).getValue();
