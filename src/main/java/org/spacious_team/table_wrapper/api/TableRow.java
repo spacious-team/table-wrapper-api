@@ -19,6 +19,8 @@
 package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -128,7 +130,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default BigDecimal getBigDecimalCellValueOrDefault(TableHeaderColumn column, BigDecimal defaultValue) {
+    default @PolyNull BigDecimal getBigDecimalCellValueOrDefault(TableHeaderColumn column, @PolyNull BigDecimal defaultValue) {
         try {
             return getBigDecimalCellValue(column);
         } catch (Exception e) {
@@ -139,7 +141,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default String getStringCellValueOrDefault(TableHeaderColumn column, String defaultValue) {
+    default @PolyNull String getStringCellValueOrDefault(TableHeaderColumn column, @PolyNull String defaultValue) {
         try {
             return getStringCellValue(column);
         } catch (Exception e) {
@@ -150,7 +152,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default Instant getInstantCellValueOrDefault(TableHeaderColumn column, Instant defaultValue) {
+    default @PolyNull Instant getInstantCellValueOrDefault(TableHeaderColumn column, @PolyNull Instant defaultValue) {
         try {
             return getInstantCellValue(column);
         } catch (Exception e) {
@@ -161,7 +163,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default LocalDateTime getLocalDateTimeCellValueOrDefault(TableHeaderColumn column, LocalDateTime defaultValue) {
+    default @PolyNull LocalDateTime getLocalDateTimeCellValueOrDefault(TableHeaderColumn column, @PolyNull LocalDateTime defaultValue) {
         try {
             return getLocalDateTimeCellValue(column);
         } catch (Exception e) {
@@ -172,7 +174,7 @@ public interface TableRow extends ReportPageRow, Cloneable {
     /**
      * @return return cell value or defaultValue if the cell is missing or the type does not match the expected
      */
-    default LocalDateTime getLocalDateTimeCellValueOrDefault(TableHeaderColumn column, ZoneId zoneId, LocalDateTime defaultValue) {
+    default @PolyNull LocalDateTime getLocalDateTimeCellValueOrDefault(TableHeaderColumn column, ZoneId zoneId, @PolyNull LocalDateTime defaultValue) {
         try {
             return getLocalDateTimeCellValue(column, zoneId);
         } catch (Exception e) {
