@@ -147,21 +147,6 @@ class ReportPageTest {
         verify(reportPage).find(1, 2, 3, 4, predicate1);
     }
 
-    @Test
-    void getNextColumnValueNull() {
-        String prefix = "test";
-        doReturn(address1).when(reportPage).findByPrefix(prefix);
-        //noinspection ConstantConditions
-        when(reportPage.getRow(address1.getRow())).thenReturn(null);
-
-        @Nullable
-        Object result = reportPage.getNextColumnValue(prefix);
-
-        assertNull(result);
-        verify(reportPage).findByPrefix(prefix);
-        verify(reportPage).getRow(address1.getRow());
-    }
-
     @ParameterizedTest
     @MethodSource("nextColumnValueRows")
     void getNextColumnValue(Object expected, ReportPageRow row) {
@@ -181,29 +166,14 @@ class ReportPageTest {
     @SuppressWarnings("ConstantConditions")
     static Object[][] nextColumnValueRows() {
         return new Object[][]{
+                {null, null},
                 {null, getRow(0, null, null)},
-                {"test", getRow(0, null, cell("test", 3))},
+                {"test", getRow(0, cell("test", 3))},
+                {123, getRow(0, cell(123, 3))},
                 {123, getRow(0,
                         cell("", 2),
                         cell(" ", 3),
                         cell(123, 4))}};
-    }
-
-    @Test
-    void getNextColumnValue2() {
-        String prefix = "test";
-        doReturn(address1).when(reportPage).findByPrefix(prefix);
-        ReportPageRow row = getRow(0,
-                cell(123, 3));
-        //noinspection ConstantConditions
-        when(reportPage.getRow(address1.getRow())).thenReturn(row);
-
-        @Nullable
-        Object result = reportPage.getNextColumnValue(prefix);
-
-        assertEquals(123, result);
-        verify(reportPage).findByPrefix(prefix);
-        verify(reportPage).getRow(address1.getRow());
     }
 
     @Test
