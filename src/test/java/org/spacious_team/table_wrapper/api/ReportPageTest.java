@@ -34,9 +34,9 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.spacious_team.table_wrapper.api.StringPrefixPredicate.ignoreCaseStringPrefixPredicateOnObject;
 import static org.spacious_team.table_wrapper.api.ReportPageRowHelper.cell;
 import static org.spacious_team.table_wrapper.api.ReportPageRowHelper.getRow;
+import static org.spacious_team.table_wrapper.api.StringPrefixPredicate.ignoreCaseStringPrefixPredicateOnObject;
 import static org.spacious_team.table_wrapper.api.TableCellAddress.NOT_FOUND;
 import static org.spacious_team.table_wrapper.api.TableCellRange.EMPTY_RANGE;
 
@@ -147,16 +147,39 @@ class ReportPageTest {
         verify(reportPage).find(1, 2, 3, 4, predicate1);
     }
 
+    @Test
+    void getNextColumnValue() {
+        String prefix = "test";
+        doReturn(NOT_FOUND).when(reportPage).findByPrefix(prefix);
+
+        reportPage.getNextColumnValue(prefix);
+
+        verify(reportPage).getNextColumnValue(prefix, 1, Integer.MAX_VALUE);
+    }
+
+    @Test
+    void getNextColumnValue_exactPosition() {
+        String prefix = "test";
+        doReturn(NOT_FOUND).when(reportPage).findByPrefix(prefix);
+
+        reportPage.getNextColumnValue(prefix, 10);
+
+        verify(reportPage).getNextColumnValue(prefix, 10, 10);
+    }
+
+
     @ParameterizedTest
-    @MethodSource("nextColumnValueRows")
-    void getNextColumnValue(Object expected, ReportPageRow row) {
+    @MethodSource("nextColumnValueRows_rangePosition")
+    void getNextColumnValue_rangePosition(ReportPageRow row,
+                                          int searchMinOffset, int searchMaxOffset,
+                                          Object expected) {
         String prefix = "test";
         doReturn(address1).when(reportPage).findByPrefix(prefix);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row);
 
         @Nullable
-        Object result = reportPage.getNextColumnValue(prefix);
+        Object result = reportPage.getNextColumnValue(prefix, searchMinOffset, searchMaxOffset);
 
         assertEquals(expected, result);
         verify(reportPage).findByPrefix(prefix);
@@ -164,16 +187,22 @@ class ReportPageTest {
     }
 
     @SuppressWarnings("ConstantConditions")
-    static Object[][] nextColumnValueRows() {
+    static Object[][] nextColumnValueRows_rangePosition() {
         return new Object[][]{
-                {null, null},
-                {null, getRow(0, null, null)},
-                {"test", getRow(0, cell("test", 3))},
-                {123, getRow(0, cell(123, 3))},
-                {123, getRow(0,
-                        cell("", 2),
-                        cell(" ", 3),
-                        cell(123, 4))}};
+                {null, -1, 1, null},
+                {getRow(0, null, null), -2, 5, null},
+                {getRow(0, cell("value", 3)), -1, 5, "value"},
+                {getRow(0, cell("value", 3)), 1, 5, "value"},
+                {getRow(0, cell("value", 3)), 2, 5, null},
+                {getRow(0, cell(123, 1)), -1, -1, 123},
+                {getRow(0, cell(123, 3)), -1, -1, null},
+                {getRow(0,
+                        cell("key", 2),
+                        cell(null, 3),
+                        cell("", 4),
+                        cell(" ", 5),
+                        cell("value1", 6),
+                        cell("value2", 7)), -1, 10, "value1"}};
     }
 
     @Test

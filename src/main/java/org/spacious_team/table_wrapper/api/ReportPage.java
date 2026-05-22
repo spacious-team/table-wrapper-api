@@ -161,14 +161,42 @@ public interface ReportPage {
     }
 
     /**
-     * For vertical table of key-value records (table with two columns), search and return value for requested key.
+     * Searches for a key and returns the value from a multi-column table, where i-th column contains the key,
+     * and the nearest non-empty cell in the same row to the right contains the value
      */
-    default @Nullable Object getNextColumnValue(String firstColumnValuePrefix) {
-        TableCellAddress address = findByPrefix(firstColumnValuePrefix);
+    default @Nullable Object getNextColumnValue(String keyPrefix) {
+        return getNextColumnValue(keyPrefix, 1, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Searches for a key and returns the value from a multi-column table, where i-th column contains the key,
+     * and the value is in column {@code i + valueColumnOffset} of the same row
+     */
+    default @Nullable Object getNextColumnValue(String keyPrefix, int valueColumnOffset) {
+        return getNextColumnValue(keyPrefix, valueColumnOffset, valueColumnOffset);
+    }
+
+    /**
+     * Searches for a key and returns the value from a multi-column table, where i-th column contains the key,
+     * and the first non-empty cell in the same row contains the value.
+     * A constraint applies: the distance from the key cell to the value cell (measured in columns)
+     * must be {@code >= searchColumnMinOffset} and {@code <= searchColumnMaxOffset}.
+     *
+     * @param searchColumnMinOffset positive or negative min column offset
+     * @param searchColumnMaxOffset positive or negative max column offset
+     */
+    default @Nullable Object getNextColumnValue(String keyPrefix, int searchColumnMinOffset, int searchColumnMaxOffset) {
+        TableCellAddress address = findByPrefix(keyPrefix);
         @Nullable ReportPageRow row = getRow(address.getRow());
         if (row != null) {
-            for (@Nullable TableCell cell : row) {
-                if (cell != null && cell.getColumnIndex() > address.getColumn()) {
+            int keyColumnIndex = address.getColumn();
+            int minValueColumnIndex = Math.max(0, keyColumnIndex + searchColumnMinOffset);
+            // long for overflow protection
+            int maxValueColumnIndex = (int) Math.min(((long) keyColumnIndex) + searchColumnMaxOffset, row.getLastCellNum());
+            for (int i = minValueColumnIndex; i <= maxValueColumnIndex; i++) {
+                if (i == keyColumnIndex) continue;
+                @Nullable TableCell cell = row.getCell(i);
+                if (cell != null) {
                     @Nullable Object value = cell.getValue();
                     if (value != null && (!(value instanceof String) || !((String) value).isBlank())) {
                         return value;
