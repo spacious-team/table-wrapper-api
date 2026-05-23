@@ -20,6 +20,7 @@ package org.spacious_team.table_wrapper.api;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static java.util.Objects.requireNonNull;
@@ -278,38 +279,39 @@ public interface ReportPage {
     }
 
     /**
-     * Returns table range. Table's first row starts with 'firstRowPrefix' prefix in one of the cells
-     * and table ends with predefined prefix in one of the last row cells.
+     * Returns a range of rows. First row starts with {@code firstRowPrefix} prefix in one of the cells
+     * and range ends with {@code lastRowPrefix} in one of the last row cells.
      */
-    default TableCellRange getTableCellRange(@Nullable String firstRowPrefix,
-                                             int headersRowCount,
-                                             @Nullable String lastRowPrefix) {
+    default TableCellRange getCellRange(@Nullable String firstRowPrefix,
+                                        @Nullable String lastRowPrefix,
+                                        int lastRowFinderOffset) {
         if (firstRowPrefix == null || lastRowPrefix == null || firstRowPrefix.isEmpty() || lastRowPrefix.isEmpty()) {
             return TableCellRange.EMPTY_RANGE;
         }
-        return getTableCellRange(
+        return getCellRange(
                 ignoreCaseStringPrefixPredicateOnObject(firstRowPrefix),
-                headersRowCount,
-                ignoreCaseStringPrefixPredicateOnObject(lastRowPrefix));
+                ignoreCaseStringPrefixPredicateOnObject(lastRowPrefix),
+                lastRowFinderOffset
+        );
     }
 
     /**
-     * Returns table range. First and last row will be found by predicate.
+     * Returns a range of rows. The first and last rows are determined by a predicate.
      */
-    default TableCellRange getTableCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
-                                             int headersRowCount,
-                                             @Nullable Predicate<@Nullable Object> lastRowFinder) {
+    default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
+                                        @Nullable Predicate<@Nullable Object> lastRowFinder,
+                                        int lastRowFinderOffset) {
         if (firstRowFinder == null || lastRowFinder == null) {
             return TableCellRange.EMPTY_RANGE;
         }
         TableCellAddress startAddress = find(firstRowFinder);
-        if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
+        if (Objects.equals(startAddress, TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row is not found");
-        TableCellAddress endAddress = find(startAddress.getRow() + headersRowCount + 1, lastRowFinder);
-        if (endAddress.equals(TableCellAddress.NOT_FOUND)) {
+        TableCellAddress endAddress = find(startAddress.getRow() + lastRowFinderOffset + 1, lastRowFinder);
+        if (Objects.equals(endAddress, TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
@@ -322,32 +324,33 @@ public interface ReportPage {
     }
 
     /**
-     * Returns table range. First row starts with 'firstRowPrefix' prefix in one of the cells,
+     * Returns a range of rows. First row starts with {@code firstRowPrefix} prefix in one of the cells,
      * range ends with empty row or last row of report page.
      */
-    default TableCellRange getTableCellRange(@Nullable String firstRowPrefix, int headersRowCount) {
+    default TableCellRange getCellRange(@Nullable String firstRowPrefix, int lastRowFinderOffset) {
         if (firstRowPrefix == null || firstRowPrefix.isEmpty()) {
             return TableCellRange.EMPTY_RANGE;
         }
-        return getTableCellRange(
+        return getCellRange(
                 ignoreCaseStringPrefixPredicateOnObject(firstRowPrefix),
-                headersRowCount);
+                lastRowFinderOffset);
     }
 
     /**
-     * Returns table range. First row will be found by predicate, range ends with empty row or last row of report page.
+     * Returns a range of rows. The first row is determined by a predicate,
+     * range ends with empty row or last row of report page.
      */
-    default TableCellRange getTableCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder, int headersRowCount) {
+    default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder, int lastRowFinderOffset) {
         if (firstRowFinder == null) {
             return TableCellRange.EMPTY_RANGE;
         }
         TableCellAddress startAddress = find(firstRowFinder);
-        if (startAddress.equals(TableCellAddress.NOT_FOUND)) {
+        if (Objects.equals(startAddress, TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row is not found");
-        int emptyRowNum = findEmptyRow(startAddress.getRow() + headersRowCount + 1);
+        int emptyRowNum = findEmptyRow(startAddress.getRow() + lastRowFinderOffset + 1);
         if (emptyRowNum == -1) {
             emptyRowNum = getLastRowNum(); // empty row is not found, use last row
         } else if (emptyRowNum <= getLastRowNum()) {
@@ -359,7 +362,7 @@ public interface ReportPage {
             lastRow = firstRow;
         } else {
             @SuppressWarnings({"nullness", "ConstantConditions"})
-            ReportPageRow row = requireNonNull(getRow(emptyRowNum), "Row is not found");
+            ReportPageRow row = requireNonNull(getRow(emptyRowNum), "Row is not found");  // NPE logically impossible
             lastRow = row;
         }
         return TableCellRange.of(
@@ -370,34 +373,46 @@ public interface ReportPage {
     }
 
     /**
-     * Returns zero-based index of empty row.
-     * This implementation generates a huge amount of garbage. May be overridden for improve performance.
+     * Returns the zero-based index of the first empty row.
      *
-     * @param startRow first row for check
-     * @return index of first empty row or -1 if empty row is not found
+     * @param startRow the first row to check (inclusive)
+     * @return the index of the first empty row, or {@code -1} if no empty row is found
+     * @implNote The default implementation may produce significant garbage during execution.
+     * Subclasses are encouraged to override this method for better performance.
      */
     default int findEmptyRow(int startRow) {
         int lastRowNum = startRow;
         for (int n = getLastRowNum(); lastRowNum <= n; lastRowNum++) {
             @Nullable ReportPageRow row = getRow(lastRowNum);
-            if (row == null || row.getLastCellNum() == -1) {
-                return lastRowNum; // all row's cells are blank
-            }
-            boolean isEmptyRow = true;
-            for (@Nullable TableCell cell : row) {
-                @Nullable Object value;
-                if (!(cell == null
-                        || ((value = cell.getValue()) == null)
-                        || (value instanceof String) && (value.toString().isEmpty()))) {
-                    isEmptyRow = false;
-                    break;
-                }
-            }
-            if (isEmptyRow) {
-                return lastRowNum; // all row's cells are blank
+            if (isRowEmpty(row)) {
+                return lastRowNum;
             }
         }
         return -1;
+    }
+
+    /**
+     * Determines that a row is empty when:
+     * <ul>
+     *     <li>{@code row == null};</li>
+     *     <li>or the row has zero cells;</li>
+     *     <li>or every cell is either {@code null}, has a {@code null} value, or contains an empty {@link String}.</li>
+     * </ul>
+     */
+    default boolean isRowEmpty(@Nullable ReportPageRow row) {
+        if (row == null || row.getLastCellNum() == -1) {
+            return true; // all row's cells are blank
+        }
+        boolean isEmptyRow = true;
+        for (@Nullable TableCell cell : row) {
+            @Nullable Object value;
+            if (!(cell == null
+                    || ((value = cell.getValue()) == null)
+                    || (value instanceof String) && (value.toString().isEmpty()))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
