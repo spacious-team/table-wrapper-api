@@ -279,11 +279,16 @@ public interface ReportPage {
     }
 
     /**
-     * Returns a range of rows. First row starts with {@code firstRowPrefix} prefix in one of the cells
-     * and range ends with {@code lastRowPrefix} in one of the last row cells.
+     * Returns a range of rows. The range begins with the first row that contains a cell
+     * starting with {@code firstRowPrefix}, and ends with the row that contains a cell
+     * starting with {@code lastRowPrefix}.
+     *
+     * @param firstRowFinderOffset start search from this offset
+     * @param lastRowFinderOffset  the row offset relative to the found first row position to start the search for the last row
      */
     default TableCellRange getCellRange(@Nullable String firstRowPrefix,
                                         @Nullable String lastRowPrefix,
+                                        int firstRowFinderOffset,
                                         int lastRowFinderOffset) {
         if (firstRowPrefix == null || lastRowPrefix == null || firstRowPrefix.isEmpty() || lastRowPrefix.isEmpty()) {
             return TableCellRange.EMPTY_RANGE;
@@ -291,20 +296,24 @@ public interface ReportPage {
         return getCellRange(
                 ignoreCaseStringPrefixPredicateOnObject(firstRowPrefix),
                 ignoreCaseStringPrefixPredicateOnObject(lastRowPrefix),
-                lastRowFinderOffset
-        );
+                firstRowFinderOffset,
+                lastRowFinderOffset);
     }
 
     /**
      * Returns a range of rows. The first and last rows are determined by a predicate.
+     *
+     * @param firstRowFinderOffset start search from this offset
+     * @param lastRowFinderOffset  the row offset relative to the found first row position to start the search for the last row
      */
     default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
                                         @Nullable Predicate<@Nullable Object> lastRowFinder,
+                                        int firstRowFinderOffset,
                                         int lastRowFinderOffset) {
         if (firstRowFinder == null || lastRowFinder == null) {
             return TableCellRange.EMPTY_RANGE;
         }
-        TableCellAddress startAddress = find(firstRowFinder);
+        TableCellAddress startAddress = find(firstRowFinderOffset, firstRowFinder);
         if (Objects.equals(startAddress, TableCellAddress.NOT_FOUND)) {
             return TableCellRange.EMPTY_RANGE;
         }
@@ -324,23 +333,34 @@ public interface ReportPage {
     }
 
     /**
-     * Returns a range of rows. First row starts with {@code firstRowPrefix} prefix in one of the cells,
-     * range ends with empty row or last row of report page.
+     * Returns a range of rows. The range begins with the first row that contains a cell
+     * starting with {@code firstRowPrefix},  range ends with empty row or last row of report page.
+     *
+     * @param firstRowFinderOffset start search from this offset
+     * @param lastRowFinderOffset  the row offset relative to the found first row position to start the search for the last row
      */
-    default TableCellRange getCellRange(@Nullable String firstRowPrefix, int lastRowFinderOffset) {
+    default TableCellRange getCellRange(@Nullable String firstRowPrefix,
+                                        int firstRowFinderOffset,
+                                        int lastRowFinderOffset) {
         if (firstRowPrefix == null || firstRowPrefix.isEmpty()) {
             return TableCellRange.EMPTY_RANGE;
         }
         return getCellRange(
                 ignoreCaseStringPrefixPredicateOnObject(firstRowPrefix),
+                firstRowFinderOffset,
                 lastRowFinderOffset);
     }
 
     /**
      * Returns a range of rows. The first row is determined by a predicate,
      * range ends with empty row or last row of report page.
+     *
+     * @param firstRowFinderOffset start search from this offset
+     * @param lastRowFinderOffset  the row offset relative to the found first row position to start the search for the last row
      */
-    default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder, int lastRowFinderOffset) {
+    default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
+                                        int firstRowFinderOffset,
+                                        int lastRowFinderOffset) {
         if (firstRowFinder == null) {
             return TableCellRange.EMPTY_RANGE;
         }

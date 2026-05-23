@@ -68,7 +68,7 @@ public interface TableFactory {
                  int headerRowsCount) {
         return create(reportPage,
                 tableName,
-                reportPage.getCellRange(tableName, lastRowPrefix, headerRowsCount),
+                reportPage.getCellRange(tableName, lastRowPrefix, 0, headerRowsCount),
                 headerDescription,
                 headerRowsCount);
     }
@@ -85,7 +85,7 @@ public interface TableFactory {
                  int headerRowsCount) {
         return create(reportPage,
                 tableName,
-                reportPage.getCellRange(tableName, headerRowsCount),
+                reportPage.getCellRange(tableName, 0, headerRowsCount),
                 headerDescription,
                 headerRowsCount);
     }
@@ -129,7 +129,7 @@ public interface TableFactory {
                  Predicate<@Nullable Object> lastRowFinder,
                  Class<T> headerDescription,
                  int headerRowsCount) {
-        TableCellRange range = reportPage.getCellRange(tableNameFinder, lastRowFinder, headerRowsCount);
+        TableCellRange range = reportPage.getCellRange(tableNameFinder, lastRowFinder, 0, headerRowsCount);
         String tableName = TableFactoryHelper.getTableName(reportPage, tableNameFinder, range);
         return create(reportPage, tableName, range, headerDescription, headerRowsCount);
     }
@@ -145,7 +145,7 @@ public interface TableFactory {
                  Predicate<@Nullable Object> tableNameFinder,
                  Class<T> headerDescription,
                  int headerRowsCount) {
-        TableCellRange range = reportPage.getCellRange(tableNameFinder, headerRowsCount);
+        TableCellRange range = reportPage.getCellRange(tableNameFinder, 0, headerRowsCount);
         String tableName = TableFactoryHelper.getTableName(reportPage, tableNameFinder, range);
         return create(reportPage, tableName, range, headerDescription, headerRowsCount);
     }
@@ -198,7 +198,7 @@ public interface TableFactory {
                          int headerRowsCount) {
         return create(reportPage,
                 providedTableName,
-                reportPage.getCellRange(firstRowPrefix, lastRowPrefix, headerRowsCount)
+                reportPage.getCellRange(firstRowPrefix, lastRowPrefix, 0, headerRowsCount)
                         .addRowsToTop(1), // add fantom first line for provided table name
                 headerDescription,
                 headerRowsCount);
@@ -218,7 +218,7 @@ public interface TableFactory {
                          int headerRowsCount) {
         return create(reportPage,
                 providedTableName,
-                reportPage.getCellRange(firstRowPrefix, headerRowsCount)
+                reportPage.getCellRange(firstRowPrefix, 0, headerRowsCount)
                         .addRowsToTop(1), // add fantom first line for provided table name
                 headerDescription,
                 headerRowsCount);
@@ -270,7 +270,7 @@ public interface TableFactory {
                          int headerRowsCount) {
         return create(reportPage,
                 providedTableName,
-                reportPage.getCellRange(firstRowFinder, lastRowFinder, headerRowsCount)
+                reportPage.getCellRange(firstRowFinder, lastRowFinder, 0, headerRowsCount)
                         .addRowsToTop(1), // add fantom first line for provided table name
                 headerDescription,
                 headerRowsCount);
@@ -291,13 +291,17 @@ public interface TableFactory {
                          int headerRowsCount) {
         return create(reportPage,
                 providedTableName,
-                reportPage.getCellRange(firstRowFinder, headerRowsCount)
+                reportPage.getCellRange(firstRowFinder, 0, headerRowsCount)
                         .addRowsToTop(1), // add fantom first line for provided table name
                 headerDescription,
                 headerRowsCount);
     }
 
 
+    /**
+     * Creates a table using the cell range from {@code tableRange}.
+     * The first row contains the table name (possibly a provided name), and the header rows begin with the second row.
+     */
     <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
                  String tableName,
