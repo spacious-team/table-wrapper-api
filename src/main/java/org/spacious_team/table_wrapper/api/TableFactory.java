@@ -151,30 +151,34 @@ public interface TableFactory {
     }
 
     /**
-     * Creates a table without name which starts with header
+     * Creates a table with a predefined name which starts with header
      * and ends with row containing cell with text starting with {@code lastRowPrefix}.
      *
-     * @param firstRowPrefix table first row should contain cell which starts with given text
-     * @param lastRowPrefix  table last row should contain cell which starts with given text
+     * @param providedTableName predefined (not existing in reportPage) table name
+     * @param firstRowPrefix    table first row should contain cell which starts with given text
+     * @param lastRowPrefix     table last row should contain cell which starts with given text
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
+                         String providedTableName,
                          String firstRowPrefix,
                          String lastRowPrefix,
                          Class<T> headerDescription) {
-        return createNameless(reportPage, "undefined", firstRowPrefix, lastRowPrefix, headerDescription, 1);
+        return createNameless(reportPage, providedTableName, firstRowPrefix, lastRowPrefix, headerDescription, 1);
     }
 
     /**
-     * Creates a table without name which starts with header and ends with empty row or last row of report page.
+     * Creates a table with a predefined name which starts with header and ends with empty row or last row of report page.
      *
-     * @param firstRowPrefix table first row should contain cell which starts with given text
+     * @param providedTableName predefined (not existing in reportPage) table name
+     * @param firstRowPrefix    table first row should contain cell which starts with given text
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
+                         String providedTableName,
                          String firstRowPrefix,
                          Class<T> headerDescription) {
-        return createNameless(reportPage, "undefined", firstRowPrefix, headerDescription, 1);
+        return createNameless(reportPage, providedTableName, firstRowPrefix, headerDescription, 1);
     }
 
     /**
@@ -221,30 +225,33 @@ public interface TableFactory {
     }
 
     /**
-     * Creates a table without name. Table first and last row is determined by predicate.
+     * Creates a table with a predefined name. Table first and last row is determined by predicate.
      *
-     * @param firstRowFinder table first row should contain cell satisfying predicate
-     * @param lastRowFinder  table last row should contain cell satisfying predicate
+     * @param providedTableName predefined (not existing in reportPage) table name
+     * @param firstRowFinder    table first row should contain cell satisfying predicate
+     * @param lastRowFinder     table last row should contain cell satisfying predicate
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
+                         String providedTableName,
                          Predicate<@Nullable Object> firstRowFinder,
                          Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription) {
-        return createNameless(reportPage, "undefined", firstRowFinder, lastRowFinder, headerDescription, 1);
+        return createNameless(reportPage, providedTableName, firstRowFinder, lastRowFinder, headerDescription, 1);
     }
 
     /**
-     * Creates a table without name. Table first row is determined by predicate,
+     * Creates a table with a predefined name. Table first row is determined by predicate,
      * and the table ends at either an empty row or the last row of the report page.
      *
      * @param firstRowFinder table first row should contain cell satisfying predicate
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
+                         String providedTableName,
                          Predicate<@Nullable Object> firstRowFinder,
                          Class<T> headerDescription) {
-        return createNameless(reportPage, "undefined", firstRowFinder, headerDescription, 1);
+        return createNameless(reportPage, providedTableName, firstRowFinder, headerDescription, 1);
     }
 
     /**

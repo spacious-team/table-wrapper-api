@@ -146,7 +146,7 @@ class TableFactoryTest {
     @Test
     void createNameless() {
         when(reportPage.getCellRange(firstRowString, lastRowString, 1)).thenReturn(tableCellRange);
-        tableFactory.createNameless(reportPage, firstRowString, lastRowString, headerDescription);
+        tableFactory.createNameless(reportPage, "undefined", firstRowString, lastRowString, headerDescription);
         verify(tableFactory).createNameless(reportPage, "undefined", firstRowString, lastRowString,
                 headerDescription, 1);
     }
@@ -154,7 +154,7 @@ class TableFactoryTest {
     @Test
     void testCreateNameless() {
         when(reportPage.getCellRange(firstRowString, 1)).thenReturn(tableCellRange);
-        tableFactory.createNameless(reportPage, firstRowString, headerDescription);
+        tableFactory.createNameless(reportPage, "undefined", firstRowString, headerDescription);
         verify(tableFactory).createNameless(reportPage, "undefined", firstRowString,
                 headerDescription, 1);
     }
@@ -197,7 +197,7 @@ class TableFactoryTest {
     @Test
     void testCreateNameless3() {
         when(reportPage.getCellRange(firstRowFinder, lastRowFinder, 1)).thenReturn(tableCellRange);
-        tableFactory.createNameless(reportPage, firstRowFinder, lastRowFinder, headerDescription);
+        tableFactory.createNameless(reportPage, "undefined", firstRowFinder, lastRowFinder, headerDescription);
         verify(tableFactory).createNameless(reportPage, "undefined", firstRowFinder, lastRowFinder,
                 headerDescription, 1);
     }
@@ -205,7 +205,7 @@ class TableFactoryTest {
     @Test
     void testCreateNameless4() {
         when(reportPage.getCellRange(firstRowFinder, 1)).thenReturn(tableCellRange);
-        tableFactory.createNameless(reportPage, firstRowFinder, headerDescription);
+        tableFactory.createNameless(reportPage, "undefined", firstRowFinder, headerDescription);
         verify(tableFactory).createNameless(reportPage, "undefined", firstRowFinder,
                 headerDescription, 1);
     }
