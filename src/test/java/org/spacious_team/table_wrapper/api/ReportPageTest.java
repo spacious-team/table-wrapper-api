@@ -34,8 +34,7 @@ import java.util.function.Predicate;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.spacious_team.table_wrapper.api.ReportPageRowHelper.cell;
-import static org.spacious_team.table_wrapper.api.ReportPageRowHelper.getRow;
+import static org.spacious_team.table_wrapper.api.ReportPageRowHelper.*;
 import static org.spacious_team.table_wrapper.api.StringPrefixPredicate.ignoreCaseStringPrefixPredicateOnObject;
 import static org.spacious_team.table_wrapper.api.TableCellAddress.NOT_FOUND;
 import static org.spacious_team.table_wrapper.api.TableCellRange.EMPTY_RANGE;
@@ -43,7 +42,6 @@ import static org.spacious_team.table_wrapper.api.TableCellRange.EMPTY_RANGE;
 @ExtendWith(MockitoExtension.class)
 class ReportPageTest {
 
-    @SuppressWarnings("NotNullFieldNotInitialized")
     static TableFactory tableFactory;
     Object value = new Object();
     TableCellAddress address1 = TableCellAddress.of(1, 2);
@@ -203,6 +201,70 @@ class ReportPageTest {
                         cell(" ", 5),
                         cell("value1", 6),
                         cell("value2", 7)), -1, 10, "value1"}};
+    }
+
+    @Test
+    void getNextRowValue() {
+        String prefix = "test";
+        doReturn(NOT_FOUND).when(reportPage).findByPrefix(prefix);
+
+        reportPage.getNextRowValue(prefix);
+
+        verify(reportPage).getNextRowValue(prefix, 1, Integer.MAX_VALUE);
+    }
+
+    @Test
+    void getNextRowValue_exactPosition() {
+        String prefix = "test";
+        doReturn(NOT_FOUND).when(reportPage).findByPrefix(prefix);
+
+        reportPage.getNextRowValue(prefix, 10);
+
+        verify(reportPage).getNextRowValue(prefix, 10, 10);
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("nextRowValueRows_rangePosition")
+    void getNextRowValue_rangePosition(ReportPageRow[] rows,
+                                       int searchMinOffset, int searchMaxOffset,
+                                       Object expected) {
+        String prefix = "test";
+        doReturn(address1).when(reportPage).findByPrefix(prefix);
+        for (int i = 0; i < rows.length; i++) {
+            //noinspection ConstantConditions
+            lenient().when(reportPage.getRow(i)).thenReturn(rows[i]);
+        }
+        when(reportPage.getLastRowNum()).thenReturn(rows.length - 1);
+
+        @Nullable
+        Object result = reportPage.getNextRowValue(prefix, searchMinOffset, searchMaxOffset);
+
+        assertEquals(expected, result);
+        verify(reportPage).findByPrefix(prefix);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    static Object[][] nextRowValueRows_rangePosition() {
+        return new Object[][]{
+                {new ReportPageRow[]{}, -1, 1, null},
+                {new ReportPageRow[]{null, null, null}, -1, 1, null},
+                {getThreeRowsHeader(), 1, 1, "b2"},
+                {getThreeRowsHeader(), -1, 5, "b2"},
+                {getThreeRowsHeader(), 1, 5, "b2"},
+                {getThreeRowsHeader(), 2, 5, null},
+                {getThreeRowsHeader(), -1, 0, null},
+                {new ReportPageRow[]{
+                        getRow(0),
+                        getRow(1, cell("key", 2)),
+                        getRow(2),
+                        getRow(3),
+                        getRow(4, null, null),
+                        getRow(5, cell(null, 2)),
+                        getRow(6, cell("", 2)),
+                        getRow(7, cell(" ", 2)),
+                        getRow(8, cell(123L, 2)),
+                        getRow(9, cell("value", 2))}, -1, 20, 123L}};
     }
 
     @Test

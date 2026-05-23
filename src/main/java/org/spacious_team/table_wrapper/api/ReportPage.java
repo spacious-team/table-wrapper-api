@@ -207,6 +207,58 @@ public interface ReportPage {
         return null;
     }
 
+
+    /**
+     * Searches for a key and returns the value from a multi-row table, where i-th row contains the key,
+     * and the nearest non-empty cell below it in the same column contains the value
+     */
+    default @Nullable Object getNextRowValue(String keyPrefix) {
+        return getNextRowValue(keyPrefix, 1, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Searches for a key and returns the value from a multi-row table, where i-th row contains the key,
+     * and the value is in row {@code i + valueRowOffset} of the same column
+     */
+    default @Nullable Object getNextRowValue(String keyPrefix, int valueRowOffset) {
+        return getNextRowValue(keyPrefix, valueRowOffset, valueRowOffset);
+    }
+
+    /**
+     * Searches for a key and returns the value from a multi-row table, where i-th row contains the key,
+     * and the first non-empty cell in the same column contains the value.
+     * A constraint applies: the distance from the key cell to the value cell (measured in rows)
+     * must be {@code >= valueRowMinOffset} and {@code <= valueRowMaxOffset}.
+     *
+     * @param valueRowMinOffset positive or negative min row offset
+     * @param valueRowMaxOffset positive or negative max row offset
+     */
+    default @Nullable Object getNextRowValue(String keyPrefix, int valueRowMinOffset, int valueRowMaxOffset) {
+        TableCellAddress address = findByPrefix(keyPrefix);
+        if (address == TableCellAddress.NOT_FOUND) {
+            return null;
+        }
+        int keyRowIndex = address.getRow();
+        int keyColIndex = address.getColumn();
+        int minValueRowIndex = Math.max(0, keyRowIndex + valueRowMinOffset);
+        // long for overflow protection
+        int maxValueRowIndex = (int) Math.min(((long) keyRowIndex) + valueRowMaxOffset, getLastRowNum());
+        for (int i = minValueRowIndex; i <= maxValueRowIndex; i++) {
+            if (i == keyRowIndex) continue;
+            @Nullable ReportPageRow row = getRow(i);
+            if (row != null) {
+                @Nullable TableCell cell = row.getCell(keyColIndex);
+                if (cell != null) {
+                    @Nullable Object value = cell.getValue();
+                    if (value != null && (!(value instanceof String) || !((String) value).isBlank())) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * @param i zero-based index
      * @return row object or null is row does not exist
