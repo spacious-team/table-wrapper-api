@@ -52,8 +52,10 @@ class ReportPageTest {
     Predicate<Object> predicate2 = ignoreCaseStringPrefixPredicateOnObject(prefix2);
     String tableName = "table name";
     String headerRow = "header row";
+    String dataRow = "data row";
     String tableFooterString = "footer";
     Predicate<Object> tableNameFinder = cell -> true;
+    Predicate<Object> firstDataRowFinder = cell -> true;
     Predicate<Object> tableFooterFinder = cell -> true;
     Class<TableHeader> tableHeader = TableHeader.class;
     @Mock
@@ -328,7 +330,7 @@ class ReportPageTest {
 
     @Test
     void getCellRange_cellNotFoundWithPredicate2() {
-        doReturn(address1).when(reportPage).find(0,predicate1);
+        doReturn(address1).when(reportPage).find(0, predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
         doReturn(NOT_FOUND).when(reportPage).find(anyInt(), eq(predicate2));
@@ -340,7 +342,7 @@ class ReportPageTest {
 
     @Test
     void getCellRange_returnExceptionally1() {
-        doReturn(address1).when(reportPage).find(0,predicate1);
+        doReturn(address1).when(reportPage).find(0, predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(null);
 
@@ -351,7 +353,7 @@ class ReportPageTest {
 
     @Test
     void getCellRange_returnExceptionally2() {
-        doReturn(address1).when(reportPage).find(0,predicate1);
+        doReturn(address1).when(reportPage).find(0, predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
         doReturn(address2).when(reportPage).find(anyInt(), eq(predicate2));
@@ -365,7 +367,7 @@ class ReportPageTest {
 
     @Test
     void getCellRange_returnOk() {
-        doReturn(address1).when(reportPage).find(0,predicate1);
+        doReturn(address1).when(reportPage).find(0, predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
         doReturn(address2).when(reportPage).find(anyInt(), eq(predicate2));
@@ -579,96 +581,120 @@ class ReportPageTest {
 
     @Test
     void create() {
+        reportPage.create(tableName, dataRow, tableFooterString, tableHeader);
+        verify(tableFactory).create(reportPage, tableName, dataRow, tableFooterString, tableHeader);
+    }
+
+    @Test
+    void create2() {
         reportPage.create(tableName, tableFooterString, tableHeader);
         verify(tableFactory).create(reportPage, tableName, tableFooterString, tableHeader);
     }
 
     @Test
-    void testCreate() {
+    void create3() {
         reportPage.create(tableName, tableHeader);
         verify(tableFactory).create(reportPage, tableName, tableHeader);
     }
 
     @Test
-    void testCreate1() {
+    void create4() {
         reportPage.create(tableName, tableFooterString, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableName, tableFooterString, tableHeader, 2);
     }
 
     @Test
-    void testCreate2() {
+    void create5() {
         reportPage.create(tableName, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableName, tableHeader, 2);
     }
 
     @Test
-    void testCreate3() {
+    void create6() {
+        reportPage.create(tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
+        verify(tableFactory).create(reportPage, tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
+    }
+
+    @Test
+    void create7() {
         reportPage.create(tableNameFinder, tableFooterFinder, tableHeader);
         verify(tableFactory).create(reportPage, tableNameFinder, tableFooterFinder, tableHeader);
     }
 
     @Test
-    void testCreate4() {
+    void create8() {
         reportPage.create(tableNameFinder, tableHeader);
         verify(tableFactory).create(reportPage, tableNameFinder, tableHeader);
     }
 
     @Test
-    void testCreate5() {
+    void create9() {
         reportPage.create(tableNameFinder, tableFooterFinder, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableNameFinder, tableFooterFinder, tableHeader, 2);
     }
 
     @Test
-    void testCreate6() {
+    void create10() {
         reportPage.create(tableNameFinder, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableNameFinder, tableHeader, 2);
     }
 
     @Test
     void createNameless() {
+        reportPage.createNameless("undefined", headerRow, dataRow, tableFooterString, tableHeader);
+        verify(tableFactory).createNameless(reportPage, "undefined", headerRow, dataRow, tableFooterString, tableHeader);
+    }
+
+    @Test
+    void createNameless2() {
         reportPage.createNameless("undefined", headerRow, tableFooterString, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefined", headerRow, tableFooterString, tableHeader);
     }
 
     @Test
-    void testCreateNameless() {
+    void createNameless3() {
         reportPage.createNameless("undefined", headerRow, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefined", headerRow, tableHeader);
     }
 
     @Test
-    void testCreateNameless1() {
+    void createNameless4() {
         reportPage.createNameless(tableName, headerRow, tableFooterString, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, headerRow, tableFooterString, tableHeader, 2);
     }
 
     @Test
-    void testCreateNameless2() {
+    void createNameless5() {
         reportPage.createNameless(tableName, headerRow, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, headerRow, tableHeader, 2);
     }
 
     @Test
-    void testCreateNameless3() {
+    void createNameless6() {
+        reportPage.createNameless("undefiled", tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
+        verify(tableFactory).createNameless(reportPage, "undefiled", tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
+    }
+
+    @Test
+    void createNameless7() {
         reportPage.createNameless("undefiled", tableNameFinder, tableFooterFinder, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefiled", tableNameFinder, tableFooterFinder, tableHeader);
     }
 
     @Test
-    void testCreateNameless4() {
+    void createNameless8() {
         reportPage.createNameless("undefined", tableNameFinder, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefined", tableNameFinder, tableHeader);
     }
 
     @Test
-    void testCreateNameless5() {
+    void createNameless9() {
         reportPage.createNameless(tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
     }
 
     @Test
-    void testCreateNameless6() {
+    void createNameless10() {
         reportPage.createNameless(tableName, tableNameFinder, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableHeader, 2);
     }

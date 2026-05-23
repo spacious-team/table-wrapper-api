@@ -437,6 +437,15 @@ public interface ReportPage {
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(String tableName,
+                 String firstDataRowPrefix,
+                 String lastRowPrefix,
+                 Class<T> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableName, firstDataRowPrefix, lastRowPrefix, headerDescription);
+    }
+
+    default <T extends Enum<T> & TableHeaderColumn>
+    Table create(String tableName,
                  String tableFooterPrefix,
                  Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
@@ -465,6 +474,15 @@ public interface ReportPage {
                  int headerRowsCount) {
         return TableFactoryRegistry.get(this)
                 .create(this, tableName, headerDescription, headerRowsCount);
+    }
+
+    default <T extends Enum<T> & TableHeaderColumn>
+    Table create(Predicate<@Nullable Object> tableNameFinder,
+                 Predicate<@Nullable Object> firstDataRowFinder,
+                 Predicate<@Nullable Object> lastRowFinder,
+                 Class<T> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .create(this, tableNameFinder, firstDataRowFinder, lastRowFinder, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
@@ -502,6 +520,16 @@ public interface ReportPage {
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
                          String firstRowPrefix,
+                         String firstDataRowPrefix,
+                         String lastRowPrefix,
+                         Class<T> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstRowPrefix, firstDataRowPrefix, lastRowPrefix, headerDescription);
+    }
+
+    default <T extends Enum<T> & TableHeaderColumn>
+    Table createNameless(String providedTableName,
+                         String firstRowPrefix,
                          String lastRowPrefix,
                          Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
@@ -533,6 +561,16 @@ public interface ReportPage {
                          int headerRowsCount) {
         return TableFactoryRegistry.get(this)
                 .createNameless(this, providedTableName, firstRowPrefix, headerDescription, headerRowsCount);
+    }
+
+    default <T extends Enum<T> & TableHeaderColumn>
+    Table createNameless(String providedTableName,
+                         Predicate<@Nullable Object> firstRowFinder,
+                         Predicate<@Nullable Object> firstDataRowFinder,
+                         Predicate<@Nullable Object> lastRowFinder,
+                         Class<T> headerDescription) {
+        return TableFactoryRegistry.get(this)
+                .createNameless(this, providedTableName, firstRowFinder, firstDataRowFinder, lastRowFinder, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
