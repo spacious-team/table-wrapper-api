@@ -437,10 +437,10 @@ public interface ReportPage {
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(String tableName,
-                 String tableFooterString,
+                 String tableFooterPrefix,
                  Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
-                .create(this, tableName, tableFooterString, headerDescription);
+                .create(this, tableName, tableFooterPrefix, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
@@ -452,27 +452,27 @@ public interface ReportPage {
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(String tableName,
-                 String tableFooterString,
+                 String lastRowPrefix,
                  Class<T> headerDescription,
-                 int headersRowCount) {
+                 int headerRowsCount) {
         return TableFactoryRegistry.get(this)
-                .create(this, tableName, tableFooterString, headerDescription, headersRowCount);
+                .create(this, tableName, lastRowPrefix, headerDescription, headerRowsCount);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(String tableName,
                  Class<T> headerDescription,
-                 int headersRowCount) {
+                 int headerRowsCount) {
         return TableFactoryRegistry.get(this)
-                .create(this, tableName, headerDescription, headersRowCount);
+                .create(this, tableName, headerDescription, headerRowsCount);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(Predicate<@Nullable Object> tableNameFinder,
-                 Predicate<@Nullable Object> tableFooterFinder,
+                 Predicate<@Nullable Object> lastRowFinder,
                  Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
-                .create(this, tableNameFinder, tableFooterFinder, headerDescription);
+                .create(this, tableNameFinder, lastRowFinder, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
@@ -484,90 +484,90 @@ public interface ReportPage {
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(Predicate<@Nullable Object> tableNameFinder,
-                 Predicate<@Nullable Object> tableFooterFinder,
+                 Predicate<@Nullable Object> lastRowFinder,
                  Class<T> headerDescription,
-                 int headersRowCount) {
+                 int headerRowsCount) {
         return TableFactoryRegistry.get(this)
-                .create(this, tableNameFinder, tableFooterFinder, headerDescription, headersRowCount);
+                .create(this, tableNameFinder, lastRowFinder, headerDescription, headerRowsCount);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(Predicate<@Nullable Object> tableNameFinder,
                  Class<T> headerDescription,
-                 int headersRowCount) {
+                 int headerRowsCount) {
         return TableFactoryRegistry.get(this)
-                .create(this, tableNameFinder, headerDescription, headersRowCount);
+                .create(this, tableNameFinder, headerDescription, headerRowsCount);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         String firstLineText,
-                         String lastRowString,
+                         String firstRowPrefix,
+                         String lastRowPrefix,
                          Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
-                .createNameless(this, providedTableName, firstLineText, lastRowString, headerDescription);
+                .createNameless(this, providedTableName, firstRowPrefix, lastRowPrefix, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         String firstLineText,
+                         String firstRowPrefix,
                          Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
-                .createNameless(this, providedTableName, firstLineText, headerDescription);
+                .createNameless(this, providedTableName, firstRowPrefix, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         String firstLineText,
-                         String lastRowString,
+                         String firstRowPrefix,
+                         String lastRowPrefix,
                          Class<T> headerDescription,
-                         int headersRowCount) {
+                         int headerRowsCount) {
         return TableFactoryRegistry.get(this)
-                .createNameless(this, providedTableName, firstLineText, lastRowString, headerDescription, headersRowCount);
+                .createNameless(this, providedTableName, firstRowPrefix, lastRowPrefix, headerDescription, headerRowsCount);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         String firstLineText,
+                         String firstRowPrefix,
                          Class<T> headerDescription,
-                         int headersRowCount) {
+                         int headerRowsCount) {
         return TableFactoryRegistry.get(this)
-                .createNameless(this, providedTableName, firstLineText, headerDescription, headersRowCount);
+                .createNameless(this, providedTableName, firstRowPrefix, headerDescription, headerRowsCount);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         Predicate<@Nullable Object> firstLineFinder,
+                         Predicate<@Nullable Object> firstRowFinder,
                          Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
-                .createNameless(this, providedTableName, firstLineFinder, lastRowFinder, headerDescription);
+                .createNameless(this, providedTableName, firstRowFinder, lastRowFinder, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         Predicate<@Nullable Object> firstLineFinder,
+                         Predicate<@Nullable Object> firstRowFinder,
                          Class<T> headerDescription) {
         return TableFactoryRegistry.get(this)
-                .createNameless(this, providedTableName, firstLineFinder, headerDescription);
+                .createNameless(this, providedTableName, firstRowFinder, headerDescription);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         Predicate<@Nullable Object> firstLineFinder,
+                         Predicate<@Nullable Object> firstRowFinder,
                          Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription,
-                         int headersRowCount) {
+                         int headerRowsCount) {
         return TableFactoryRegistry.get(this)
-                .createNameless(this, providedTableName, firstLineFinder, lastRowFinder, headerDescription, headersRowCount);
+                .createNameless(this, providedTableName, firstRowFinder, lastRowFinder, headerDescription, headerRowsCount);
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(String providedTableName,
-                         Predicate<@Nullable Object> firstLineFinder,
+                         Predicate<@Nullable Object> firstRowFinder,
                          Class<T> headerDescription,
-                         int headersRowCount) {
+                         int headerRowsCount) {
         return TableFactoryRegistry.get(this)
-                .createNameless(this, providedTableName, firstLineFinder, headerDescription, headersRowCount);
+                .createNameless(this, providedTableName, firstRowFinder, headerDescription, headerRowsCount);
     }
 }
