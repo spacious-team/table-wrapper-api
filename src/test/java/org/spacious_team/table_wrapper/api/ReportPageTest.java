@@ -439,7 +439,7 @@ class ReportPageTest {
 
     @Test
     void findEmptyRowFoundSecond() {
-        ReportPageRow row = getRow(1, cell("abc", 0));
+        ReportPageRow row = getRow(1, cell(123, 0));
         //noinspection ConstantConditions
         when(reportPage.getRow(1)).thenReturn(row);
         //noinspection ConstantConditions
@@ -485,6 +485,17 @@ class ReportPageTest {
         assertEquals(2, reportPage.findEmptyRow(1));
     }
 
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    void findEmptyRowFoundSecondWithNoCell() {
+        ReportPageRow row1 = getRow(1, cell(null, 0), cell("abc", 1));
+        ReportPageRow row2 = getRow(2);
+        when(reportPage.getRow(1)).thenReturn(row1);
+        when(reportPage.getRow(2)).thenReturn(row2);
+        when(reportPage.getLastRowNum()).thenReturn(1000);
+
+        assertEquals(2, reportPage.findEmptyRow(1));
+    }
 
     @Test
     void create() {
