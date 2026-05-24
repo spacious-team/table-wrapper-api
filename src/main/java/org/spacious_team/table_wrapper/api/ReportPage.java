@@ -303,8 +303,9 @@ public interface ReportPage {
      * starting with {@code firstRowPrefix}, and ends with the row that contains a cell
      * starting with {@code lastRowPrefix}.
      *
-     * @param firstRowFinderOffset start search from this offset
-     * @param lastRowFinderOffset  the number of rows to skip after firstRow to start the search for the last row
+     * @param firstRowFinderOffset the offset to start searching for the first row
+     * @param lastRowFinderOffset  the number of rows to skip after the first row to start searching for the last row
+     *                             (0 to start searching from the next row)
      */
     default TableCellRange getCellRange(@Nullable String firstRowPrefix,
                                         @Nullable String lastRowPrefix,
@@ -323,8 +324,9 @@ public interface ReportPage {
     /**
      * Returns a range of rows. The first and last rows are determined by a predicate.
      *
-     * @param firstRowFinderOffset start search from this offset
-     * @param lastRowFinderOffset  the number of rows to skip after firstRow to start the search for the last row
+     * @param firstRowFinderOffset the offset to start searching for the first row
+     * @param lastRowFinderOffset  the number of rows to skip after the first row to start searching for the last row
+     *                             (0 to start searching from the next row)
      */
     default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
                                         @Nullable Predicate<@Nullable Object> lastRowFinder,
@@ -356,8 +358,9 @@ public interface ReportPage {
      * Returns a range of rows. The range begins with the first row that contains a cell
      * starting with {@code firstRowPrefix},  range ends with empty row or last row of report page.
      *
-     * @param firstRowFinderOffset start search from this offset
-     * @param lastRowFinderOffset  the number of rows to skip after firstRow to start the search for the last row
+     * @param firstRowFinderOffset the offset to start searching for the first row
+     * @param lastRowFinderOffset  the number of rows to skip after the first row to start searching for the last row
+     *                             (0 to start searching from the next row)
      */
     default TableCellRange getCellRange(@Nullable String firstRowPrefix,
                                         int firstRowFinderOffset,
@@ -375,8 +378,9 @@ public interface ReportPage {
      * Returns a range of rows. The first row is determined by a predicate,
      * range ends with empty row or last row of report page.
      *
-     * @param firstRowFinderOffset start search from this offset
-     * @param lastRowFinderOffset  the number of rows to skip after firstRow to start the search for the last row
+     * @param firstRowFinderOffset the offset to start searching for the first row
+     * @param lastRowFinderOffset  the number of rows to skip after the first row to start searching for the last row
+     *                             (0 to start searching from the next row)
      */
     default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
                                         int firstRowFinderOffset,
