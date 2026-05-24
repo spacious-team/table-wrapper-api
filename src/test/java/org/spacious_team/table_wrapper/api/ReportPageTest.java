@@ -58,6 +58,7 @@ class ReportPageTest {
     Predicate<Object> firstDataRowFinder = cell -> true;
     Predicate<Object> tableFooterFinder = cell -> true;
     Class<TableHeader> tableHeader = TableHeader.class;
+    int tableNameRowCount = 2;
     @Mock
     ReportPageRow row1;
     @Mock
@@ -619,6 +620,66 @@ class ReportPageTest {
     void createTable10() {
         reportPage.createTable(tableNameFinder, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableNameFinder, 1, tableHeader, 2);
+    }
+
+    @Test
+    void createTable11() {
+        reportPage.createTable(tableName, tableNameRowCount, dataRow, tableFooterString, tableHeader);
+        verify(tableFactory).create(reportPage, tableName, tableNameRowCount, dataRow, tableFooterString, tableHeader);
+    }
+
+    @Test
+    void createTable12() {
+        reportPage.createTable(tableName, tableNameRowCount, tableFooterString, tableHeader);
+        verify(tableFactory).create(reportPage, tableName, tableNameRowCount, tableFooterString, tableHeader, 1);
+    }
+
+    @Test
+    void createTable13() {
+        reportPage.createTable(tableName, tableNameRowCount, tableHeader);
+        verify(tableFactory).create(reportPage, tableName, tableNameRowCount, tableHeader, 1);
+    }
+
+    @Test
+    void createTable14() {
+        reportPage.createTable(tableName, tableNameRowCount, tableFooterString, tableHeader, 2);
+        verify(tableFactory).create(reportPage, tableName, tableNameRowCount, tableFooterString, tableHeader, 2);
+    }
+
+    @Test
+    void createTable15() {
+        reportPage.createTable(tableName, tableNameRowCount, tableHeader, 2);
+        verify(tableFactory).create(reportPage, tableName, tableNameRowCount, tableHeader, 2);
+    }
+
+    @Test
+    void createTable16() {
+        reportPage.createTable(tableNameFinder, tableNameRowCount, firstDataRowFinder, tableFooterFinder, tableHeader);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, firstDataRowFinder, tableFooterFinder, tableHeader);
+    }
+
+    @Test
+    void createTable17() {
+        reportPage.createTable(tableNameFinder, tableNameRowCount, tableFooterFinder, tableHeader);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, tableFooterFinder, tableHeader, 1);
+    }
+
+    @Test
+    void createTable18() {
+        reportPage.createTable(tableNameFinder, tableNameRowCount, tableHeader);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, tableHeader, 1);
+    }
+
+    @Test
+    void createTable19() {
+        reportPage.createTable(tableNameFinder, tableNameRowCount, tableFooterFinder, tableHeader, 2);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, tableFooterFinder, tableHeader, 2);
+    }
+
+    @Test
+    void createTable20() {
+        reportPage.createTable(tableNameFinder, tableNameRowCount, tableHeader, 2);
+        verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, tableHeader, 2);
     }
 
     @Test
