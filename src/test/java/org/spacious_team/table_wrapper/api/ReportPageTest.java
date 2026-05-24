@@ -430,7 +430,7 @@ class ReportPageTest {
         doReturn(address1).when(reportPage).find(predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
-        doReturn(-1).when(reportPage).findEmptyRow(anyInt());
+        doReturn(-1).when(reportPage).findRow(anyInt(), anyInt(), any());
         int lastRowNum = 3;
         when(reportPage.getLastRowNum()).thenReturn(lastRowNum);
         //noinspection ConstantConditions
@@ -449,7 +449,7 @@ class ReportPageTest {
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
         int emptyRowNum = 3;
-        doReturn(emptyRowNum).when(reportPage).findEmptyRow(anyInt());
+        doReturn(emptyRowNum).when(reportPage).findRow(anyInt(), anyInt(), any());
         int lastRowNum = 4;
         when(reportPage.getLastRowNum()).thenReturn(lastRowNum);
         //noinspection ConstantConditions
@@ -469,7 +469,7 @@ class ReportPageTest {
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
         int emptyRowNum = 1;
-        doReturn(emptyRowNum).when(reportPage).findEmptyRow(anyInt());
+        doReturn(emptyRowNum).when(reportPage).findRow(anyInt(), anyInt(), any());
         int lastRowNum = 4;
         when(reportPage.getLastRowNum()).thenReturn(lastRowNum);
         when(row1.getFirstCellNum()).thenReturn(10);
@@ -483,13 +483,13 @@ class ReportPageTest {
     }
 
     @Test
-    void findEmptyRow_notFound() {
+    void findRow_notFound() {
         ReportPageRow row = getRow(1, cell("abc", 0));
         //noinspection ConstantConditions
         when(reportPage.getRow(1)).thenReturn(row);
         when(reportPage.getLastRowNum()).thenReturn(1);
 
-        assertEquals(-1, reportPage.findEmptyRow(1));
+        assertEquals(-1, reportPage.findRow(1, Integer.MAX_VALUE, EmptyRowPredicate.INSTANCE));
     }
 
     @Test
@@ -498,11 +498,11 @@ class ReportPageTest {
         when(reportPage.getRow(1)).thenReturn(null);
         when(reportPage.getLastRowNum()).thenReturn(1000);
 
-        assertEquals(1, reportPage.findEmptyRow(1));
+        assertEquals(1, reportPage.findRow(1, Integer.MAX_VALUE, EmptyRowPredicate.INSTANCE));
     }
 
     @Test
-    void findEmptyRow_foundSecond() {
+    void findRow_foundSecond() {
         ReportPageRow row = getRow(1, cell(123, 0));
         //noinspection ConstantConditions
         when(reportPage.getRow(1)).thenReturn(row);
@@ -510,73 +510,55 @@ class ReportPageTest {
         when(reportPage.getRow(2)).thenReturn(null);
         when(reportPage.getLastRowNum()).thenReturn(1000);
 
-        assertEquals(2, reportPage.findEmptyRow(1));
+        assertEquals(2, reportPage.findRow(1, Integer.MAX_VALUE, EmptyRowPredicate.INSTANCE));
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    void findEmptyRow_foundSecondWithNull() {
+    void findRow_foundSecondWithNull() {
         ReportPageRow row1 = getRow(1, cell(null, 0), cell("abc", 1));
         ReportPageRow row2 = getRow(2, cell(null, 0), cell(null, 1));
         when(reportPage.getRow(1)).thenReturn(row1);
         when(reportPage.getRow(2)).thenReturn(row2);
         when(reportPage.getLastRowNum()).thenReturn(1000);
 
-        assertEquals(2, reportPage.findEmptyRow(1));
+        assertEquals(2, reportPage.findRow(1, Integer.MAX_VALUE, EmptyRowPredicate.INSTANCE));
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    void findEmptyRow_foundSecondWithNullCell() {
+    void findRow_foundSecondWithNullCell() {
         ReportPageRow row1 = getRow(1, cell(null, 0), cell("abc", 1));
         ReportPageRow row2 = getRow(2, null, null);
         when(reportPage.getRow(1)).thenReturn(row1);
         when(reportPage.getRow(2)).thenReturn(row2);
         when(reportPage.getLastRowNum()).thenReturn(1000);
 
-        assertEquals(2, reportPage.findEmptyRow(1));
+        assertEquals(2, reportPage.findRow(1, Integer.MAX_VALUE, EmptyRowPredicate.INSTANCE));
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    void findEmptyRow_foundSecondWithEmptyString() {
+    void findRow_foundSecondWithEmptyString() {
         ReportPageRow row1 = getRow(1, cell(null, 0), cell("abc", 1));
         ReportPageRow row2 = getRow(2, cell("", 0), cell("", 20));
         when(reportPage.getRow(1)).thenReturn(row1);
         when(reportPage.getRow(2)).thenReturn(row2);
         when(reportPage.getLastRowNum()).thenReturn(1000);
 
-        assertEquals(2, reportPage.findEmptyRow(1));
+        assertEquals(2, reportPage.findRow(1, Integer.MAX_VALUE, EmptyRowPredicate.INSTANCE));
     }
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    void findEmptyRow_foundSecondWithNoCell() {
+    void findRow_foundSecondWithNoCell() {
         ReportPageRow row1 = getRow(1, cell(null, 0), cell("abc", 1));
         ReportPageRow row2 = getRow(2);
         when(reportPage.getRow(1)).thenReturn(row1);
         when(reportPage.getRow(2)).thenReturn(row2);
         when(reportPage.getLastRowNum()).thenReturn(1000);
 
-        assertEquals(2, reportPage.findEmptyRow(1));
-    }
-
-    @ParameterizedTest
-    @MethodSource("getRows")
-    void isEmptyRow(boolean expected, ReportPageRow row) {
-        assertEquals(expected, reportPage.isRowEmpty(row));
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    static Object[][] getRows() {
-        return new Object[][]{
-                {true, null},
-                {true, getRow(0)},
-                {true, getRow(0, null, null)},
-                {true, getRow(0, cell(null, 3), cell("", 4))},
-                {false, getRow(0, cell(null, 3), cell(" ", 4))},
-                {false, getRow(0, cell("value", 3))},
-                {false, getRow(0, cell(123, 3))}};
+        assertEquals(2, reportPage.findRow(1, Integer.MAX_VALUE, EmptyRowPredicate.INSTANCE));
     }
 
     @Test

@@ -162,6 +162,26 @@ public interface ReportPage {
     }
 
     /**
+     * Returns the zero-based index of the first row that matches the predicate.
+     *
+     * @param startRow search rows start from this
+     * @param endRow   search rows excluding this, can handle values greater than real rows count
+     * @return the index of the first empty row, or {@code -1} if no empty row is found
+     * @implNote The default implementation may produce significant garbage during execution.
+     * Subclasses are encouraged to override this method for better performance.
+     */
+    default int findRow(int startRow, int endRow, Predicate<@Nullable ReportPageRow> predicate) {
+        int max = Math.min(endRow, getLastRowNum() + 1);  // exclusive
+        for (int i = startRow; i < max; i++) {
+            @Nullable ReportPageRow row = getRow(i);
+            if (predicate.test(row)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Searches for a key and returns the value from a multi-column table, where i-th column contains the key,
      * and the nearest non-empty cell in the same row to the right contains the value
      */
@@ -284,7 +304,7 @@ public interface ReportPage {
      * starting with {@code lastRowPrefix}.
      *
      * @param firstRowFinderOffset start search from this offset
-     * @param lastRowFinderOffset  the row offset relative to the found first row position to start the search for the last row
+     * @param lastRowFinderOffset  the number of rows to skip after firstRow to start the search for the last row
      */
     default TableCellRange getCellRange(@Nullable String firstRowPrefix,
                                         @Nullable String lastRowPrefix,
@@ -304,7 +324,7 @@ public interface ReportPage {
      * Returns a range of rows. The first and last rows are determined by a predicate.
      *
      * @param firstRowFinderOffset start search from this offset
-     * @param lastRowFinderOffset  the row offset relative to the found first row position to start the search for the last row
+     * @param lastRowFinderOffset  the number of rows to skip after firstRow to start the search for the last row
      */
     default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
                                         @Nullable Predicate<@Nullable Object> lastRowFinder,
@@ -337,7 +357,7 @@ public interface ReportPage {
      * starting with {@code firstRowPrefix},  range ends with empty row or last row of report page.
      *
      * @param firstRowFinderOffset start search from this offset
-     * @param lastRowFinderOffset  the row offset relative to the found first row position to start the search for the last row
+     * @param lastRowFinderOffset  the number of rows to skip after firstRow to start the search for the last row
      */
     default TableCellRange getCellRange(@Nullable String firstRowPrefix,
                                         int firstRowFinderOffset,
@@ -356,7 +376,7 @@ public interface ReportPage {
      * range ends with empty row or last row of report page.
      *
      * @param firstRowFinderOffset start search from this offset
-     * @param lastRowFinderOffset  the row offset relative to the found first row position to start the search for the last row
+     * @param lastRowFinderOffset  the number of rows to skip after firstRow to start the search for the last row
      */
     default TableCellRange getCellRange(@Nullable Predicate<@Nullable Object> firstRowFinder,
                                         int firstRowFinderOffset,
@@ -370,7 +390,8 @@ public interface ReportPage {
         }
         @SuppressWarnings({"nullness", "ConstantConditions"})
         ReportPageRow firstRow = requireNonNull(getRow(startAddress.getRow()), "Row is not found");
-        int emptyRowNum = findEmptyRow(startAddress.getRow() + lastRowFinderOffset + 1);
+        int emptyRowSearchOffset = startAddress.getRow() + lastRowFinderOffset + 1;
+        int emptyRowNum = findRow(emptyRowSearchOffset, Integer.MAX_VALUE, EmptyRowPredicate.INSTANCE);
         if (emptyRowNum == -1) {
             emptyRowNum = getLastRowNum(); // empty row is not found, use last row
         } else if (emptyRowNum <= getLastRowNum()) {
@@ -390,48 +411,6 @@ public interface ReportPage {
                 emptyRowNum,
                 firstRow.getFirstCellNum(),
                 lastRow.getLastCellNum());
-    }
-
-    /**
-     * Returns the zero-based index of the first empty row.
-     *
-     * @param startRow the first row to check (inclusive)
-     * @return the index of the first empty row, or {@code -1} if no empty row is found
-     * @implNote The default implementation may produce significant garbage during execution.
-     * Subclasses are encouraged to override this method for better performance.
-     */
-    default int findEmptyRow(int startRow) {
-        int lastRowNum = startRow;
-        for (int n = getLastRowNum(); lastRowNum <= n; lastRowNum++) {
-            @Nullable ReportPageRow row = getRow(lastRowNum);
-            if (isRowEmpty(row)) {
-                return lastRowNum;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Determines that a row is empty when:
-     * <ul>
-     *     <li>{@code row == null};</li>
-     *     <li>or the row has zero cells;</li>
-     *     <li>or every cell is either {@code null}, has a {@code null} value, or contains an empty {@link String}.</li>
-     * </ul>
-     */
-    default boolean isRowEmpty(@Nullable ReportPageRow row) {
-        if (row == null || row.getLastCellNum() == -1) {
-            return true; // all row's cells are blank
-        }
-        for (@Nullable TableCell cell : row) {
-            @Nullable Object value;
-            if (!(cell == null
-                    || ((value = cell.getValue()) == null)
-                    || (value instanceof String) && (value.toString().isEmpty()))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     default <T extends Enum<T> & TableHeaderColumn>
