@@ -580,122 +580,122 @@ class ReportPageTest {
     }
 
     @Test
-    void create() {
-        reportPage.create(tableName, dataRow, tableFooterString, tableHeader);
+    void createTable1() {
+        reportPage.createTable(tableName, dataRow, tableFooterString, tableHeader);
         verify(tableFactory).create(reportPage, tableName, dataRow, tableFooterString, tableHeader);
     }
 
     @Test
-    void create2() {
-        reportPage.create(tableName, tableFooterString, tableHeader);
+    void createTable2() {
+        reportPage.createTable(tableName, tableFooterString, tableHeader);
         verify(tableFactory).create(reportPage, tableName, tableFooterString, tableHeader);
     }
 
     @Test
-    void create3() {
-        reportPage.create(tableName, tableHeader);
+    void createTable3() {
+        reportPage.createTable(tableName, tableHeader);
         verify(tableFactory).create(reportPage, tableName, tableHeader);
     }
 
     @Test
-    void create4() {
-        reportPage.create(tableName, tableFooterString, tableHeader, 2);
+    void createTable4() {
+        reportPage.createTable(tableName, tableFooterString, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableName, tableFooterString, tableHeader, 2);
     }
 
     @Test
-    void create5() {
-        reportPage.create(tableName, tableHeader, 2);
+    void createTable5() {
+        reportPage.createTable(tableName, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableName, tableHeader, 2);
     }
 
     @Test
-    void create6() {
-        reportPage.create(tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
+    void createTable6() {
+        reportPage.createTable(tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
         verify(tableFactory).create(reportPage, tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
     }
 
     @Test
-    void create7() {
-        reportPage.create(tableNameFinder, tableFooterFinder, tableHeader);
+    void createTable7() {
+        reportPage.createTable(tableNameFinder, tableFooterFinder, tableHeader);
         verify(tableFactory).create(reportPage, tableNameFinder, tableFooterFinder, tableHeader);
     }
 
     @Test
-    void create8() {
-        reportPage.create(tableNameFinder, tableHeader);
+    void createTable8() {
+        reportPage.createTable(tableNameFinder, tableHeader);
         verify(tableFactory).create(reportPage, tableNameFinder, tableHeader);
     }
 
     @Test
-    void create9() {
-        reportPage.create(tableNameFinder, tableFooterFinder, tableHeader, 2);
+    void createTable9() {
+        reportPage.createTable(tableNameFinder, tableFooterFinder, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableNameFinder, tableFooterFinder, tableHeader, 2);
     }
 
     @Test
-    void create10() {
-        reportPage.create(tableNameFinder, tableHeader, 2);
+    void createTable10() {
+        reportPage.createTable(tableNameFinder, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableNameFinder, tableHeader, 2);
     }
 
     @Test
-    void createNameless() {
-        reportPage.createNameless("undefined", headerRow, dataRow, tableFooterString, tableHeader);
+    void createNamelessTable1() {
+        reportPage.createNamelessTable("undefined", headerRow, dataRow, tableFooterString, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefined", headerRow, dataRow, tableFooterString, tableHeader);
     }
 
     @Test
-    void createNameless2() {
-        reportPage.createNameless("undefined", headerRow, tableFooterString, tableHeader);
+    void createNamelessTable2() {
+        reportPage.createNamelessTable("undefined", headerRow, tableFooterString, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefined", headerRow, tableFooterString, tableHeader);
     }
 
     @Test
-    void createNameless3() {
-        reportPage.createNameless("undefined", headerRow, tableHeader);
+    void createNamelessTable3() {
+        reportPage.createNamelessTable("undefined", headerRow, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefined", headerRow, tableHeader);
     }
 
     @Test
-    void createNameless4() {
-        reportPage.createNameless(tableName, headerRow, tableFooterString, tableHeader, 2);
+    void createNamelessTable4() {
+        reportPage.createNamelessTable(tableName, headerRow, tableFooterString, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, headerRow, tableFooterString, tableHeader, 2);
     }
 
     @Test
-    void createNameless5() {
-        reportPage.createNameless(tableName, headerRow, tableHeader, 2);
+    void createNamelessTable5() {
+        reportPage.createNamelessTable(tableName, headerRow, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, headerRow, tableHeader, 2);
     }
 
     @Test
-    void createNameless6() {
-        reportPage.createNameless("undefiled", tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
+    void createNamelessTable6() {
+        reportPage.createNamelessTable("undefiled", tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefiled", tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
     }
 
     @Test
-    void createNameless7() {
-        reportPage.createNameless("undefiled", tableNameFinder, tableFooterFinder, tableHeader);
+    void createNamelessTable7() {
+        reportPage.createNamelessTable("undefiled", tableNameFinder, tableFooterFinder, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefiled", tableNameFinder, tableFooterFinder, tableHeader);
     }
 
     @Test
-    void createNameless8() {
-        reportPage.createNameless("undefined", tableNameFinder, tableHeader);
+    void createNamelessTable8() {
+        reportPage.createNamelessTable("undefined", tableNameFinder, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefined", tableNameFinder, tableHeader);
     }
 
     @Test
-    void createNameless9() {
-        reportPage.createNameless(tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
+    void createNamelessTable9() {
+        reportPage.createNamelessTable(tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
     }
 
     @Test
-    void createNameless10() {
-        reportPage.createNameless(tableName, tableNameFinder, tableHeader, 2);
+    void createNamelessTable10() {
+        reportPage.createNamelessTable(tableName, tableNameFinder, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableHeader, 2);
     }
 
