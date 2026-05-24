@@ -64,7 +64,8 @@ public abstract class AbstractTable<R extends ReportPageRow, C> implements Table
     private final int dataRowOffset;
 
     /**
-     * @param tableRange only first and last row numbers matters
+     * @param tableName  real or provided table name
+     * @param tableRange the table cells range, the first table row is the first header row
      */
     @SuppressWarnings("unused")
     protected <T extends Enum<T> & TableHeaderColumn>
@@ -75,7 +76,7 @@ public abstract class AbstractTable<R extends ReportPageRow, C> implements Table
                   int headersRowCount) {
         this.reportPage = reportPage;
         this.tableName = tableName;
-        this.dataRowOffset = 1 + headersRowCount; // table_name + headersRowCount
+        this.dataRowOffset = headersRowCount;
         this.empty = isEmpty(tableRange, dataRowOffset);
         this.headerDescription = this.empty ?
                 Collections.emptyMap() :
@@ -89,6 +90,10 @@ public abstract class AbstractTable<R extends ReportPageRow, C> implements Table
                         getColumnIndices(this.headerDescription).max().orElse(tableRange.getLastColumn()));
     }
 
+    /**
+     * @param  appendDataRowsToTop positive or negative value
+     * @param appendDataRowsToBottom positive or negative value
+     */
     @SuppressWarnings("unused")
     protected AbstractTable(AbstractTable<R, C> table, int appendDataRowsToTop, int appendDataRowsToBottom) {
         this.reportPage = table.reportPage;
@@ -114,7 +119,7 @@ public abstract class AbstractTable<R extends ReportPageRow, C> implements Table
         Map<TableColumn, Integer> columnIndices = new HashMap<>();
         ReportPageRow[] headerRows = new ReportPageRow[headersRowCount];
         for (int i = 0; i < headersRowCount; i++) {
-            @Nullable ReportPageRow row = reportPage.getRow(tableRange.getFirstRow() + 1 + i);
+            @Nullable ReportPageRow row = reportPage.getRow(tableRange.getFirstRow() + i);
             @SuppressWarnings("nullness")
             ReportPageRow notNullRow = requireNonNull(row, "Header row is absent");
             headerRows[i] = notNullRow;

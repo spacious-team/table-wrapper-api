@@ -43,7 +43,7 @@ class TableFactoryTest {
     @Mock
     TableCellRange tableCellRange2;
     @Mock
-    TableCellRange tableCellRangeAddTop1;
+    TableCellRange tableCellRangeRemoveTop1;
     String tableName = "table name";
     String dataRow = "data row";
     String lastRowString = "footer";
@@ -62,15 +62,17 @@ class TableFactoryTest {
         when(tableCellRange.getFirstRow()).thenReturn(10);
         when(tableCellRange.getLastRow()).thenReturn(20);
         when(reportPage.getCellRange(tableName, lastRowString, 10, 9)).thenReturn(tableCellRange2);
+        when(tableCellRange2.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
         tableFactory.create(reportPage, tableName, dataRow, lastRowString, headerDescription);
 
         verify(reportPage).getCellRange(tableName, dataRow, 0, 1);
         verify(reportPage).getCellRange(tableName, lastRowString, 10, 9);
+        verify(tableCellRange2).addRowsToTop(-1);
         verify(tableFactory).create(
                 reportPage,
                 tableName,
-                tableCellRange2,
+                tableCellRangeRemoveTop1,
                 headerDescription,
                 9);
     }
@@ -93,12 +95,14 @@ class TableFactoryTest {
 
     @Test
     void create1() {
+        when(reportPage.getCellRange(tableName, lastRowString, 0, 1)).thenReturn(tableCellRange);
         tableFactory.create(reportPage, tableName, lastRowString, headerDescription);
         verify(tableFactory).create(reportPage, tableName, lastRowString, headerDescription, 1);
     }
 
     @Test
     void create2() {
+        when(reportPage.getCellRange(tableName, 0, 1)).thenReturn(tableCellRange);
         tableFactory.create(reportPage, tableName, headerDescription);
         verify(tableFactory).create(reportPage, tableName, headerDescription, 1);
     }
@@ -106,14 +110,16 @@ class TableFactoryTest {
     @Test
     void create3() {
         when(reportPage.getCellRange(tableName, lastRowString, 0, 2)).thenReturn(tableCellRange);
+        when(tableCellRange.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
         tableFactory.create(reportPage, tableName, lastRowString, headerDescription, 2);
 
         verify(reportPage).getCellRange(tableName, lastRowString, 0, 2);
+        verify(tableCellRange).addRowsToTop(-1);
         verify(tableFactory).create(
                 reportPage,
                 tableName,
-                tableCellRange,
+                tableCellRangeRemoveTop1,
                 headerDescription,
                 2);
     }
@@ -121,14 +127,16 @@ class TableFactoryTest {
     @Test
     void create4() {
         when(reportPage.getCellRange(tableName, 0, 2)).thenReturn(tableCellRange);
+        when(tableCellRange.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
         tableFactory.create(reportPage, tableName, headerDescription, 2);
 
         verify(reportPage).getCellRange(tableName, 0, 2);
+        verify(tableCellRange).addRowsToTop(-1);
         verify(tableFactory).create(
                 reportPage,
                 tableName,
-                tableCellRange,
+                tableCellRangeRemoveTop1,
                 headerDescription,
                 2);
     }
@@ -139,15 +147,17 @@ class TableFactoryTest {
         when(tableCellRange.getFirstRow()).thenReturn(10);
         when(tableCellRange.getLastRow()).thenReturn(20);
         when(reportPage.getCellRange(tableNameFinder, lastRowFinder, 10, 9)).thenReturn(tableCellRange2);
+        when(tableCellRange2.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
         tableFactory.create(reportPage, tableNameFinder, dataRowFinder, lastRowFinder, headerDescription);
 
         verify(reportPage).getCellRange(tableNameFinder, dataRowFinder, 0, 1);
         verify(reportPage).getCellRange(tableNameFinder, lastRowFinder, 10, 9);
+        verify(tableCellRange2).addRowsToTop(-1);
         verify(tableFactory).create(
                 eq(reportPage),
                 any(String.class),
-                eq(tableCellRange2),
+                eq(tableCellRangeRemoveTop1),
                 eq(headerDescription),
                 eq(9));
     }
@@ -185,14 +195,16 @@ class TableFactoryTest {
     @Test
     void create7() {
         when(reportPage.getCellRange(tableNameFinder, lastRowFinder, 0, 2)).thenReturn(tableCellRange);
+        when(tableCellRange.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
         tableFactory.create(reportPage, tableNameFinder, lastRowFinder, headerDescription, 2);
 
         verify(reportPage).getCellRange(tableNameFinder, lastRowFinder, 0, 2);
+        verify(tableCellRange).addRowsToTop(-1);
         verify(tableFactory).create(
                 eq(reportPage),
                 any(String.class),
-                any(TableCellRange.class),
+                eq(tableCellRangeRemoveTop1),
                 eq(headerDescription),
                 eq(2));
     }
@@ -200,14 +212,16 @@ class TableFactoryTest {
     @Test
     void create8() {
         when(reportPage.getCellRange(tableNameFinder, 0, 2)).thenReturn(tableCellRange);
+        when(tableCellRange.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
         tableFactory.create(reportPage, tableNameFinder, headerDescription, 2);
 
         verify(reportPage).getCellRange(tableNameFinder, 0, 2);
+        verify(tableCellRange).addRowsToTop(-1);
         verify(tableFactory).create(
                 eq(reportPage),
                 any(String.class),
-                any(TableCellRange.class),
+                eq(tableCellRangeRemoveTop1),
                 eq(headerDescription),
                 eq(2));
     }
@@ -218,7 +232,6 @@ class TableFactoryTest {
         when(tableCellRange.getFirstRow()).thenReturn(10);
         when(tableCellRange.getLastRow()).thenReturn(30);
         when(reportPage.getCellRange(firstRowString, lastRowString, 10, 20)).thenReturn(tableCellRange2);
-        when(tableCellRange2.addRowsToTop(1)).thenReturn(tableCellRangeAddTop1);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowString, dataRow, lastRowString, headerDescription);
 
@@ -227,7 +240,7 @@ class TableFactoryTest {
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
-                tableCellRangeAddTop1,
+                tableCellRange2,
                 headerDescription,
                 20);
     }
@@ -267,17 +280,15 @@ class TableFactoryTest {
     @Test
     void createNameless3() {
         when(reportPage.getCellRange(firstRowString, lastRowString, 0, 2)).thenReturn(tableCellRange);
-        when(tableCellRange.addRowsToTop(1)).thenReturn(tableCellRangeAddTop1);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowString, lastRowString,
                 headerDescription, 2);
 
         verify(reportPage).getCellRange(firstRowString, lastRowString, 0, 2);
-        verify(tableCellRange).addRowsToTop(1);
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
-                tableCellRangeAddTop1,
+                tableCellRange,
                 headerDescription,
                 2);
     }
@@ -285,16 +296,14 @@ class TableFactoryTest {
     @Test
     void createNameless4() {
         when(reportPage.getCellRange(firstRowString, 0, 2)).thenReturn(tableCellRange);
-        when(tableCellRange.addRowsToTop(1)).thenReturn(tableCellRangeAddTop1);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowString, headerDescription, 2);
 
         verify(reportPage).getCellRange(firstRowString, 0, 2);
-        verify(tableCellRange).addRowsToTop(1);
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
-                tableCellRangeAddTop1,
+                tableCellRange,
                 headerDescription,
                 2);
     }
@@ -305,7 +314,6 @@ class TableFactoryTest {
         when(tableCellRange.getFirstRow()).thenReturn(10);
         when(tableCellRange.getLastRow()).thenReturn(30);
         when(reportPage.getCellRange(firstRowFinder, lastRowFinder, 10, 20)).thenReturn(tableCellRange2);
-        when(tableCellRange2.addRowsToTop(1)).thenReturn(tableCellRangeAddTop1);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, dataRowFinder, lastRowFinder, headerDescription);
 
@@ -314,7 +322,7 @@ class TableFactoryTest {
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
-                tableCellRangeAddTop1,
+                tableCellRange2,
                 headerDescription,
                 20);
     }
@@ -354,17 +362,15 @@ class TableFactoryTest {
     @Test
     void createNameless7() {
         when(reportPage.getCellRange(firstRowFinder, lastRowFinder, 0, 2)).thenReturn(tableCellRange);
-        when(tableCellRange.addRowsToTop(1)).thenReturn(tableCellRangeAddTop1);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, lastRowFinder,
                 headerDescription, 2);
 
         verify(reportPage).getCellRange(firstRowFinder, lastRowFinder, 0, 2);
-        verify(tableCellRange).addRowsToTop(1);
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
-                tableCellRangeAddTop1,
+                tableCellRange,
                 headerDescription,
                 2);
     }
@@ -372,16 +378,14 @@ class TableFactoryTest {
     @Test
     void createNameless8() {
         when(reportPage.getCellRange(firstRowFinder, 0, 2)).thenReturn(tableCellRange);
-        when(tableCellRange.addRowsToTop(1)).thenReturn(tableCellRangeAddTop1);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, headerDescription, 2);
 
         verify(reportPage).getCellRange(firstRowFinder, 0, 2);
-        verify(tableCellRange).addRowsToTop(1);
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
-                tableCellRangeAddTop1,
+                tableCellRange,
                 headerDescription,
                 2);
     }

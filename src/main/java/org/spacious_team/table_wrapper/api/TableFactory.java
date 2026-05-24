@@ -49,7 +49,8 @@ public interface TableFactory {
         TableCellRange range = EMPTY_RANGE;
         if (!Objects.equals(headerRange, EMPTY_RANGE)) {
             headerRowsCount = headerRange.getLastRow() - headerRange.getFirstRow() - 1;
-            range = reportPage.getCellRange(tableName, lastRowPrefix, headerRange.getFirstRow(), headerRowsCount);
+            range = reportPage.getCellRange(tableName, lastRowPrefix, headerRange.getFirstRow(), headerRowsCount)
+                    .addRowsToTop(-1);  // exclude table name row
         }
         return create(reportPage, tableName, range, headerDescription, headerRowsCount);
     }
@@ -94,11 +95,9 @@ public interface TableFactory {
                  String lastRowPrefix,
                  Class<T> headerDescription,
                  int headerRowsCount) {
-        return create(reportPage,
-                tableName,
-                reportPage.getCellRange(tableName, lastRowPrefix, 0, headerRowsCount),
-                headerDescription,
-                headerRowsCount);
+        TableCellRange range = reportPage.getCellRange(tableName, lastRowPrefix, 0, headerRowsCount)
+                .addRowsToTop(-1);  // exclude table name row
+        return create(reportPage, tableName, range, headerDescription, headerRowsCount);
     }
 
     /**
@@ -111,11 +110,9 @@ public interface TableFactory {
                  String tableName,
                  Class<T> headerDescription,
                  int headerRowsCount) {
-        return create(reportPage,
-                tableName,
-                reportPage.getCellRange(tableName, 0, headerRowsCount),
-                headerDescription,
-                headerRowsCount);
+        TableCellRange range = reportPage.getCellRange(tableName, 0, headerRowsCount)
+                .addRowsToTop(-1);  // exclude table name row
+        return create(reportPage, tableName, range, headerDescription, headerRowsCount);
     }
 
     /**
@@ -136,7 +133,8 @@ public interface TableFactory {
         TableCellRange range = EMPTY_RANGE;
         if (!Objects.equals(headerRange, EMPTY_RANGE)) {
             headerRowsCount = headerRange.getLastRow() - headerRange.getFirstRow() - 1;
-            range = reportPage.getCellRange(tableNameFinder, lastRowFinder, headerRange.getFirstRow(), headerRowsCount);
+            range = reportPage.getCellRange(tableNameFinder, lastRowFinder, headerRange.getFirstRow(), headerRowsCount)
+                    .addRowsToTop(-1);  // exclude table name row
         }
         String tableName = TableFactoryHelper.getTableName(reportPage, tableNameFinder, range);
         return create(reportPage, tableName, range, headerDescription, headerRowsCount);
@@ -181,7 +179,8 @@ public interface TableFactory {
                  Predicate<@Nullable Object> lastRowFinder,
                  Class<T> headerDescription,
                  int headerRowsCount) {
-        TableCellRange range = reportPage.getCellRange(tableNameFinder, lastRowFinder, 0, headerRowsCount);
+        TableCellRange range = reportPage.getCellRange(tableNameFinder, lastRowFinder, 0, headerRowsCount)
+                .addRowsToTop(-1);  // exclude table name row
         String tableName = TableFactoryHelper.getTableName(reportPage, tableNameFinder, range);
         return create(reportPage, tableName, range, headerDescription, headerRowsCount);
     }
@@ -197,7 +196,8 @@ public interface TableFactory {
                  Predicate<@Nullable Object> tableNameFinder,
                  Class<T> headerDescription,
                  int headerRowsCount) {
-        TableCellRange range = reportPage.getCellRange(tableNameFinder, 0, headerRowsCount);
+        TableCellRange range = reportPage.getCellRange(tableNameFinder, 0, headerRowsCount)
+                .addRowsToTop(-1);  // exclude table name row
         String tableName = TableFactoryHelper.getTableName(reportPage, tableNameFinder, range);
         return create(reportPage, tableName, range, headerDescription, headerRowsCount);
     }
@@ -223,8 +223,7 @@ public interface TableFactory {
         TableCellRange range = EMPTY_RANGE;
         if (!Objects.equals(headerRange, EMPTY_RANGE)) {
             headerRowsCount = headerRange.getLastRow() - headerRange.getFirstRow();
-            range = reportPage.getCellRange(firstRowPrefix, lastRowPrefix, headerRange.getFirstRow(), headerRowsCount)
-                    .addRowsToTop(1); // add fantom first line for provided table name
+            range = reportPage.getCellRange(firstRowPrefix, lastRowPrefix, headerRange.getFirstRow(), headerRowsCount);
         }
         return create(reportPage, providedTableName, range, headerDescription, headerRowsCount);
     }
@@ -277,8 +276,7 @@ public interface TableFactory {
                          int headerRowsCount) {
         return create(reportPage,
                 providedTableName,
-                reportPage.getCellRange(firstRowPrefix, lastRowPrefix, 0, headerRowsCount)
-                        .addRowsToTop(1), // add fantom first line for provided table name
+                reportPage.getCellRange(firstRowPrefix, lastRowPrefix, 0, headerRowsCount),
                 headerDescription,
                 headerRowsCount);
     }
@@ -297,8 +295,7 @@ public interface TableFactory {
                          int headerRowsCount) {
         return create(reportPage,
                 providedTableName,
-                reportPage.getCellRange(firstRowPrefix, 0, headerRowsCount)
-                        .addRowsToTop(1), // add fantom first line for provided table name
+                reportPage.getCellRange(firstRowPrefix, 0, headerRowsCount),
                 headerDescription,
                 headerRowsCount);
     }
@@ -323,8 +320,7 @@ public interface TableFactory {
         TableCellRange range = EMPTY_RANGE;
         if (!Objects.equals(headerRange, EMPTY_RANGE)) {
             headerRowsCount = headerRange.getLastRow() - headerRange.getFirstRow();
-            range = reportPage.getCellRange(firstRowFinder, lastRowFinder, headerRange.getFirstRow(), headerRowsCount)
-                    .addRowsToTop(1); // add fantom first line for provided table name
+            range = reportPage.getCellRange(firstRowFinder, lastRowFinder, headerRange.getFirstRow(), headerRowsCount);
         }
         return create(reportPage, providedTableName, range, headerDescription, headerRowsCount);
     }
@@ -375,8 +371,7 @@ public interface TableFactory {
                          int headerRowsCount) {
         return create(reportPage,
                 providedTableName,
-                reportPage.getCellRange(firstRowFinder, lastRowFinder, 0, headerRowsCount)
-                        .addRowsToTop(1), // add fantom first line for provided table name
+                reportPage.getCellRange(firstRowFinder, lastRowFinder, 0, headerRowsCount),
                 headerDescription,
                 headerRowsCount);
     }
@@ -396,8 +391,7 @@ public interface TableFactory {
                          int headerRowsCount) {
         return create(reportPage,
                 providedTableName,
-                reportPage.getCellRange(firstRowFinder, 0, headerRowsCount)
-                        .addRowsToTop(1), // add fantom first line for provided table name
+                reportPage.getCellRange(firstRowFinder, 0, headerRowsCount),
                 headerDescription,
                 headerRowsCount);
     }
@@ -405,7 +399,7 @@ public interface TableFactory {
 
     /**
      * Creates a table using the cell range from {@code tableRange}.
-     * The first row contains the table name (possibly a provided name), and the header rows begin with the second row.
+     * The first table row is the first header row.
      */
     <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
