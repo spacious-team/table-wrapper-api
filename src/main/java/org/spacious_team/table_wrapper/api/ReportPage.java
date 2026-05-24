@@ -423,7 +423,6 @@ public interface ReportPage {
         if (row == null || row.getLastCellNum() == -1) {
             return true; // all row's cells are blank
         }
-        boolean isEmptyRow = true;
         for (@Nullable TableCell cell : row) {
             @Nullable Object value;
             if (!(cell == null
