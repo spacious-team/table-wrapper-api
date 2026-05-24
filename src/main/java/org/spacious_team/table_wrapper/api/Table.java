@@ -88,9 +88,16 @@ public interface Table extends Iterable<@Nullable TableRow> {
     Map<TableColumn, Integer> getHeaderDescription();
 
     /**
-     * By default, table iterates throw all rows, call method if last row is "total" row, and it should be excluded
+     * Call method if the first row should be excluded
      */
-    default Table excludeTotalRow() {
+    default Table excludeFirstRow() {
+        return subTable(-1, 0);
+    }
+
+    /**
+     * Call method if the last row is "total" row, and it should be excluded
+     */
+    default Table excludeLastRow() {
         return subTable(0, -1);
     }
 
