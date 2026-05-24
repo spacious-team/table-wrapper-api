@@ -64,7 +64,7 @@ class TableFactoryTest {
         when(reportPage.getCellRange(tableName, lastRowString, 10, 9)).thenReturn(tableCellRange2);
         when(tableCellRange2.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
-        tableFactory.create(reportPage, tableName, dataRow, lastRowString, headerDescription);
+        tableFactory.create(reportPage, tableName, 1, dataRow, lastRowString, headerDescription);
 
         verify(reportPage).getCellRange(tableName, dataRow, 0, 1);
         verify(reportPage).getCellRange(tableName, lastRowString, 10, 9);
@@ -81,7 +81,7 @@ class TableFactoryTest {
     void create_dataPrefix_dataRowNotFound() {
         when(reportPage.getCellRange(tableName, dataRow, 0, 1)).thenReturn(EMPTY_RANGE);
 
-        tableFactory.create(reportPage, tableName, dataRow, lastRowString, headerDescription);
+        tableFactory.create(reportPage, tableName, 1, dataRow, lastRowString, headerDescription);
 
         verify(reportPage).getCellRange(tableName, dataRow, 0, 1);
         verify(reportPage, never()).getCellRange(eq(tableName), eq(lastRowString), anyInt(), anyInt());
@@ -94,25 +94,11 @@ class TableFactoryTest {
     }
 
     @Test
-    void create1() {
-        when(reportPage.getCellRange(tableName, lastRowString, 0, 1)).thenReturn(tableCellRange);
-        tableFactory.create(reportPage, tableName, lastRowString, headerDescription);
-        verify(tableFactory).create(reportPage, tableName, lastRowString, headerDescription, 1);
-    }
-
-    @Test
-    void create2() {
-        when(reportPage.getCellRange(tableName, 0, 1)).thenReturn(tableCellRange);
-        tableFactory.create(reportPage, tableName, headerDescription);
-        verify(tableFactory).create(reportPage, tableName, headerDescription, 1);
-    }
-
-    @Test
-    void create3() {
+    void create_tableNameAndLastRowPrefix() {
         when(reportPage.getCellRange(tableName, lastRowString, 0, 2)).thenReturn(tableCellRange);
         when(tableCellRange.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
-        tableFactory.create(reportPage, tableName, lastRowString, headerDescription, 2);
+        tableFactory.create(reportPage, tableName, 1, lastRowString, headerDescription, 2);
 
         verify(reportPage).getCellRange(tableName, lastRowString, 0, 2);
         verify(tableCellRange).addRowsToTop(-1);
@@ -125,11 +111,11 @@ class TableFactoryTest {
     }
 
     @Test
-    void create4() {
+    void create_tableNamePrefix() {
         when(reportPage.getCellRange(tableName, 0, 2)).thenReturn(tableCellRange);
         when(tableCellRange.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
-        tableFactory.create(reportPage, tableName, headerDescription, 2);
+        tableFactory.create(reportPage, tableName, 1, headerDescription, 2);
 
         verify(reportPage).getCellRange(tableName, 0, 2);
         verify(tableCellRange).addRowsToTop(-1);
@@ -149,7 +135,7 @@ class TableFactoryTest {
         when(reportPage.getCellRange(tableNameFinder, lastRowFinder, 10, 9)).thenReturn(tableCellRange2);
         when(tableCellRange2.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
-        tableFactory.create(reportPage, tableNameFinder, dataRowFinder, lastRowFinder, headerDescription);
+        tableFactory.create(reportPage, tableNameFinder, 1, dataRowFinder, lastRowFinder, headerDescription);
 
         verify(reportPage).getCellRange(tableNameFinder, dataRowFinder, 0, 1);
         verify(reportPage).getCellRange(tableNameFinder, lastRowFinder, 10, 9);
@@ -166,7 +152,7 @@ class TableFactoryTest {
     void create_dataRowFinder_dataRowNotFound() {
         when(reportPage.getCellRange(tableNameFinder, dataRowFinder, 0, 1)).thenReturn(EMPTY_RANGE);
 
-        tableFactory.create(reportPage, tableNameFinder, dataRowFinder, lastRowFinder, headerDescription);
+        tableFactory.create(reportPage, tableNameFinder, 1, dataRowFinder, lastRowFinder, headerDescription);
 
         verify(reportPage).getCellRange(tableNameFinder, dataRowFinder, 0, 1);
         verify(reportPage, never()).getCellRange(eq(tableNameFinder), eq(lastRowFinder), anyInt(), anyInt());
@@ -179,25 +165,11 @@ class TableFactoryTest {
     }
 
     @Test
-    void create5() {
-        when(reportPage.getCellRange(tableNameFinder, lastRowFinder, 0, 1)).thenReturn(tableCellRange);
-        tableFactory.create(reportPage, tableNameFinder, lastRowFinder, headerDescription);
-        verify(tableFactory).create(reportPage, tableNameFinder, lastRowFinder, headerDescription, 1);
-    }
-
-    @Test
-    void create6() {
-        when(reportPage.getCellRange(tableNameFinder, 0, 1)).thenReturn(tableCellRange);
-        tableFactory.create(reportPage, tableNameFinder, headerDescription);
-        verify(tableFactory).create(reportPage, tableNameFinder, headerDescription, 1);
-    }
-
-    @Test
-    void create7() {
+    void create_tableNameAndLastRowFinder() {
         when(reportPage.getCellRange(tableNameFinder, lastRowFinder, 0, 2)).thenReturn(tableCellRange);
         when(tableCellRange.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
-        tableFactory.create(reportPage, tableNameFinder, lastRowFinder, headerDescription, 2);
+        tableFactory.create(reportPage, tableNameFinder, 1, lastRowFinder, headerDescription, 2);
 
         verify(reportPage).getCellRange(tableNameFinder, lastRowFinder, 0, 2);
         verify(tableCellRange).addRowsToTop(-1);
@@ -210,11 +182,11 @@ class TableFactoryTest {
     }
 
     @Test
-    void create8() {
+    void create_tableNameFinder() {
         when(reportPage.getCellRange(tableNameFinder, 0, 2)).thenReturn(tableCellRange);
         when(tableCellRange.addRowsToTop(-1)).thenReturn(tableCellRangeRemoveTop1);
 
-        tableFactory.create(reportPage, tableNameFinder, headerDescription, 2);
+        tableFactory.create(reportPage, tableNameFinder, 1, headerDescription, 2);
 
         verify(reportPage).getCellRange(tableNameFinder, 0, 2);
         verify(tableCellRange).addRowsToTop(-1);
@@ -228,14 +200,14 @@ class TableFactoryTest {
 
     @Test
     void createNameless_dataPrefix_dataRowFound() {
-        when(reportPage.getCellRange(firstRowString, dataRow, 0, 1)).thenReturn(tableCellRange);
+        when(reportPage.getCellRange(firstRowString, dataRow, 0, 0)).thenReturn(tableCellRange);
         when(tableCellRange.getFirstRow()).thenReturn(10);
         when(tableCellRange.getLastRow()).thenReturn(30);
         when(reportPage.getCellRange(firstRowString, lastRowString, 10, 20)).thenReturn(tableCellRange2);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowString, dataRow, lastRowString, headerDescription);
 
-        verify(reportPage).getCellRange(firstRowString, dataRow, 0, 1);
+        verify(reportPage).getCellRange(firstRowString, dataRow, 0, 0);
         verify(reportPage).getCellRange(firstRowString, lastRowString, 10, 20);
         verify(tableFactory).create(
                 reportPage,
@@ -247,11 +219,11 @@ class TableFactoryTest {
 
     @Test
     void createNameless_dataPrefix_dataRowNotFound() {
-        when(reportPage.getCellRange(firstRowString, dataRow, 0, 1)).thenReturn(EMPTY_RANGE);
+        when(reportPage.getCellRange(firstRowString, dataRow, 0, 0)).thenReturn(EMPTY_RANGE);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowString, dataRow, lastRowString, headerDescription);
 
-        verify(reportPage).getCellRange(firstRowString, dataRow, 0, 1);
+        verify(reportPage).getCellRange(firstRowString, dataRow, 0, 0);
         verify(reportPage, never()).getCellRange(eq(firstRowString), eq(lastRowString), anyInt(), anyInt());
         verify(tableFactory).create(
                 reportPage,
@@ -262,29 +234,13 @@ class TableFactoryTest {
     }
 
     @Test
-    void createNameless1() {
+    void createNameless_headerRowAndLastRowPrefix() {
         when(reportPage.getCellRange(firstRowString, lastRowString, 0, 1)).thenReturn(tableCellRange);
-        tableFactory.createNameless(reportPage, providedTableName, firstRowString, lastRowString, headerDescription);
-        verify(tableFactory).createNameless(reportPage, providedTableName, firstRowString, lastRowString,
-                headerDescription, 1);
-    }
-
-    @Test
-    void createNameless2() {
-        when(reportPage.getCellRange(firstRowString, 0, 1)).thenReturn(tableCellRange);
-        tableFactory.createNameless(reportPage, providedTableName, firstRowString, headerDescription);
-        verify(tableFactory).createNameless(reportPage, providedTableName, firstRowString,
-                headerDescription, 1);
-    }
-
-    @Test
-    void createNameless3() {
-        when(reportPage.getCellRange(firstRowString, lastRowString, 0, 2)).thenReturn(tableCellRange);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowString, lastRowString,
                 headerDescription, 2);
 
-        verify(reportPage).getCellRange(firstRowString, lastRowString, 0, 2);
+        verify(reportPage).getCellRange(firstRowString, lastRowString, 0, 1);
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
@@ -294,12 +250,12 @@ class TableFactoryTest {
     }
 
     @Test
-    void createNameless4() {
-        when(reportPage.getCellRange(firstRowString, 0, 2)).thenReturn(tableCellRange);
+    void createNameless_headerRowPrefix() {
+        when(reportPage.getCellRange(firstRowString, 0, 1)).thenReturn(tableCellRange);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowString, headerDescription, 2);
 
-        verify(reportPage).getCellRange(firstRowString, 0, 2);
+        verify(reportPage).getCellRange(firstRowString, 0, 1);
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
@@ -310,14 +266,14 @@ class TableFactoryTest {
 
     @Test
     void createNameless_dataFinder_dataRowFound() {
-        when(reportPage.getCellRange(firstRowFinder, dataRowFinder, 0, 1)).thenReturn(tableCellRange);
+        when(reportPage.getCellRange(firstRowFinder, dataRowFinder, 0, 0)).thenReturn(tableCellRange);
         when(tableCellRange.getFirstRow()).thenReturn(10);
         when(tableCellRange.getLastRow()).thenReturn(30);
         when(reportPage.getCellRange(firstRowFinder, lastRowFinder, 10, 20)).thenReturn(tableCellRange2);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, dataRowFinder, lastRowFinder, headerDescription);
 
-        verify(reportPage).getCellRange(firstRowFinder, dataRowFinder, 0, 1);
+        verify(reportPage).getCellRange(firstRowFinder, dataRowFinder, 0, 0);
         verify(reportPage).getCellRange(firstRowFinder, lastRowFinder, 10, 20);
         verify(tableFactory).create(
                 reportPage,
@@ -329,11 +285,11 @@ class TableFactoryTest {
 
     @Test
     void createNameless_dataFinder_dataRowNotFound() {
-        when(reportPage.getCellRange(firstRowFinder, dataRowFinder, 0, 1)).thenReturn(EMPTY_RANGE);
+        when(reportPage.getCellRange(firstRowFinder, dataRowFinder, 0, 0)).thenReturn(EMPTY_RANGE);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, dataRowFinder, lastRowFinder, headerDescription);
 
-        verify(reportPage).getCellRange(firstRowFinder, dataRowFinder, 0, 1);
+        verify(reportPage).getCellRange(firstRowFinder, dataRowFinder, 0, 0);
         verify(reportPage, never()).getCellRange(eq(firstRowFinder), eq(lastRowFinder), anyInt(), anyInt());
         verify(tableFactory).create(
                 reportPage,
@@ -344,29 +300,13 @@ class TableFactoryTest {
     }
 
     @Test
-    void createNameless5() {
+    void createNameless_headerRowAndLastRowFinder() {
         when(reportPage.getCellRange(firstRowFinder, lastRowFinder, 0, 1)).thenReturn(tableCellRange);
-        tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, lastRowFinder, headerDescription);
-        verify(tableFactory).createNameless(reportPage, providedTableName, firstRowFinder, lastRowFinder,
-                headerDescription, 1);
-    }
-
-    @Test
-    void createNameless6() {
-        when(reportPage.getCellRange(firstRowFinder, 0, 1)).thenReturn(tableCellRange);
-        tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, headerDescription);
-        verify(tableFactory).createNameless(reportPage, providedTableName, firstRowFinder,
-                headerDescription, 1);
-    }
-
-    @Test
-    void createNameless7() {
-        when(reportPage.getCellRange(firstRowFinder, lastRowFinder, 0, 2)).thenReturn(tableCellRange);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, lastRowFinder,
                 headerDescription, 2);
 
-        verify(reportPage).getCellRange(firstRowFinder, lastRowFinder, 0, 2);
+        verify(reportPage).getCellRange(firstRowFinder, lastRowFinder, 0, 1);
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
@@ -376,12 +316,12 @@ class TableFactoryTest {
     }
 
     @Test
-    void createNameless8() {
-        when(reportPage.getCellRange(firstRowFinder, 0, 2)).thenReturn(tableCellRange);
+    void createNameless_headerRowFinder() {
+        when(reportPage.getCellRange(firstRowFinder, 0, 1)).thenReturn(tableCellRange);
 
         tableFactory.createNameless(reportPage, providedTableName, firstRowFinder, headerDescription, 2);
 
-        verify(reportPage).getCellRange(firstRowFinder, 0, 2);
+        verify(reportPage).getCellRange(firstRowFinder, 0, 1);
         verify(tableFactory).create(
                 reportPage,
                 providedTableName,
