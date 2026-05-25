@@ -30,22 +30,26 @@ public interface TableFactory {
     boolean canHandle(ReportPage reportPage);
 
     /**
-     * Creates a table which starts with name followed by header
-     * and ends with row containing cell with text starting with {@code lastRowPrefix}.
+     * Creates a table.
+     * The table found by {@code tableName} prefix. Table name spans {@code tableNameRowCount} rows.
+     * The table header starts after the table name rows.
+     * If {@code lastRowPrefix} is not null and not empty,
+     * the range ends with row containing cell with text starting with {@code lastRowPrefix}.
+     * If {@code lastRowPrefix} is null or empty, the range ends with empty row or last row of report page.
      * The first data row is determined by cell with text starting with {@code firstDataRowPrefix}.
-     * Table name spans {@code tableNameRowCount} rows.
      *
-     * @param tableName          table name row should contain cell which starts with given text
-     * @param tableNameRowCount  the number of rows to skip after the table name
-     * @param firstDataRowPrefix first data row should contain cell which starts with given text
-     * @param lastRowPrefix      table last row should contain cell which starts with given text
+     * @param tableName          the table name row should contain cell which starts with this prefix
+     * @param tableNameRowCount  the number of rows to skip after the first table name row (inclusive) to reach the table header
+     * @param firstDataRowPrefix the first data row should contain cell which starts with this prefix
+     * @param lastRowPrefix      if not null, then the table last row should contain cell which starts with this prefix,
+     *                           if null the table ends with empty row or last row of report page
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
                  String tableName,
                  int tableNameRowCount,
                  String firstDataRowPrefix,
-                 String lastRowPrefix,
+                 @Nullable String lastRowPrefix,
                  Class<T> headerDescription) {
         TableCellRange headerRange = reportPage.getCellRange(tableName, firstDataRowPrefix,
                 0, tableNameRowCount);  // (tableNameRowCount + 1 - 1): table name rows and at least 1 header row
@@ -59,20 +63,26 @@ public interface TableFactory {
         return create(reportPage, tableName, range, headerDescription, headerRowsCount);
     }
 
+
     /**
-     * Creates a table which starts with name followed by header
-     * and ends with row containing cell with text starting with {@code lastRowPrefix}.
-     * Table name spans {@code tableNameRowCount} rows.
+     * Creates a table.
+     * The table found by {@code tableName} prefix. Table name spans {@code tableNameRowCount} rows.
+     * The table header starts after the table name rows.
+     * If {@code lastRowPrefix} is not null and not empty,
+     * the range ends with row containing cell with text starting with {@code lastRowPrefix}.
+     * If {@code lastRowPrefix} is null or empty, the range ends with empty row or last row of report page.
      *
-     * @param tableName         table name row should contain cell which starts with given text
-     * @param tableNameRowCount the number of rows to skip after the table name
-     * @param lastRowPrefix     table last row should contain cell which starts with given text
+     * @param tableName         the table name row should contain cell which starts with this prefix
+     * @param tableNameRowCount the number of rows to skip after the table name to reach the table header
+     * @param lastRowPrefix     if not null, then the table last row should contain cell which starts with this prefix,
+     *                          if null the table ends with empty row or last row of report page
+     * @param headerRowsCount   the number of rows to skip after the first header row (inclusive) to reach the table data row
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
                  String tableName,
                  int tableNameRowCount,
-                 String lastRowPrefix,
+                 @Nullable String lastRowPrefix,
                  Class<T> headerDescription,
                  int headerRowsCount) {
         TableCellRange range = reportPage.getCellRange(tableName, lastRowPrefix,
@@ -82,39 +92,25 @@ public interface TableFactory {
     }
 
     /**
-     * Creates a table which starts with name followed by header and ends with empty row or last row of report page.
-     * Table name spans {@code tableNameRowCount} rows.
-     *
-     * @param tableName         table name row should contain cell which starts with given text
-     * @param tableNameRowCount the number of rows to skip after the table name
-     */
-    default <T extends Enum<T> & TableHeaderColumn>
-    Table create(ReportPage reportPage,
-                 String tableName,
-                 int tableNameRowCount,
-                 Class<T> headerDescription,
-                 int headerRowsCount) {
-        TableCellRange range = reportPage.getCellRange(tableName, 0,
-                        tableNameRowCount + headerRowsCount - 1)
-                .addRowsToTop(-tableNameRowCount);
-        return create(reportPage, tableName, range, headerDescription, headerRowsCount);
-    }
-
-    /**
-     * Creates a table. Table name row, first data row and last row is determined by predicate.
-     * Table name spans {@code tableNameRowCount} rows.
+     * Creates a table.
+     * The table found by {@code tableNameFinder} predicate. Table name spans {@code tableNameRowCount} rows.
+     * The table header starts after the table name rows.
+     * If {@code lastRowFinder} is not null, the end of the range is determined by this predicate.
+     * If {@code lastRowFinder} is null, the range ends with empty row or last row of report page.
+     * The first data row is determined by {@code firstDataRowFinder} predicate.
      *
      * @param tableNameFinder    table name row should contain cell satisfying predicate
-     * @param tableNameRowCount  the number of rows to skip after the table name
-     * @param firstDataRowFinder first data row should contain cell satisfying predicate
-     * @param lastRowFinder      table last row should contain cell satisfying predicate
+     * @param tableNameRowCount  the number of rows to skip after the first table name row (inclusive) to reach the table header
+     * @param firstDataRowFinder the first data row should contain cell satisfying predicate
+     * @param lastRowFinder      if not null, then the table last row should contain cell satisfying predicate,
+     *                           if null the table ends with empty row or last row of report page
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
                  Predicate<@Nullable Object> tableNameFinder,
                  int tableNameRowCount,
                  Predicate<@Nullable Object> firstDataRowFinder,
-                 Predicate<@Nullable Object> lastRowFinder,
+                 @Nullable Predicate<@Nullable Object> lastRowFinder,
                  Class<T> headerDescription) {
         TableCellRange headerRange = reportPage.getCellRange(tableNameFinder, firstDataRowFinder,
                 0, tableNameRowCount);  // (tableNameRowCount + 1 - 1): table name rows and at least 1 header row
@@ -130,18 +126,23 @@ public interface TableFactory {
     }
 
     /**
-     * Creates a table. Table name row and last row is determined by predicate.
-     * Table name spans {@code tableNameRowCount} rows.
+     * Creates a table.
+     * The table found by {@code tableNameFinder} predicate. Table name spans {@code tableNameRowCount} rows.
+     * The table header starts after the table name rows.
+     * If {@code lastRowFinder} is not null, the end of the range is determined by this predicate.
+     * If {@code lastRowFinder} is null, the range ends with empty row or last row of report page.
      *
      * @param tableNameFinder   table name row should contain cell satisfying predicate
-     * @param tableNameRowCount the number of rows to skip after the table name
-     * @param lastRowFinder     table last row should contain cell satisfying predicate
+     * @param tableNameRowCount the number of rows to skip after the first table name row (inclusive) to reach the table header
+     * @param lastRowFinder     if not null, then the table last row should contain cell satisfying predicate,
+     *                          if null the table ends with empty row or last row of report page
+     * @param headerRowsCount   the number of rows to skip after the first header row (inclusive) to reach the table data row
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table create(ReportPage reportPage,
                  Predicate<@Nullable Object> tableNameFinder,
                  int tableNameRowCount,
-                 Predicate<@Nullable Object> lastRowFinder,
+                 @Nullable Predicate<@Nullable Object> lastRowFinder,
                  Class<T> headerDescription,
                  int headerRowsCount) {
         TableCellRange range = reportPage.getCellRange(tableNameFinder, lastRowFinder,
@@ -152,41 +153,25 @@ public interface TableFactory {
     }
 
     /**
-     * Creates a table. Table name row is determined by predicate,
-     * and the table ends at either an empty row or the last row of the report page.
-     * Table name spans {@code tableNameRowCount} rows.
-     *
-     * @param tableNameFinder   table name row should contain cell satisfying predicate
-     * @param tableNameRowCount the number of rows to skip after the table name
-     */
-    default <T extends Enum<T> & TableHeaderColumn>
-    Table create(ReportPage reportPage,
-                 Predicate<@Nullable Object> tableNameFinder,
-                 int tableNameRowCount,
-                 Class<T> headerDescription,
-                 int headerRowsCount) {
-        TableCellRange range = reportPage.getCellRange(tableNameFinder,
-                        0, tableNameRowCount + headerRowsCount - 1)
-                .addRowsToTop(-tableNameRowCount);
-        String tableName = TableFactoryHelper.getTableName(reportPage, tableNameFinder, range);
-        return create(reportPage, tableName, range, headerDescription, headerRowsCount);
-    }
-
-    /**
-     * Creates a table with a predefined name which starts with header
-     * and ends with row containing cell with text starting with {@code lastRowPrefix}.
+     * Creates a table.
+     * The table found by {@code headerRowPrefix} prefix.
+     * If {@code lastRowPrefix} is not null and not empty,
+     * the range ends with row containing cell with text starting with {@code lastRowPrefix}.
+     * If {@code lastRowPrefix} is null or empty, the range ends with empty row or last row of report page.
      * The first data row is determined by cell with text starting with {@code firstDataRowPrefix}.
      *
-     * @param headerRowPrefix    table first row should contain cell which starts with given text
-     * @param firstDataRowPrefix table first data row should contain cell which starts with given text
-     * @param lastRowPrefix      table last row should contain cell which starts with given text
+     * @param providedTableName  the generated name of the table
+     * @param headerRowPrefix    the table first row should contain cell which starts with this prefix
+     * @param firstDataRowPrefix the first data row should contain cell which starts with this prefix
+     * @param lastRowPrefix      if not null, then the table last row should contain cell which starts with this prefix,
+     *                           if null the table ends with empty row or last row of report page
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
                          String providedTableName,
                          String headerRowPrefix,
                          String firstDataRowPrefix,
-                         String lastRowPrefix,
+                         @Nullable String lastRowPrefix,
                          Class<T> headerDescription) {
         TableCellRange headerRange = reportPage.getCellRange(headerRowPrefix, firstDataRowPrefix, 0, 0);
         int headerRowsCount = 0;
@@ -199,18 +184,23 @@ public interface TableFactory {
     }
 
     /**
-     * Creates a table with a predefined name which starts with header
-     * and ends with row containing cell with text starting  {@code lastRowPrefix}.
+     * Creates a table.
+     * The table found by {@code headerRowPrefix} prefix.
+     * If {@code lastRowPrefix} is not null and not empty,
+     * the range ends with row containing cell with text starting with {@code lastRowPrefix}.
+     * If {@code lastRowPrefix} is null or empty, the range ends with empty row or last row of report page.
      *
-     * @param providedTableName predefined (not existing in reportPage) table name
-     * @param headerRowPrefix   table first row should contain cell which starts with given text
-     * @param lastRowPrefix     table last row should contain cell which starts with given text
+     * @param providedTableName the generated name of the table
+     * @param headerRowPrefix   the table first row should contain cell which starts with this prefix
+     * @param lastRowPrefix     if not null, then the table last row should contain cell which starts with this prefix,
+     *                          if null the table ends with empty row or last row of report page
+     * @param headerRowsCount   the number of rows to skip after the first header row (inclusive) to reach the table data row
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
                          String providedTableName,
                          String headerRowPrefix,
-                         String lastRowPrefix,
+                         @Nullable String lastRowPrefix,
                          Class<T> headerDescription,
                          int headerRowsCount) {
         return create(reportPage,
@@ -221,38 +211,24 @@ public interface TableFactory {
     }
 
     /**
-     * Creates a table with a predefined name which starts with header and ends with empty row or last row of report page.
+     * Creates a table.
+     * The table found by {@code headerRowFinder} predicate.
+     * If {@code lastRowFinder} is not null, the end of the range is determined by this predicate.
+     * If {@code lastRowFinder} is null, the range ends with empty row or last row of report page.
+     * The first data row is determined by {@code firstDataRowFinder} predicate.
      *
-     * @param providedTableName predefined (not existing in reportPage) table name
-     * @param headerRowPrefix   table first row should contain cell which starts with given text
-     */
-    default <T extends Enum<T> & TableHeaderColumn>
-    Table createNameless(ReportPage reportPage,
-                         String providedTableName,
-                         String headerRowPrefix,
-                         Class<T> headerDescription,
-                         int headerRowsCount) {
-        return create(reportPage,
-                providedTableName,
-                reportPage.getCellRange(headerRowPrefix, 0, headerRowsCount - 1),
-                headerDescription,
-                headerRowsCount);
-    }
-
-    /**
-     * Creates a table with a predefined name. Table header row, first data row and last row is determined by predicate.
-     *
-     * @param providedTableName  predefined (not existing in reportPage) table name
-     * @param headerRowFinder    table first row should contain cell satisfying predicate
-     * @param firstDataRowFinder first data row should contain cell satisfying predicate
-     * @param lastRowFinder      table last row should contain cell satisfying predicate
+     * @param providedTableName  the generated name of the table
+     * @param headerRowFinder    the table first row should contain cell satisfying predicate
+     * @param firstDataRowFinder the first data row should contain cell satisfying predicate
+     * @param lastRowFinder      if not null, then the table last row should contain cell satisfying predicate,
+     *                           if null the table ends with empty row or last row of report page
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
                          String providedTableName,
                          Predicate<@Nullable Object> headerRowFinder,
                          Predicate<@Nullable Object> firstDataRowFinder,
-                         Predicate<@Nullable Object> lastRowFinder,
+                         @Nullable Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription) {
         TableCellRange headerRange = reportPage.getCellRange(headerRowFinder, firstDataRowFinder, 0, 0);
         int headerRowsCount = 0;
@@ -265,17 +241,22 @@ public interface TableFactory {
     }
 
     /**
-     * Creates a table with a predefined name. Table first and last row is determined by predicate.
+     * Creates a table.
+     * The table found by {@code headerRowFinder} predicate.
+     * If {@code lastRowFinder} is not null, the end of the range is determined by this predicate.
+     * If {@code lastRowFinder} is null, the range ends with empty row or last row of report page.
      *
-     * @param providedTableName predefined (not existing in reportPage) table name
-     * @param headerRowFinder   table first row should contain cell satisfying predicate
-     * @param lastRowFinder     table last row should contain cell satisfying predicate
+     * @param providedTableName the generated name of the table
+     * @param headerRowFinder   the table first row should contain cell satisfying predicate
+     * @param lastRowFinder     if not null, then the table last row should contain cell satisfying predicate,
+     *                          if null the table ends with empty row or last row of report page
+     * @param headerRowsCount   the number of rows to skip after the first header row (inclusive) to reach the table data row
      */
     default <T extends Enum<T> & TableHeaderColumn>
     Table createNameless(ReportPage reportPage,
                          String providedTableName,
                          Predicate<@Nullable Object> headerRowFinder,
-                         Predicate<@Nullable Object> lastRowFinder,
+                         @Nullable Predicate<@Nullable Object> lastRowFinder,
                          Class<T> headerDescription,
                          int headerRowsCount) {
         return create(reportPage,
@@ -284,27 +265,6 @@ public interface TableFactory {
                 headerDescription,
                 headerRowsCount);
     }
-
-    /**
-     * Creates a table with a predefined name. Table first row is determined by a predicate,
-     * and the table ends at either an empty row or the last row of the report page.
-     *
-     * @param providedTableName predefined (not existing in reportPage) table name
-     * @param headerRowFinder   table first row should contain cell satisfying predicate
-     */
-    default <T extends Enum<T> & TableHeaderColumn>
-    Table createNameless(ReportPage reportPage,
-                         String providedTableName,
-                         Predicate<@Nullable Object> headerRowFinder,
-                         Class<T> headerDescription,
-                         int headerRowsCount) {
-        return create(reportPage,
-                providedTableName,
-                reportPage.getCellRange(headerRowFinder, 0, headerRowsCount - 1),
-                headerDescription,
-                headerRowsCount);
-    }
-
 
     /**
      * Creates a table using the cell range from {@code tableRange}.

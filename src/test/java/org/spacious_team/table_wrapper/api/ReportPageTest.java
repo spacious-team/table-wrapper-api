@@ -288,19 +288,22 @@ class ReportPageTest {
     }
 
     @Test
-    void getCellRange_withNullArgs() {
+    void getCellRange_nullArgs_emptyRange() {
+        assertSame(
+                EMPTY_RANGE,
+                reportPage.getCellRange(null, (String) null, 0, 2));
+        assertSame(
+                EMPTY_RANGE,
+                reportPage.getCellRange(null, (Predicate<Object>) null, 0, 2));
+        assertSame(
+                EMPTY_RANGE,
+                reportPage.getCellRange("", "", 0, 2));
         assertSame(
                 EMPTY_RANGE,
                 reportPage.getCellRange(null, "xyz", 0, 2));
         assertSame(
                 EMPTY_RANGE,
                 reportPage.getCellRange("", "xyz", 0, 2));
-        assertSame(
-                EMPTY_RANGE,
-                reportPage.getCellRange("xyz", null, 0, 2));
-        assertSame(
-                EMPTY_RANGE,
-                reportPage.getCellRange("xyz", "", 0, 2));
     }
 
     @Test
@@ -312,12 +315,15 @@ class ReportPageTest {
 
     @Test
     void getCellRange_withNullPredicates() {
+        Predicate<Object> falsePredicate = cell -> false;
+        lenient().doReturn(NOT_FOUND).when(reportPage).find(0, falsePredicate);
+
         assertSame(
                 EMPTY_RANGE,
-                reportPage.getCellRange(null, cell -> false, 0, 2));
+                reportPage.getCellRange(null, falsePredicate, 0, 2));
         assertSame(
                 EMPTY_RANGE,
-                reportPage.getCellRange(cell -> false, null, 0, 2));
+                reportPage.getCellRange(falsePredicate, null, 0, 2));
     }
 
     @Test
@@ -342,7 +348,7 @@ class ReportPageTest {
     }
 
     @Test
-    void getCellRange_returnExceptionally1() {
+    void getCellRange_predicate1ReturnNullRow_exception() {
         doReturn(address1).when(reportPage).find(0, predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(null);
@@ -353,7 +359,7 @@ class ReportPageTest {
     }
 
     @Test
-    void getCellRange_returnExceptionally2() {
+    void getCellRange_predicate2ReturnNullRow_exception() {
         doReturn(address1).when(reportPage).find(0, predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
@@ -375,7 +381,9 @@ class ReportPageTest {
         //noinspection ConstantConditions
         when(reportPage.getRow(address2.getRow())).thenReturn(row2);
         when(row1.getFirstCellNum()).thenReturn(10);
+        when(row1.getRowNum()).thenReturn(address1.getRow());
         when(row2.getLastCellNum()).thenReturn(20);
+        when(row2.getRowNum()).thenReturn(address2.getRow());
 
         assertEquals(
                 TableCellRange.of(address1.getRow(), address2.getRow(), row1.getFirstCellNum(), row2.getLastCellNum()),
@@ -383,103 +391,92 @@ class ReportPageTest {
     }
 
     @Test
-    void getCellRange_withNullArgs2() {
-        assertSame(
-                EMPTY_RANGE,
-                reportPage.getCellRange((String) null, 0, 2));
-        assertSame(
-                EMPTY_RANGE,
-                reportPage.getCellRange("", 0, 2));
-    }
-
-    @Test
     void getCellRange_callWithPrefix() {
-        doReturn(null).when(reportPage).getCellRange(predicate1, 0, 2);
-        reportPage.getCellRange(prefix1, 0, 2);
-        verify(reportPage).getCellRange(predicate1, 0, 2);
+        doReturn(null).when(reportPage).getCellRange(predicate1, null, 0, 2);
+        reportPage.getCellRange(prefix1, null, 0, 2);
+        verify(reportPage).getCellRange(predicate1, null, 0, 2);
     }
 
     @Test
-    void getCellRange_withNullPredicates2() {
-        assertSame(
-                EMPTY_RANGE,
-                reportPage.getCellRange((Predicate<Object>) null, 0, 2));
-    }
-
-    @Test
-    void getCellRange_cellNotFound2() {
-        doReturn(NOT_FOUND).when(reportPage).find(predicate1);
-
-        assertSame(
-                EMPTY_RANGE,
-                reportPage.getCellRange(predicate1, 0, 2));
-    }
-
-    @Test
-    void getCellRange_returnExceptionally21() {
-        doReturn(address1).when(reportPage).find(predicate1);
-        //noinspection ConstantConditions
-        when(reportPage.getRow(address1.getRow())).thenReturn(null);
-
-        assertThrows(
-                NullPointerException.class,
-                () -> reportPage.getCellRange(predicate1, 0, 2));
-    }
-
-    @Test
-    void getCellRange_lastRowNotFound_returnOk() {
-        doReturn(address1).when(reportPage).find(predicate1);
+    void getCellRange_predicate2IsNullAndEmptyRowNotFound_useLastRow() {
+        doReturn(address1).when(reportPage).find(0, predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
-        doReturn(-1).when(reportPage).findRow(anyInt(), anyInt(), any());
+        doReturn(-1).when(reportPage).findRow(anyInt(), anyInt(), any());  // searches empty row
         int lastRowNum = 3;
         when(reportPage.getLastRowNum()).thenReturn(lastRowNum);
         //noinspection ConstantConditions
         when(reportPage.getRow(lastRowNum)).thenReturn(row2);
         when(row1.getFirstCellNum()).thenReturn(10);
+        when(row1.getRowNum()).thenReturn(address1.getRow());
         when(row2.getLastCellNum()).thenReturn(20);
+        when(row2.getRowNum()).thenReturn(lastRowNum);
 
         assertEquals(
                 TableCellRange.of(address1.getRow(), lastRowNum, row1.getFirstCellNum(), row2.getLastCellNum()),
-                reportPage.getCellRange(predicate1, 0, 2));
+                reportPage.getCellRange(predicate1, null, 0, 2));
     }
 
     @Test
-    void getCellRange_excludeEmptyRow_returnOk() {
-        doReturn(address1).when(reportPage).find(predicate1);
+    void getCellRange_prefix2IsEmpty_excludeEmptyRow() {
+        doReturn(address1).when(reportPage).find(eq(0), any());
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
         int emptyRowNum = 3;
-        doReturn(emptyRowNum).when(reportPage).findRow(anyInt(), anyInt(), any());
+        doReturn(emptyRowNum).when(reportPage).findRow(anyInt(), anyInt(), any());  // searches empty row
         int lastRowNum = 4;
         when(reportPage.getLastRowNum()).thenReturn(lastRowNum);
         //noinspection ConstantConditions
         when(reportPage.getRow(emptyRowNum - 1)).thenReturn(row2);
         when(row1.getFirstCellNum()).thenReturn(10);
+        when(row1.getRowNum()).thenReturn(address1.getRow());
         when(row2.getLastCellNum()).thenReturn(20);
+        when(row2.getRowNum()).thenReturn(emptyRowNum - 1);
 
         assertTrue(emptyRowNum > address1.getRow());
         assertEquals(
                 TableCellRange.of(address1.getRow(), emptyRowNum - 1, row1.getFirstCellNum(), row2.getLastCellNum()),
-                reportPage.getCellRange(predicate1, 0, 2));
+                reportPage.getCellRange(prefix1, "", 0, 2));
     }
 
     @Test
-    void getCellRange_emptyRowGreaterThanStartAddress_returnOk() {
-        doReturn(address1).when(reportPage).find(predicate1);
+    void getCellRange_predicate2IsNull_excludeEmptyRow() {
+        doReturn(address1).when(reportPage).find(0, predicate1);
+        //noinspection ConstantConditions
+        when(reportPage.getRow(address1.getRow())).thenReturn(row1);
+        int emptyRowNum = 3;
+        doReturn(emptyRowNum).when(reportPage).findRow(anyInt(), anyInt(), any());  // searches empty row
+        int lastRowNum = 4;
+        when(reportPage.getLastRowNum()).thenReturn(lastRowNum);
+        //noinspection ConstantConditions
+        when(reportPage.getRow(emptyRowNum - 1)).thenReturn(row2);
+        when(row1.getFirstCellNum()).thenReturn(10);
+        when(row1.getRowNum()).thenReturn(address1.getRow());
+        when(row2.getLastCellNum()).thenReturn(20);
+        when(row2.getRowNum()).thenReturn(emptyRowNum - 1);
+
+        assertTrue(emptyRowNum > address1.getRow());
+        assertEquals(
+                TableCellRange.of(address1.getRow(), emptyRowNum - 1, row1.getFirstCellNum(), row2.getLastCellNum()),
+                reportPage.getCellRange(predicate1, null, 0, 2));
+    }
+
+    @Test
+    void getCellRange_emptyRowGreaterThanStartAddress_firstAndLastRowEquals() {
+        doReturn(address1).when(reportPage).find(0, predicate1);
         //noinspection ConstantConditions
         when(reportPage.getRow(address1.getRow())).thenReturn(row1);
         int emptyRowNum = 1;
-        doReturn(emptyRowNum).when(reportPage).findRow(anyInt(), anyInt(), any());
+        doReturn(emptyRowNum).when(reportPage).findRow(anyInt(), anyInt(), any());  // searches empty row
         int lastRowNum = 4;
         when(reportPage.getLastRowNum()).thenReturn(lastRowNum);
         when(row1.getFirstCellNum()).thenReturn(10);
-        when(row1.getLastCellNum()).thenReturn(20);
+        when(row1.getRowNum()).thenReturn(address1.getRow());
 
         assertTrue(emptyRowNum <= address1.getRow());
         assertEquals(
                 TableCellRange.of(address1.getRow(), address1.getRow(), row1.getFirstCellNum(), row1.getLastCellNum()),
-                reportPage.getCellRange(predicate1, 0, 2));
+                reportPage.getCellRange(predicate1, null, 0, 2));
         verify(reportPage, times(1)).getRow(address1.getRow());
     }
 
@@ -564,122 +561,26 @@ class ReportPageTest {
 
     @Test
     void createTable1() {
-        reportPage.createTable(tableName, dataRow, tableFooterString, tableHeader);
-        verify(tableFactory).create(reportPage, tableName, 1, dataRow, tableFooterString, tableHeader);
-    }
-
-    @Test
-    void createTable2() {
-        reportPage.createTable(tableName, tableFooterString, tableHeader);
-        verify(tableFactory).create(reportPage, tableName, 1, tableFooterString, tableHeader, 1);
-    }
-
-    @Test
-    void createTable3() {
-        reportPage.createTable(tableName, tableHeader);
-        verify(tableFactory).create(reportPage, tableName, 1, tableHeader, 1);
-    }
-
-    @Test
-    void createTable4() {
-        reportPage.createTable(tableName, tableFooterString, tableHeader, 2);
-        verify(tableFactory).create(reportPage, tableName, 1, tableFooterString, tableHeader, 2);
-    }
-
-    @Test
-    void createTable5() {
-        reportPage.createTable(tableName, tableHeader, 2);
-        verify(tableFactory).create(reportPage, tableName, 1, tableHeader, 2);
-    }
-
-    @Test
-    void createTable6() {
-        reportPage.createTable(tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
-        verify(tableFactory).create(reportPage, tableNameFinder, 1, firstDataRowFinder, tableFooterFinder, tableHeader);
-    }
-
-    @Test
-    void createTable7() {
-        reportPage.createTable(tableNameFinder, tableFooterFinder, tableHeader);
-        verify(tableFactory).create(reportPage, tableNameFinder, 1, tableFooterFinder, tableHeader, 1);
-    }
-
-    @Test
-    void createTable8() {
-        reportPage.createTable(tableNameFinder, tableHeader);
-        verify(tableFactory).create(reportPage, tableNameFinder, 1, tableHeader, 1);
-    }
-
-    @Test
-    void createTable9() {
-        reportPage.createTable(tableNameFinder, tableFooterFinder, tableHeader, 2);
-        verify(tableFactory).create(reportPage, tableNameFinder, 1, tableFooterFinder, tableHeader, 2);
-    }
-
-    @Test
-    void createTable10() {
-        reportPage.createTable(tableNameFinder, tableHeader, 2);
-        verify(tableFactory).create(reportPage, tableNameFinder, 1, tableHeader, 2);
-    }
-
-    @Test
-    void createTable11() {
         reportPage.createTable(tableName, tableNameRowCount, dataRow, tableFooterString, tableHeader);
         verify(tableFactory).create(reportPage, tableName, tableNameRowCount, dataRow, tableFooterString, tableHeader);
     }
 
     @Test
-    void createTable12() {
-        reportPage.createTable(tableName, tableNameRowCount, tableFooterString, tableHeader);
-        verify(tableFactory).create(reportPage, tableName, tableNameRowCount, tableFooterString, tableHeader, 1);
-    }
-
-    @Test
-    void createTable13() {
-        reportPage.createTable(tableName, tableNameRowCount, tableHeader);
-        verify(tableFactory).create(reportPage, tableName, tableNameRowCount, tableHeader, 1);
-    }
-
-    @Test
-    void createTable14() {
+    void createTable2() {
         reportPage.createTable(tableName, tableNameRowCount, tableFooterString, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableName, tableNameRowCount, tableFooterString, tableHeader, 2);
     }
 
     @Test
-    void createTable15() {
-        reportPage.createTable(tableName, tableNameRowCount, tableHeader, 2);
-        verify(tableFactory).create(reportPage, tableName, tableNameRowCount, tableHeader, 2);
-    }
-
-    @Test
-    void createTable16() {
+    void createTable3() {
         reportPage.createTable(tableNameFinder, tableNameRowCount, firstDataRowFinder, tableFooterFinder, tableHeader);
         verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, firstDataRowFinder, tableFooterFinder, tableHeader);
     }
 
     @Test
-    void createTable17() {
-        reportPage.createTable(tableNameFinder, tableNameRowCount, tableFooterFinder, tableHeader);
-        verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, tableFooterFinder, tableHeader, 1);
-    }
-
-    @Test
-    void createTable18() {
-        reportPage.createTable(tableNameFinder, tableNameRowCount, tableHeader);
-        verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, tableHeader, 1);
-    }
-
-    @Test
-    void createTable19() {
+    void createTable4() {
         reportPage.createTable(tableNameFinder, tableNameRowCount, tableFooterFinder, tableHeader, 2);
         verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, tableFooterFinder, tableHeader, 2);
-    }
-
-    @Test
-    void createTable20() {
-        reportPage.createTable(tableNameFinder, tableNameRowCount, tableHeader, 2);
-        verify(tableFactory).create(reportPage, tableNameFinder, tableNameRowCount, tableHeader, 2);
     }
 
     @Test
@@ -690,58 +591,21 @@ class ReportPageTest {
 
     @Test
     void createNamelessTable2() {
-        reportPage.createNamelessTable("undefined", headerRow, tableFooterString, tableHeader);
-        verify(tableFactory).createNameless(reportPage, "undefined", headerRow, tableFooterString, tableHeader, 1);
-    }
-
-    @Test
-    void createNamelessTable3() {
-        reportPage.createNamelessTable("undefined", headerRow, tableHeader);
-        verify(tableFactory).createNameless(reportPage, "undefined", headerRow, tableHeader, 1);
-    }
-
-    @Test
-    void createNamelessTable4() {
         reportPage.createNamelessTable(tableName, headerRow, tableFooterString, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, headerRow, tableFooterString, tableHeader, 2);
     }
 
     @Test
-    void createNamelessTable5() {
-        reportPage.createNamelessTable(tableName, headerRow, tableHeader, 2);
-        verify(tableFactory).createNameless(reportPage, tableName, headerRow, tableHeader, 2);
-    }
-
-    @Test
-    void createNamelessTable6() {
+    void createNamelessTable3() {
         reportPage.createNamelessTable("undefiled", tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
         verify(tableFactory).createNameless(reportPage, "undefiled", tableNameFinder, firstDataRowFinder, tableFooterFinder, tableHeader);
     }
 
     @Test
-    void createNamelessTable7() {
-        reportPage.createNamelessTable("undefiled", tableNameFinder, tableFooterFinder, tableHeader);
-        verify(tableFactory).createNameless(reportPage, "undefiled", tableNameFinder, tableFooterFinder, tableHeader, 1);
-    }
-
-    @Test
-    void createNamelessTable8() {
-        reportPage.createNamelessTable("undefined", tableNameFinder, tableHeader);
-        verify(tableFactory).createNameless(reportPage, "undefined", tableNameFinder, tableHeader, 1);
-    }
-
-    @Test
-    void createNamelessTable9() {
+    void createNamelessTable4() {
         reportPage.createNamelessTable(tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
         verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableFooterFinder, tableHeader, 2);
     }
-
-    @Test
-    void createNamelessTable10() {
-        reportPage.createNamelessTable(tableName, tableNameFinder, tableHeader, 2);
-        verify(tableFactory).createNameless(reportPage, tableName, tableNameFinder, tableHeader, 2);
-    }
-
 
     enum TableHeader implements TableHeaderColumn {
         ;
