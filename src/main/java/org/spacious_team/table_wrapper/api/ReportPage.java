@@ -166,7 +166,7 @@ public interface ReportPage {
      *
      * @param startRow search rows start from this
      * @param endRow   search rows excluding this, can handle values greater than real rows count
-     * @return the index of the first empty row, or {@code -1} if no empty row is found
+     * @return the zero-based index of the first matching row, or {@code -1} if no row matches the predicate
      * @implNote The default implementation may produce significant garbage during execution.
      * Subclasses are encouraged to override this method for better performance.
      */
