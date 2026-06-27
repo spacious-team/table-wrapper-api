@@ -30,6 +30,8 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 final class TableFactoryHelper {
 
+    private static final String TABLE_NAME_NOT_FOUND = "<not found>";
+
     static String getTableName(ReportPage reportPage, Predicate<@Nullable Object> tableNameFinder, TableCellRange range) {
         try {
             if (!Objects.equals(range, TableCellRange.EMPTY_RANGE)) {
@@ -42,8 +44,7 @@ final class TableFactoryHelper {
                 }
             }
         } catch (Exception ignore) {
-            return "<not found>";
         }
-        return "<not found>";
+        return TABLE_NAME_NOT_FOUND;
     }
 }

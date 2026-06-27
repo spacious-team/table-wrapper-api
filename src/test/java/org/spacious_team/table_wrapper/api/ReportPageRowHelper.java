@@ -95,8 +95,16 @@ final class ReportPageRowHelper {
     static ReportPageRow getRow(int rowNum, TableCell... cells) {
         ReportPageRow row = mock(ReportPageRow.class);
         Collection<TableCell> cellsCollection = Arrays.asList(cells);
-        when(row.iterator()).then($ -> cellsCollection.iterator());
+        lenient().when(row.iterator()).then($ -> cellsCollection.iterator());
         lenient().when(row.getRowNum()).thenReturn(rowNum);
+        int maxCol = -1;
+        for (int i = 0; i < cells.length; i++) {
+            TableCell cell = cells[i];
+            int col = (cell == null) ? i : cell.getColumnIndex();
+            lenient().when(row.getCell(col)).thenReturn(cell);
+            maxCol = Math.max(col, maxCol);
+        }
+        lenient().when(row.getLastCellNum()).thenReturn(maxCol);
         return row;
     }
 

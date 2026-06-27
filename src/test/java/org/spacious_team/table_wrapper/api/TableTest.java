@@ -50,8 +50,14 @@ class TableTest {
     }
 
     @Test
-    void excludeTotalRow() {
-        table.excludeTotalRow();
+    void excludeFirstRow() {
+        table.excludeFirstRow();
+        verify(table).subTable(-1, 0);
+    }
+
+    @Test
+    void excludeLastRow() {
+        table.excludeLastRow();
         verify(table).subTable(0, -1);
     }
 }
