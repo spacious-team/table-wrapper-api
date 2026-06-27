@@ -22,9 +22,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Predicate;
 
-class EmptyRowPredicate implements Predicate<@Nullable ReportPageRow> {
+public class EmptyRowPredicate implements Predicate<@Nullable ReportPageRow> {
 
-    static final EmptyRowPredicate INSTANCE = new EmptyRowPredicate();
+    public static final EmptyRowPredicate INSTANCE = new EmptyRowPredicate();
 
     @Override
     public boolean test(@Nullable ReportPageRow row) {
